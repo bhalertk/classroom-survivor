@@ -7,6 +7,11 @@ button:focus-visible, summary:focus-visible { outline: 3px solid #358b9a; outlin
 button { touch-action: manipulation; }
 .hud-right button, #dialogue-next { touch-action: none; user-select: none; -webkit-user-select: none; }
 button.touch-pressed { filter: brightness(1.12); }
+#hud-toggle { width: 44px; flex-shrink: 0; font-size: 12px; }
+.hud-hidden .topbar .brand, .hud-hidden .hud-center,
+.hud-hidden .hud-right > :not(#hud-toggle), .hud-hidden .status-panel,
+.hud-hidden .boss-health, .hud-hidden .bottom-hint { display: none; }
+.hud-hidden .topbar { justify-content: flex-end; }
 .lesson-progress { height: 4px; margin-top: 5px; overflow: hidden; border-radius: 4px; background: #d7dfd3; }
 .lesson-progress > div { height: 100%; width: 0; background: #47998d; }
 .hp-warning { display: block; margin-bottom: 7px; color: #ffd69a; font-size: 11px; font-weight: 900; line-height: 1.5; }
@@ -21,6 +26,19 @@ button.touch-pressed { filter: brightness(1.12); }
 .upgrade-card small { font-size: 12px; }
 .upgrade-card .upgrade-stats, .upgrade-card .evolution-hint { font-size: 11px; }
 .upgrade-card .upgrade-effect { min-height: 0; }
+.upgrade-refresh { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 12px; margin: 12px 0 16px; }
+.upgrade-refresh[hidden] { display: none; }
+#upgrade-reroll { min-height: 44px; padding: 9px 15px; border: 2px solid #397c77; border-radius: 9px; background: #d6ebe0; color: #235b58; font-size: 15px; font-weight: 900; }
+#upgrade-reroll:disabled { border-color: #c1c4b6; background: #e6e7dc; color: #697668; cursor: default; }
+#upgrade-refresh-note { font-size: 13px; line-height: 1.5; color: #4e686c; }
+.dialogue-portrait { float: left; width: 88px; height: 88px; margin: 0 12px 8px 0; border: 2px solid #ddcd9c; border-radius: 12px; }
+.dialogue-portrait[hidden] { display: none; }
+.chapter-dialogue button { clear: both; position: sticky; bottom: 0; }
+.difficulty-picker { display: flex; gap: 8px; margin: 12px 0 8px; }
+.difficulty-picker button { flex: 1; min-height: 44px; padding: 8px; border: 2px solid #c0cbb7; border-radius: 9px; background: #edf0df; color: #4c6766; font-weight: 900; }
+.difficulty-picker button.selected { border-color: #297b77; background: #377f79; color: #fff8dc; box-shadow: inset 0 0 0 2px #ffffff40; }
+.difficulty-description { margin-bottom: 18px; font-size: 14px; color: #526d70; line-height: 1.6; }
+.difficulty-indicator { margin-bottom: 7px; color: #efd298; font-size: 11px; font-weight: 900; }
 @media (pointer: coarse) {
   .icon-btn, .speed-btn { min-width: 44px; min-height: 44px; }
   .secondary-btn, .text-btn, .chapter-dialogue button, .tutorial-panel button { min-height: 44px; }
@@ -31,7 +49,7 @@ button.touch-pressed { filter: brightness(1.12); }
   .talent-slot:not(.equipped) { display: none; }
   .talent-slots { gap: 3px; }
   .toast { top: 112px; font-size: 14px; }
-  .timer-box { max-width: 155px; }
+  .timer-box { max-width: 96px; }
   .hud-label { line-height: 1.4; }
   .chapter-dialogue { max-height: min(230px, calc(100dvh - 270px)); }
 }

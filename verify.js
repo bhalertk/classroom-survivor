@@ -310,10 +310,10 @@ assert.equal(evalGame("defeatedBosses.size"), 3);
 assert.equal(evalGame("mode"), "ended", "Victory requires all thirty lessons and all three bosses");
 assert.equal(elements["end-title"].textContent, "放學了！");
 evalGame("startGame(); enemies = [makeEnemy(player.x + 250,player.y,'mini1')]; enemies[0].windup = .01; enemies[0].throwAngle = Math.PI; updateEnemies(.02)");
-assert.equal(evalGame("enemyProjectiles.length"), 4, "Collector throws a stronger spread of bottle caps");
+assert.equal(evalGame("enemyProjectiles.length"), 6, "Collector throws a stronger spread of bottle caps");
 assert.equal(evalGame("enemies[0].lungeTime"), 0, "Collector uses ranged attacks");
 evalGame("enemyProjectiles[0].x = player.x; enemyProjectiles[0].y = player.y; enemyProjectiles[0].vx = 0; enemyProjectiles[0].vy = 0; updateEnemyProjectiles(.02)");
-assert.equal(evalGame("player.hp"), evalGame("player.maxHp-22"), "Bottle cap collision damages the player");
+assert.equal(evalGame("player.hp"), evalGame("player.maxHp-24"), "Bottle cap collision damages the player");
 evalGame("startGame(); enemies = [makeEnemy(player.x + 300,player.y,'mini2'),makeEnemy(player.x - 300,player.y,'mini2')]; enemies[0].memberIndex = 0; enemies[1].memberIndex = 1; enemies[0].attackClock = 0; enemies[1].windup = .01; enemies[1].throwAngle = 0; updateEnemies(.02)");
 assert.equal(evalGame("enemyProjectiles[0].type"), "tire", "Second cyclist throws tires");
 assert.equal(evalGame("enemies[0].windup"), .7, "First cyclist warns before charging");
@@ -725,7 +725,7 @@ evalGame("mode='playing';gameSpeed=3;updateNarrative(.3)");assert.equal(evalGame
 evalGame("gameTime=60;updateNarrative(0);const heldDialogueTime=dialogueTime;updateNarrative(.3)");
 assert(Math.abs(evalGame('heldDialogueTime-dialogueTime')-.1)<1e-8,'Dialogue reading time stays the same at triple speed');
 evalGame("gameTime=270;spawnedBosses.add('mini1');enemies=[makeEnemy(player.x+300,player.y,'mini2'),makeEnemy(player.x-300,player.y,'mini2')];damageEnemy(enemies[0],99999,'pistol')");
-assert.equal(evalGame("narrativeSeen.has('boss-defeat-mini2')"),false,'One cyclist does not trigger the victory dialogue');
+assert.equal(evalGame("narrativeSeen.has('boss-defeat-mini2')"),true,'The first cyclist triggers dialogue');
 evalGame("damageEnemy(enemies.find(e=>e.kind==='mini2'&&e.hp>0),99999,'pistol')");
 assert.equal(evalGame("narrativeHistory.filter(e=>e.title===BOSS_DIALOGUE.mini2.defeat.title).length"),1);
 assert(elements['pause-story-log'].children.length>1);
@@ -756,25 +756,25 @@ delete elements['chapter-dialogue'].animate;evalGame('storyReducedMotion=false;s
 const standalone = fs.readFileSync("play.html", "utf8");
 // Strengthened bosses change attacks at half health without losing their windup cues.
 evalGame("startGame();enemies=[makeEnemy(player.x+250,player.y,'mini1')];enemies[0].hp=enemies[0].maxHp/2;enemies[0].attackClock=0;updateEnemies(.01)");
-assert.equal(evalGame('enemies[0].maxHp'),1600);assert.equal(evalGame('enemies[0].windup'),.55);
+assert.equal(evalGame('enemies[0].maxHp'),2100);assert.equal(evalGame('enemies[0].windup'),.55);
 assert.equal(evalGame("effects.filter(e=>e.type==='boss-enrage').length"),1);
 evalGame('enemies[0].windup=.01;updateEnemies(.02);updateHud()');
-assert.equal(evalGame('enemyProjectiles.length'),7);assert.equal(evalGame('enemies[0].attackClock'),.95);
-assert(Math.abs(evalGame('Math.hypot(enemyProjectiles[0].vx,enemyProjectiles[0].vy)')-340)<1e-8);
+assert.equal(evalGame('enemyProjectiles.length'),9);assert.equal(evalGame('enemies[0].attackClock'),.85);
+assert(Math.abs(evalGame('Math.hypot(enemyProjectiles[0].vx,enemyProjectiles[0].vy)')-360)<1e-8);
 assert(elements['boss-name'].textContent.includes('暴走'));
 evalGame('updateEnemies(.01)');assert.equal(evalGame("effects.filter(e=>e.type==='boss-enrage').length"),1,'Rage introduction occurs once');
 evalGame("startGame();enemies=[makeEnemy(player.x+300,player.y,'mini2')];enemies[0].memberIndex=1;enemies[0].hp=enemies[0].maxHp/2;enemies[0].windup=.01;enemies[0].throwAngle=Math.PI;updateEnemies(.02)");
-assert.equal(evalGame('enemyProjectiles.length'),3);assert.equal(evalGame('enemies[0].maxHp'),1500);
+assert.equal(evalGame('enemyProjectiles.length'),3);assert.equal(evalGame('enemies[0].maxHp'),1900);
 evalGame("startGame();enemies=[makeEnemy(player.x+300,player.y,'mini2')];enemies[0].memberIndex=0;enemies[0].hp=enemies[0].maxHp/2;enemies[0].attackClock=0;updateEnemies(.01)");
 assert.equal(evalGame('enemies[0].windup'),.6);
 assert(Math.abs(evalGame('Math.hypot(enemies[0].lungeVX,enemies[0].lungeVY)')-840)<1e-8);
-for(const [rage,count] of [[false,5],[true,10]]) {
+for(const [rage,count] of [[false,7],[true,12]]) {
   evalGame(`startGame();enemies=[makeEnemy(player.x+250,player.y,'final')];enemies[0].hp=${rage?'enemies[0].maxHp/2':'enemies[0].maxHp'};enemies[0].lungeTime=.01;enemies[0].attackClock=10;updateEnemies(.02)`);
   assert.equal(evalGame("enemyProjectiles.filter(p=>p.type==='boss-wave').length"),count);
-  assert.equal(evalGame('enemies[0].maxHp'),7000);
+  assert.equal(evalGame('enemies[0].maxHp'),9000);
   evalGame('updateEnemies(.02)');assert.equal(evalGame('enemyProjectiles.length'),count,'A charge emits its shockwave only once');
   evalGame('enemyProjectiles[0].x=player.x;enemyProjectiles[0].y=player.y;enemyProjectiles[0].vx=0;enemyProjectiles[0].vy=0;updateEnemyProjectiles(.001)');
-  assert.equal(evalGame('player.hp'),178);
+  assert.equal(evalGame('player.hp'),174);
   evalGame('drawEnemyProjectile({type:"boss-wave",x:player.x,y:player.y,vx:1,vy:0});for(const e of effects)drawEffect(e)');
 }
 // Every encounter clears ordinary enemies and hazards while retaining equipment and drops.
@@ -817,54 +817,64 @@ click('practice-btn');evalGame('enterTutorialStep(14)');click('pause-btn');click
 assert.equal(evalGame('mode'),'tutorial');assert.equal(evalGame('tutorialStep'),0,"Restarting paused tutorial restarts the lesson");
 click('skip-tutorial');
 assert(standalone.includes(source.trim()), "Rebuild play.html so the standalone game includes the latest code");
-// Martial enemies complete a warned movement, a warned strike, and a recovery.
-function martialSetup(kind) {
+// Enemy 13 teleports beside the current player, then delivers a dodgeable punch.
+function specialSetup(kind) {
   evalGame(`startGame();enemies=[makeEnemy(player.x+200,player.y,'${kind}')];enemies[0].attackClock=0;updateEnemies(.01)`);
 }
-function martialUntil(condition) {
+function specialUntil(condition) {
   for(let i=0;i<200&&!evalGame(condition);i++)evalGame('updateEnemies(.02)');
-  assert(evalGame(condition),`Martial phase did not complete: ${condition}`);
+  assert(evalGame(condition),`Special attack did not complete: ${condition}`);
 }
-martialSetup('boxer');
-assert.equal(evalGame('enemies[0].martialMove'),'step');
-assert.equal(evalGame('player.hp'),200);
-martialUntil("enemies[0].martialMove==='uppercut'");
-assert(Math.abs(evalGame('enemies[0].y-player.y'))>50,'The sidestep actually moves sideways');
-assert.equal(evalGame('player.hp'),200,'The sidestep itself does not damage the player');
+specialSetup('boxer');
+assert.equal(evalGame('enemies[0].martialMove'),'teleport');
+evalGame('var beforeTeleportX=enemies[0].x;updateEnemies(.2);player.x+=120');
+assert.equal(evalGame('enemies[0].x'),evalGame('beforeTeleportX'),'No dash movement occurs during teleport preparation');
+specialUntil("enemies[0].martialMove==='uppercut'");
+assert(Math.abs(evalGame('distance(enemies[0],player)')-80)<1e-8,'Teleport follows the current player and leaves space beside them');
+assert.equal(evalGame('player.hp'),200,'Teleport itself does not cause unavoidable damage');
 assert.equal(evalGame('enemies[0].windup'),.5);
-martialUntil('enemies[0].martialRecovery>0');
-assert.equal(evalGame('player.hp'),180,'The uppercut deals its damage once');
-evalGame('player.invulnerable=0;updateEnemies(.1)');assert.equal(evalGame('player.hp'),180);
-martialSetup('boxer');martialUntil("enemies[0].martialMove==='uppercut'");
+specialUntil('enemies[0].martialRecovery>0');assert.equal(evalGame('player.hp'),180);
+evalGame('player.invulnerable=0;updateEnemies(.1)');assert.equal(evalGame('player.hp'),180,'One punch cannot hit twice');
+specialSetup('boxer');specialUntil("enemies[0].martialMove==='uppercut'");
 evalGame('player.x=enemies[0].x-Math.cos(enemies[0].throwAngle)*70;player.y=enemies[0].y-Math.sin(enemies[0].throwAngle)*70');
-martialUntil('enemies[0].martialRecovery>0');assert.equal(evalGame('player.hp'),200,'Moving behind the locked uppercut dodges it');
-martialSetup('striker');assert.equal(evalGame('enemies[0].windup'),.65);
-martialUntil('enemies[0].lungeTime>0');
-martialUntil("enemies[0].martialMove==='heavy'");
-assert.equal(evalGame('player.hp'),180,'The flying kick hits during travel');
-assert.equal(evalGame('enemies[0].windup'),.75);
-evalGame('player.invulnerable=0;player.x=enemies[0].targetX;player.y=enemies[0].targetY');
-martialUntil('enemies[0].martialRecovery>0');assert.equal(evalGame('player.hp'),154,'The heavy strike damages its warned circle');
-martialSetup('striker');
-evalGame('player.y+=200');
-martialUntil("enemies[0].martialMove==='heavy'");
-assert.equal(evalGame('player.hp'),200,'The flying kick keeps the warned direction');
-evalGame('player.x=enemies[0].targetX+180;player.y=enemies[0].targetY');
-martialUntil('enemies[0].martialRecovery>0');assert.equal(evalGame('player.hp'),200,'Leaving the locked circle dodges the heavy strike');
+specialUntil('enemies[0].martialRecovery>0');assert.equal(evalGame('player.hp'),200,'The warned punch can be dodged by moving behind it');
+for(const [x,y] of [[45,87],[1755,87],[45,1155],[1755,1155]]) {
+  evalGame(`startGame();player.x=${x};player.y=${y};enemies=[makeEnemy(player.x+(player.x<900?200:-200),player.y,'boxer')];enemies[0].attackClock=0;updateEnemies(.01)`);
+  specialUntil("enemies[0].martialMove==='uppercut'");
+  assert(evalGame('enemies[0].x>=40&&enemies[0].x<=MAP.w-40&&enemies[0].y>=85&&enemies[0].y<=MAP.h-40'),'Corner teleport stays inside the classroom');
+  assert(Math.abs(evalGame('distance(enemies[0],player)')-80)<1e-8);
+}
+// Enemy 14 summons exactly three balls and launches toward its warned target.
+specialSetup('striker');assert.equal(evalGame('enemies[0].windup'),.8);
+assert.equal(evalGame('enemyProjectiles.length'),0);
+evalGame('var warnedBalls=summonedBallShots(enemies[0]);player.y+=240;drawEnemy(enemies[0],1)');
+specialUntil('enemies[0].martialRecovery>0');
+assert.equal(evalGame('enemyProjectiles.length'),3);
+assert(evalGame("enemyProjectiles.every((p,i)=>p.type==='summoned-ball'&&Math.abs(p.vx-Math.cos(warnedBalls[i].angle)*270)<1e-8)"),'Moving after the warning does not retarget the volley');
+evalGame('updateEnemies(.1)');assert.equal(evalGame('enemyProjectiles.length'),3,'One summon does not duplicate balls');
+evalGame('for(const p of enemyProjectiles)drawEnemyProjectile(p);enemyProjectiles[0].x=player.x;enemyProjectiles[0].y=player.y;enemyProjectiles[0].vx=0;enemyProjectiles[0].vy=0;updateEnemyProjectiles(.01)');
+assert.equal(evalGame('player.hp'),186);assert.equal(evalGame('enemyProjectiles.length'),2,'A ball disappears after impact');
+evalGame('mode="paused";var ballLife=enemyProjectiles[0].life;advanceSimulation(.1)');assert.equal(evalGame('enemyProjectiles[0].life'),evalGame('ballLife'));
+evalGame('mode="playing";for(const p of enemyProjectiles)p.life=.01;updateEnemyProjectiles(.02)');assert.equal(evalGame('enemyProjectiles.length'),0,'Missed balls expire');
+for(const [x,y] of [[40,85],[1760,85],[40,1160],[1760,1160]]) {
+  evalGame(`startGame();enemies=[makeEnemy(${x},${y},'striker')];enemies[0].targetX=player.x;enemies[0].targetY=player.y;enemies[0].windup=.01;updateEnemies(.02)`);
+  assert.equal(evalGame('enemyProjectiles.length'),3);
+  assert(evalGame('enemyProjectiles.every(p=>p.x>20&&p.x<MAP.w-20&&p.y>60&&p.y<MAP.h-20)'),'All three balls start inside the classroom even near a wall');
+}
 for(const kind of ['boxer','striker']) {
-  martialSetup(kind);
-  evalGame('enemies[0].stunTime=1;var martialWindup=enemies[0].windup;updateEnemies(.1)');
-  assert.equal(evalGame('enemies[0].windup'),evalGame('martialWindup'),'Tool stuns delay attacks');
-  evalGame('mode="paused";advanceSimulation(.1)');assert.equal(evalGame('enemies[0].windup'),evalGame('martialWindup'));
-  evalGame('mode="upgrade";advanceSimulation(.1)');assert.equal(evalGame('enemies[0].windup'),evalGame('martialWindup'));
-  evalGame('mode="playing";enemies[0].stunTime=0');
-  martialUntil('enemies[0].lungeTime>0');
-  evalGame('drawEnemy(enemies[0],1);for(const e of effects)drawEffect(e)');
-  martialUntil('enemies[0].windup>0');evalGame('drawEnemy(enemies[0],1)');
-  martialUntil('enemies[0].martialRecovery>0');evalGame('for(const e of effects)drawEffect(e)');
+  specialSetup(kind);
+  evalGame('enemies[0].stunTime=1;var specialWindup=enemies[0].windup;updateEnemies(.1)');
+  assert.equal(evalGame('enemies[0].windup'),evalGame('specialWindup'),'Tools can interrupt both attacks');
+  evalGame('mode="paused";advanceSimulation(.1)');assert.equal(evalGame('enemies[0].windup'),evalGame('specialWindup'));
+  evalGame('mode="upgrade";advanceSimulation(.1)');assert.equal(evalGame('enemies[0].windup'),evalGame('specialWindup'));
+  evalGame('mode="playing";enemies[0].stunTime=0;drawEnemy(enemies[0],1)');
+  specialUntil('enemies[0].martialRecovery>0');evalGame('for(const e of effects)drawEffect(e)');
   evalGame('gameTime=270;spawnScheduledBosses()');
-  assert.equal(evalGame('enemies.some(e=>!e.boss)'),false,'Boss arrival removes the martial enemies');
+  assert.equal(evalGame('enemies.some(e=>!e.boss)'),false);
+  assert.equal(evalGame('enemyProjectiles.length'),0,'Boss arrival clears the summoned balls');
   assert.equal(evalGame('effects.some(e=>e.type.startsWith("martial-"))'),false);
+  specialSetup(kind);evalGame("damageEnemy(enemies[0],99999,'pistol');updateEnemies(1)");
+  assert.equal(evalGame('enemies.length'),0);assert.equal(evalGame('enemyProjectiles.length'),0,'Defeated casters cannot complete a pending attack');
 }
 for(const [kind,lesson,roll] of [['boxer',13,.02],['striker',14,.1]]) {
   math.random=()=>roll;evalGame(`gameTime=(${lesson}-1)*LESSON_LENGTH`);assert.equal(evalGame('regularEnemyKind()'),kind);
@@ -964,4 +974,128 @@ touchChoice.listeners.pointerup(touchEvent(112));assert.equal(evalGame('mode'),'
 touchTap(touchChoice,113);assert.equal(evalGame('mode'),'playing','Dynamically created upgrade cards also support secondary touch');
 assert.equal(evalGame("pickups.filter(p=>p.type!=='xp').length"),1);
 touchChoice.listeners.click({detail:1,preventDefault(){}});assert.equal(evalGame("pickups.filter(p=>p.type!=='xp').length"),1);
-console.log("PASS: gameplay regression suite and multi-touch controls (joystick + buttons, cancellation, click deduplication, keyboard/mouse, dynamic upgrade cards)");
+// HUD can be hidden and restored with a second finger without stopping movement.
+evalGame('startGame()');
+elements.joystick.listeners.pointerdown(touchEvent(120,{isPrimary:true,clientX:115}));
+touchTap(elements['hud-toggle'],121);
+assert.equal(evalGame('hudHidden'),true);assert.equal(elements['hud-toggle'].textContent,'顯示');
+assert.equal(evalGame('pointer.id'),120);assert(evalGame('pointer.x>0'));
+assert.equal(evalGame('mode'),'playing');
+elements['hud-toggle'].listeners.click({detail:1,preventDefault(){}});assert.equal(evalGame('hudHidden'),true);
+touchTap(elements['hud-toggle'],122);assert.equal(evalGame('hudHidden'),false);
+document.listeners.keydown({key:'h',repeat:false});assert.equal(evalGame('hudHidden'),true);
+document.listeners.keydown({key:'h',repeat:true});assert.equal(evalGame('hudHidden'),true);
+click('pause-btn');assert.equal(evalGame('mode'),'paused','Hidden HUD never prevents the pause overlay');
+document.listeners.keydown({key:'h',repeat:false});assert.equal(evalGame('hudHidden'),false);
+assert.equal(elements['hud-toggle'].textContent,'隱藏');
+// Each normal level offers exactly one free reroll, without spending another level.
+evalGame('startGame();gainExperience(player.xpNeed);var originalChoices=upgradeChoices.map(c=>c.id);var refreshLevel=player.level;var refreshXp=player.xp;var refreshTime=gameTime');
+assert.equal(evalGame('upgradeRerolls'),1);assert.equal(elements['upgrade-refresh'].hidden,false);
+touchTap(elements['upgrade-reroll'],130);
+assert.equal(evalGame('upgradeRerolls'),0);assert.equal(elements['upgrade-reroll'].disabled,true);
+assert(evalGame('upgradeChoices.every(c=>!originalChoices.includes(c.id)&&canChooseUpgrade(c))'),'A large pool replaces all three choices with eligible alternatives');
+assert.equal(evalGame('new Set(upgradeChoices.map(c=>c.id)).size'),3);
+assert.equal(evalGame('player.level'),evalGame('refreshLevel'));assert.equal(evalGame('player.xp'),evalGame('refreshXp'));
+assert.equal(evalGame('pickups.length'),0);assert.equal(evalGame('mode'),'upgrade');
+evalGame('advanceSimulation(.1)');assert.equal(evalGame('gameTime'),evalGame('refreshTime'));
+const refreshedIds=evalGame('upgradeChoices.map(c=>c.id).join(",")');
+elements['upgrade-reroll'].listeners.click({detail:1,preventDefault(){}});
+document.listeners.keydown({key:'r',repeat:false});evalGame('rerollUpgrades()');
+assert.equal(evalGame('upgradeChoices.map(c=>c.id).join(",")'),refreshedIds,'Touch compatibility clicks and repeated commands cannot reroll twice');
+evalGame('chooseUpgrade(originalChoices[0])');assert.equal(evalGame('mode'),'upgrade','A stale card cannot be selected after reroll');
+document.listeners.keydown({key:'1',repeat:false});assert.equal(evalGame('mode'),'playing');
+assert.equal(evalGame('pickups.length'),1);assert.equal(evalGame('Object.values(player.weapons).every(level=>level===0)'),true,'Refreshed choices still require pickup');
+evalGame('gainExperience(player.xpNeed)');assert.equal(evalGame('upgradeRerolls'),1);
+document.listeners.keydown({key:'r',repeat:true});assert.equal(evalGame('upgradeRerolls'),1);
+document.listeners.keydown({key:'r',repeat:false});assert.equal(evalGame('upgradeRerolls'),0,'A new level restores the keyboard reroll');
+// With four eligible choices the reroll introduces the one unseen option.
+evalGame('startGame();for(const w of CONTENT.weapons.slice(0,6))player.weapons[w.id]=5;for(const t of CONTENT.talents.slice(0,6))player.talents[t.id]=true;for(const w of CONTENT.weapons.slice(0,4))player.weapons[w.id]=4;gainExperience(player.xpNeed);var limitedChoices=upgradeChoices.map(c=>c.id);rerollUpgrades()');
+assert(evalGame('upgradeChoices.some(c=>!limitedChoices.includes(c.id))'));
+assert(evalGame('upgradeChoices.every(canChooseUpgrade)'));assert.equal(evalGame('new Set(upgradeChoices.map(c=>c.id)).size'),3);
+// Full loadouts and pending level-five drops cannot be bypassed by refreshing.
+evalGame("startGame();for(const w of CONTENT.weapons.slice(0,6))player.weapons[w.id]=5;for(const t of CONTENT.talents.slice(0,6))player.talents[t.id]=true;player.weapons.blueberry=4;player.weapons.pistol=4;pickups=[{type:'weapon',weaponId:'pistol',level:5,x:100,y:100}];gainExperience(player.xpNeed);var limitedBefore=upgradeChoices.map(c=>c.id).join(',');rerollUpgrades()");
+assert.equal(elements['upgrade-reroll'].disabled,true);assert.equal(evalGame('upgradeRerolls'),1,'An impossible reroll does not consume its charge');
+assert.equal(evalGame('upgradeChoices.map(c=>c.id).join(",")'),evalGame('limitedBefore'));
+assert.equal(evalGame('upgradeChoices.filter(canChooseUpgrade).map(c=>c.id).join(",")'),'blueberry');
+click('practice-btn');evalGame('enterTutorialStep(3);var guidedChoices=upgradeChoices.map(c=>c.id).join(",");rerollUpgrades()');
+assert.equal(elements['upgrade-refresh'].hidden,true);assert.equal(evalGame('upgradeChoices.map(c=>c.id).join(",")'),evalGame('guidedChoices'),'Guided tutorial choices remain available');
+// Boss victory dialogue interrupts old lines and changes portrait with each speaker/emotion.
+for(const kind of ['mini1','mini2','final']) {
+  evalGame(`startGame();enemies=Array.from({length:${kind==='mini2'?2:1}},()=>makeEnemy(player.x+200,player.y,'${kind}'));damageEnemy(enemies[0],99999,'pistol')`);
+  if(kind==='mini2') {
+    assert.equal(evalGame("narrativeSeen.has('boss-defeat-mini2')"),true);
+    evalGame("damageEnemy(enemies[1],99999,'pistol')");
+  }
+  assert.equal(evalGame('activeDialogue.id'),`boss-defeat-${kind}`,'Victory takes priority immediately');
+  assert.equal(evalGame(`narrativeHistory.filter(e=>e.id.startsWith('boss-defeat-${kind}')).length`),3);
+  for(let page=0;page<3;page++) {
+    assert.equal(evalGame('activeDialogue.emotion'),evalGame(`BOSS_VICTORY_STORIES.${kind}[${page}].emotion`));
+    assert.equal(elements['dialogue-portrait'].hidden,false);
+    assert(elements['dialogue-speaker'].textContent.includes(evalGame('EMOTION_LABELS[activeDialogue.emotion]')));
+    evalGame('portraitTime=3.9;drawDialoguePortrait()');
+    if(page<2)click('dialogue-next');
+  }
+  evalGame(`queueBossVictory('${kind}')`);
+  assert.equal(evalGame(`narrativeHistory.filter(e=>e.id.startsWith('boss-defeat-${kind}')).length`),3,'Victory stories do not repeat');
+}
+// Current settings are the hard preset; easier modes apply to every enemy and Boss.
+for(const [id,hp,regen,enemyHp,bossHps,damage,cap] of [
+  ['easy',280,3,24,[1365,1235,5850],12,119],
+  ['normal',240,2.5,30,[1722,1558,7380],16,156],
+  ['hard',200,2,37,[2100,1900,9000],20,183]
+]) {
+  evalGame('returnToMenu()');click(`difficulty-${id}`);click('quick-start-btn');
+  assert.equal(evalGame('runDifficulty'),id);assert.equal(evalGame('player.maxHp'),hp);assert.equal(evalGame('player.healthRegen'),regen);
+  assert.equal(evalGame("makeEnemy(100,100).maxHp"),enemyHp);
+  for(const [i,kind] of ['mini1','mini2','final'].entries())assert.equal(evalGame(`makeEnemy(100,100,'${kind}').maxHp`),bossHps[i]);
+  evalGame('damagePlayer(20)');assert.equal(evalGame('player.hp'),hp-damage);
+  assert.equal(evalGame('spawnSettings().cap'),cap);
+  assert.equal(evalGame('spawnSettings().count'),id==='hard'?2:1);
+  if(id==='hard')assert.equal(evalGame('spawnSettings().interval'),1.25);else assert(evalGame('spawnSettings().interval')>1.25);
+  evalGame("chooseDifficulty('easy')");assert.equal(evalGame('runDifficulty'),id,'A running game cannot switch its balance');
+  click('practice-btn');assert.equal(evalGame('player.maxHp'),200);assert.equal(evalGame('player.healthRegen'),2);
+  assert.equal(evalGame('makeEnemy(100,100).maxHp'),37,'Tutorial enemies keep consistent practice health');
+  click('skip-tutorial');assert.equal(evalGame('runDifficulty'),id);assert.equal(evalGame('player.maxHp'),hp,'Tutorial exit uses the selected difficulty');
+  evalGame('gainExperience(player.xpNeed)');assert.equal(evalGame('upgradeRerolls'),1);
+}
+evalGame('startGame();togglePause()');click('pause-menu-btn');assert.equal(evalGame('mode'),'menu');
+click('difficulty-normal');click('quick-start-btn');evalGame('finishGame(false)');click('end-menu-btn');assert.equal(evalGame('mode'),'menu');
+assert.equal(evalGame('selectedDifficulty'),'normal');
+click('difficulty-hard');
+// Character choice is shared by story, tutorial, gameplay and retry, with identical abilities.
+for(const gender of ['girl','boy']) {
+  evalGame('returnToMenu()');touchTap(elements[`character-${gender}`],140);
+  assert.equal(evalGame('player.gender'),gender);
+  click('start-btn');assert.equal(evalGame('player.gender'),gender);
+  click('story-skip');assert.equal(evalGame('player.gender'),gender);
+  click('skip-tutorial');assert.equal(evalGame('player.gender'),gender);
+  assert.equal(evalGame('player.maxHp'),200);assert.equal(evalGame('player.speed'),225);
+  evalGame(`chooseCharacter('${gender==='boy'?'girl':'boy'}')`);
+  assert.equal(evalGame('player.gender'),gender,'Character choice cannot change during a run');
+  evalGame('startGame()');assert.equal(evalGame('player.gender'),gender);
+  evalGame('drawPlayer(0);storyStudent(ctx,100,100,0,false,false,"happy")');
+}
+// Solid desks block swept movement, including a whole dash, without preventing sliding.
+evalGame('startGame();player.x=190;player.y=420;moveActor(player,1000,420)');
+assert(evalGame('player.x<205&&clearOfTables(player,player.r)'));
+evalGame('moveActor(player,430,500)');assert(evalGame('player.y>490&&clearOfTables(player,player.r)'));
+assert(evalGame('clearOfTables(makePlayer(),21)'),'Spawn starts in an aisle');
+for(const kind of ['basic','mini2','final']) {
+  evalGame(`startGame();player.x=430;player.y=420;enemies=[makeEnemy(170,420,'${kind}')];enemies[0].lungeVX=1000;enemies[0].lungeVY=0;enemies[0].lungeTime=1;updateEnemies(.3)`);
+  assert(evalGame('enemies[0].x<=225-enemies[0].r&&clearOfTables(enemies[0],enemies[0].r)'),'Charges stop at desks');
+  assert.equal(evalGame('player.hp'),200);
+  evalGame(`startGame();player.x=440;player.y=420;enemies=[makeEnemy(170,420,'${kind}')];var closestApproach=9999;var allClear=true;for(var i=0;i<600;i++){updateEnemies(.02);allClear&&=clearOfTables(enemies[0],enemies[0].r);closestApproach=Math.min(closestApproach,distance(enemies[0],player));}`);
+  assert(evalGame('allClear'),'Enemies stay outside tables while navigating');
+  assert(evalGame('closestApproach<100'),`${kind} can navigate around the desk to approach the player`);
+}
+for(const kind of ['cap','rubber','sound-wave','summoned-ball','grenade','tissue']) {
+  evalGame(`startGame();player.x=440;player.y=420;enemyProjectiles=[{type:'${kind}',x:170,y:420,vx:1000,vy:0,r:10,damage:20,life:3,travelTime:1,fuse:2}];updateEnemyProjectiles(.3)`);
+  assert.equal(evalGame('enemyProjectiles.length'),0,`${kind} cannot pass through a desk`);
+  assert.equal(evalGame('player.hp'),200);
+}
+evalGame('startGame();player.x=290;player.y=490;damagePlayer(20,{x:290,y:350})');
+assert.equal(evalGame('player.hp'),200,'Tables block damage across cover');
+evalGame('damagePlayer(20,{x:290,y:510})');assert.equal(evalGame('player.hp'),180,'Nearby attacks in the same aisle still hit');
+evalGame("startGame();var relocated=makeEnemy(290,415);pickups=[{type:'xp',x:290,y:415,r:8,value:1,age:0}];updatePickups(.02)");
+assert(evalGame('clearOfTables(relocated,relocated.r)&&clearOfTables(pickups[0],pickups[0].r)'),'Spawns and drops never stay inside desks');
+console.log("PASS: gameplay, multi-touch, HUD, reroll, Boss stories, difficulty, gender selection, solid desks/navigation/attacks, tutorial and standalone build");

@@ -20,10 +20,11 @@
         <div class="timer-box"><span id="lesson-label" class="hud-label">第 1 / 30 節</span><strong id="timer">00:30</strong><div class="lesson-progress" aria-hidden="true"><div id="lesson-fill"></div></div></div>
         <div class="wave-box"><span class="hud-label">距離放學</span><strong id="wave">15:00</strong></div>
       </div>
-      <div class="hud-right"><span id="kill-count">擊退 0</span><button id="speed-btn" class="icon-btn speed-btn" aria-label="遊戲速度 1 倍，點擊切換" title="切換 1×、2×、3×（F）">1×</button><button id="sound-btn" class="icon-btn" aria-label="開啟音效" title="音效">♪</button><button id="pause-btn" class="icon-btn" aria-label="暫停遊戲" title="暫停">Ⅱ</button></div>
+      <div class="hud-right"><span id="kill-count">擊退 0</span><button id="speed-btn" class="icon-btn speed-btn" aria-label="遊戲速度 1 倍，點擊切換" title="切換 1×、2×、3×（F）">1×</button><button id="sound-btn" class="icon-btn" aria-label="開啟音效" title="音效">♪</button><button id="pause-btn" class="icon-btn" aria-label="暫停遊戲" title="暫停">Ⅱ</button><button id="hud-toggle" class="icon-btn" aria-label="隱藏選單與生命欄" aria-expanded="true" title="隱藏遊戲介面（H）">隱藏</button></div>
     </div>
 
     <div class="status-panel">
+      <div id="difficulty-indicator" class="difficulty-indicator">難度：困難</div>
       <div class="loadout"><span id="loadout-label">✎ 鉛筆揮砍 · 道具 0 / 6</span><strong id="weapon-levels">🫐 0/5　⌖ 0/5　✹ 0/5<br>🏹 0/5　▰ 0/5　△ 0/5</strong></div>
       <div class="talent-loadout"><span id="talent-label">天賦 0 / 6</span><div id="talent-slots" class="talent-slots"></div></div>
       <small id="slow-label" class="slow-label" hidden>減速 3.0 秒</small>
@@ -37,6 +38,7 @@
 
     <div id="toast" class="toast" aria-live="polite"></div>
     <aside id="chapter-dialogue" class="chapter-dialogue" hidden aria-label="102 班劇情對話">
+      <canvas id="dialogue-portrait" class="dialogue-portrait" width="144" height="144" aria-hidden="true" hidden></canvas>
       <div class="dialogue-heading"><span id="dialogue-speaker"></span><strong id="dialogue-title"></strong></div>
       <p id="dialogue-text" aria-live="polite"></p>
       <button id="dialogue-next" type="button">收起對話 ×</button>
@@ -56,9 +58,10 @@
         <li>避開手雷與陷阱警示，先處理召喚者；深藍可從側面或背後攻擊。被戳眼時半邊視野會遮蔽 3 秒。</li>
         <li>第 11 節起，大聲公方塊人會發射音波；命中後眩暈 1 秒，暫時不能移動或發動攻擊。</li>
         <li>第 12 節起，飛踢方塊人會叫出倒楣蛋，再把他踢飛當成遠程武器；看到準備動作就側移閃避。</li>
-        <li>第 13 節起，閃身拳手會快速側移接昇龍拳，離開前方扇形或繞背閃避；第 14 節起，飛踢重擊手會直線飛踢再重擊，先側移躲飛踢，再離開落地提示圈。</li>
+        <li>第 13 節起，瞬移拳手會瞬移到身旁再出拳，現身後離開扇形或繞背閃避；第 14 節起，三球召喚者會召喚 3 顆球，看到方向線就側移閃避。</li>
         <li>第 10 節：瓶蓋收藏家會丟瓶蓋。</li>
-        <li>第 20 節：雙人單車隊，一人衝撞、一人丟輪胎；兩人都倒下才算擊敗。</li>
+        <li>第 20 節：雙人單車隊，一人衝撞、一人丟輪胎；一人倒下就觸發劇情，兩人都倒下才結束 Boss 戰。</li>
+        <li>課桌和講桌是實體障礙，會擋住你、敵人和敵方攻擊；沿著走道移動，也能利用桌子掩護。</li>
         <li>第 30 節：擊敗最終 Boss，撐到放學鐘響才能通關。</li>
         <li>Boss 登場時場上小怪與敵方投射物、陷阱消失；Boss 戰暫停課節計時與小怪生成。整組 Boss 擊敗後恢復倒數。</li>
         <li>Boss 半血後會暴走，加快攻擊；看到蓄力方向先閃避，再找空檔反擊。</li>
@@ -78,6 +81,9 @@
           <div><span class="how-icon">◎</span><strong>自動攻擊</strong><small>靠近目標就會自動瞄準</small></div>
           <div><span class="how-icon">✦</span><strong>收集成長</strong><small>收集光點並選擇能力</small></div>
         </div>
+        <div class="difficulty-picker" role="group" aria-label="選擇主角"><button id="character-boy" type="button" class="selected" aria-pressed="true">男生 · 短髮</button><button id="character-girl" type="button" aria-pressed="false">女生 · 馬尾</button></div>
+        <div class="difficulty-picker" role="group" aria-label="選擇遊戲難度"><button id="difficulty-easy" type="button" aria-pressed="false">簡單</button><button id="difficulty-normal" type="button" aria-pressed="false">普通</button><button id="difficulty-hard" type="button" class="selected" aria-pressed="true">困難</button></div>
+        <p id="difficulty-description" class="difficulty-description" aria-live="polite"></p>
         <button id="start-btn" class="primary-btn">開始故事 <span>→</span></button>
         <button id="practice-btn" class="secondary-btn">直接練習新手教學</button>
         <button id="quick-start-btn" class="secondary-btn">已熟悉操作，直接挑戰</button>
@@ -112,6 +118,7 @@
         <h2 id="upgrade-title">課間靈感</h2>
         <p>工具與天賦隨機三選一，選完要撿起。工具滿 5 級＋對應天賦可超級進化。</p>
         <p id="tutorial-upgrade-guide" class="tutorial-upgrade-guide" hidden></p>
+        <div id="upgrade-refresh" class="upgrade-refresh" hidden><button id="upgrade-reroll" type="button" title="免費刷新升級選項（R）">↻ 刷新一次（免費）</button><span id="upgrade-refresh-note" role="status">每次升級限用一次，也可按 R。</span></div>
         <div id="upgrade-options" class="upgrade-options"></div>
         <div class="key-hint">按 1、2、3 也可以選擇</div>
         <button id="upgrade-skip-tutorial" class="secondary-btn" hidden>跳過教學，開始挑戰</button>
@@ -127,6 +134,7 @@
         <details class="story-journal"><summary>102 班劇情回顧</summary><div id="pause-story-log"></div></details>
         <button id="resume-btn" class="primary-btn">繼續遊戲 <span>→</span></button>
         <button id="pause-restart-btn" class="secondary-btn">重新開始</button>
+        <button id="pause-menu-btn" class="secondary-btn">結束本局，回主選單</button>
       </div>
     </section>
 
@@ -140,6 +148,7 @@
         <details class="story-journal"><summary>102 班劇情回顧</summary><div id="end-story-log"></div></details>
         <div class="result-stats"><div><strong id="result-time">00:00</strong><span>課程進度</span></div><div><strong id="result-kills">0</strong><span>擊退敵人</span></div><div><strong id="result-level">1</strong><span>達到等級</span></div></div>
         <button id="restart-btn" class="primary-btn">再玩一局 <span>↻</span></button>
+        <button id="end-menu-btn" class="secondary-btn">回主選單選擇難度</button>
       </div>
     </section>
   </main>
