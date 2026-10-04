@@ -94,9 +94,9 @@ Object.assign(SUPER_TOOLS, {
   bell:{name:"放學交響鐘", damage:45, range:270, pulseRadius:270, knockback:145, cooldown:2, upgrade:"大範圍聲波清場，強力推開周圍敵人"}
 });
 const BOSS_SCHEDULE = [
-  { id: "mini1", name: "瓶蓋收藏家", lesson: 10, hp: 1200, r: 34, damage: 16, color: "#688c94" },
-  { id: "mini2", name: "雙人單車隊", lesson: 20, hp: 1100, members: 2, r: 32, damage: 20, color: "#be8363" },
-  { id: "final", name: "最終 Boss", lesson: 30, hp: 5000, r: 48, damage: 25, color: "#b57884" }
+  { id: "mini1", name: "瓶蓋收藏家", lesson: 10, hp: 1600, r: 34, damage: 22, color: "#688c94" },
+  { id: "mini2", name: "雙人單車隊", lesson: 20, hp: 1500, members: 2, r: 32, damage: 26, color: "#be8363" },
+  { id: "final", name: "最終 Boss", lesson: 30, hp: 7000, r: 48, damage: 34, color: "#b57884" }
 ];
 const TOOL_APPEARANCES = {
   blueberry: ["單顆藍莓", "巨型藍莓", "小西瓜", "雙顆西瓜組", "金色西瓜組"],
@@ -219,6 +219,15 @@ function toolStats(id, level, withTalents = true) {
 let mode = "menu";
 let pauseReturnMode = "playing";
 let storyIndex = 0;
+let storyAnimationTime = 0;
+let endingWon = false;
+let dialogueEntrance = null;
+const storyMotionPreference = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+let storyReducedMotion = !!storyMotionPreference?.matches;
+storyMotionPreference?.addEventListener?.("change",event=>{
+  storyReducedMotion=event.matches;
+  if(storyReducedMotion){dialogueEntrance?.cancel();dialogueEntrance=null;}
+});
 let narrativeSeen=new Set();
 let narrativeHistory=[];
 let narrativeQueue=[];
@@ -264,6 +273,7 @@ let defeatedBosses = new Set();
 let gameTime = 0;
 let gameSpeed = 1;
 let talentHudSignature = "";
+let batchingHud = false;
 let spawnClock = 0;
 let kills = 0;
 let soundEnabled = false;
@@ -283,7 +293,17 @@ function spawnSettings() {
   const lesson = currentLesson();
   return { count: 2 + Math.floor((lesson - 1) / 5), interval: Math.max(.38, 1.25 - (lesson - 1) * .03), cap: 180 + lesson * 3 };
 }
-function showScreen(id) { for (const name of screens) $(name).classList.toggle("visible", name === id); }
+function resetInput() {
+  keys.clear();
+  const stick=$('joystick'),captured=pointer.id;
+  pointer.active=false;pointer.id=null;pointer.x=pointer.y=0;
+  if(captured!==null&&stick.hasPointerCapture?.(captured))stick.releasePointerCapture(captured);
+  $('stick').style.transform='translate(0,0)';
+}
+function showScreen(id) {
+  if(id)resetInput();
+  for (const name of screens) $(name).classList.toggle("visible", name === id);
+}
 
 function resize() {
   cw = window.innerWidth;
@@ -302,7 +322,7 @@ resize();
 function makePlayer() {
   return {
     x: MAP.w / 2, y: MAP.h / 2 + 75, r: 21,
-    hp: PLAYER_MAX_HP, maxHp: PLAYER_MAX_HP, healthRegen: 2, speed: 225, invulnerable: 0, slowTime: 0, stunTime:0, visionTime:0, visionSide:null,
+    hp: PLAYER_MAX_HP, maxHp: PLAYER_MAX_HP, healthRegen: 2, speed: 225, invulnerable: 0, damageFlash:0, slowTime: 0, stunTime:0, visionTime:0, visionSide:null,
     facing: 0, moving: false, level: 1, xp: 0, xpNeed: 6,
     pencilCooldown: 0, swingTime: 0, swingAngle: 0,
     blueberryCooldown: 0, pistolCooldown: 0, firecrackerCooldown: 0,
@@ -317,6 +337,7 @@ function makePlayer() {
 function resetWorld() {
   player = makePlayer();
   narrativeSeen=new Set();narrativeHistory=[];narrativeQueue=[];activeDialogue=null;dialogueTime=0;
+  dialogueEntrance?.cancel();dialogueEntrance=null;
   $("chapter-dialogue").hidden=true;
   renderStoryJournal();
   enemies = [];
@@ -338,8 +359,7 @@ function resetWorld() {
   tutorialControls = {paused:false,resumed:false,speed:false};
   tutorialWaypoint=null;
   tutorialSpeedTime=0;
-  keys.clear();
-  pointer.x = pointer.y = 0;
+  resetInput();
   updateHud();
 }
 resetWorld();
@@ -351,15 +371,102 @@ function startStory() {
   showScreen("story-screen");
 }
 function renderStory() {
+  storyAnimationTime=0;
   $("story-progress").textContent = `${String(storyIndex + 1).padStart(2, "0")} / ${String(STORY.length).padStart(2,"0")}`;
   $("story-title").textContent = STORY[storyIndex].title;
   $("story-text").textContent = STORY[storyIndex].text;
-  $("story-art").className = `story-art scene-${STORY[storyIndex].scene}`;
+  $("story-art").className = `story-art animated-story-art scene-${STORY[storyIndex].scene}`;
   $("story-next").innerHTML = storyIndex === STORY.length - 1 ? "進入教學 <span>→</span>" : "下一頁 <span>→</span>";
+  drawStoryFrame($("story-canvas").getContext("2d"),storyIndex,0,storyReducedMotion);
 }
 function nextStory() {
   if (storyIndex < STORY.length - 1) { storyIndex++; renderStory(); }
   else startTutorial();
+}
+function storyBox(c,x,y,w,h,fill,stroke="#785e48",radius=4) {
+  c.beginPath();c.roundRect(x,y,w,h,radius);c.fillStyle=fill;c.fill();
+  if(stroke){c.strokeStyle=stroke;c.lineWidth=2;c.stroke();}
+}
+function storyStudent(c,x,y,time,walking,leader=false) {
+  c.save();c.translate(x,y+(walking?Math.sin(time*10)*2:0));
+  c.fillStyle="#43595933";c.beginPath();c.ellipse(0,29,25,6,0,0,Math.PI*2);c.fill();
+  if(!leader)storyBox(c,12,-12,15,30,"#cf9b5f","#876b4d");
+  for(const side of [-1,1])storyBox(c,side<0?-13:3,20+(walking?Math.sin(time*10+side)*4:0),10,12,"#3d536b","#284959");
+  storyBox(c,-18,-7,36,31,leader?"#528c7b":"#527a9d","#284c69",7);
+  storyBox(c,-24,-4,8,20,"#f5c7a5","#bc917e");storyBox(c,16,-4,8,20,"#f5c7a5","#bc917e");
+  c.fillStyle="#f0c49f";c.beginPath();c.arc(0,-25,18,0,Math.PI*2);c.fill();
+  c.fillStyle=leader?"#3e524e":"#394258";c.beginPath();c.arc(0,-31,18,Math.PI,Math.PI*2);c.lineTo(18,-20);c.lineTo(6,-31);c.lineTo(-18,-21);c.fill();
+  c.fillStyle="#283c4a";c.fillRect(-8,-25,3,4);c.fillRect(5,-25,3,4);
+  c.strokeStyle="#b7836c";c.beginPath();c.moveTo(-4,-14);c.quadraticCurveTo(0,-11,5,-14);c.stroke();
+  c.fillStyle="#f0cf78";c.fillRect(-17,0,34,4);
+  if(leader){c.strokeStyle="#334e54";c.lineWidth=2;c.strokeRect(-11,-28,10,9);c.strokeRect(2,-28,10,9);c.beginPath();c.moveTo(-1,-24);c.lineTo(2,-24);c.stroke();}
+  c.restore();
+}
+function drawStoryFrame(c,page,elapsed,reduced=false) {
+  const t=reduced?4.5:Math.max(0,elapsed),motion=reduced?0:Math.sin(t*3),progress=clamp(t/2.4,0,1);
+  const ease=1-(1-progress)**3;
+  c.save();c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,900,300);
+  c.fillStyle=page===1?"#c3d3ca":"#e8dbc0";c.fillRect(0,0,900,300);
+  c.fillStyle="#d0bb92";c.fillRect(0,197,900,103);
+  c.strokeStyle="#bda57a";c.lineWidth=1;
+  for(let x=0;x<900;x+=90){c.beginPath();c.moveTo(x,198);c.lineTo(x,300);c.stroke();}
+  for(let y=222;y<300;y+=30){c.beginPath();c.moveTo(0,y);c.lineTo(900,y);c.stroke();}
+  storyBox(c,277,22,362,148,"#347369","#8f6e4c",6);
+  c.fillStyle="#dfeacb";c.font="900 20px 'Noto Sans TC',sans-serif";c.textAlign="center";c.fillText("國中 102 班",458,54);
+  storyBox(c,48,39,105,191,"#76938d","#706149");
+  const opening=[0,6].includes(page)?clamp(t/2,0,1):0;
+  c.save();c.translate(48,39);c.scale(1-opening*.65,1);storyBox(c,0,0,105,191,"#b28353","#76583e");storyBox(c,15,18,75,55,"#b9d7d4","#76908c");c.fillStyle="#efda99";c.beginPath();c.arc(88,107,4,0,Math.PI*2);c.fill();c.restore();
+  storyBox(c,52,9,96,24,"#f8f1d9","#78917c");c.fillStyle="#41645a";c.font="900 15px 'Noto Sans TC',sans-serif";c.fillText("102 班",100,27);
+  c.save();c.translate(766,58);c.fillStyle="#fcf5e1";c.strokeStyle="#a17c52";c.lineWidth=4;c.beginPath();c.arc(0,0,26,0,Math.PI*2);c.fill();c.stroke();
+  const clockTime=page===1?Math.min(t,1.2):page===6?t:0;
+  c.rotate(reduced?0:clockTime*2);c.strokeStyle="#4b6b63";c.lineWidth=3;c.beginPath();c.moveTo(0,13);c.lineTo(0,-17);c.moveTo(0,0);c.lineTo(13,0);c.stroke();c.restore();
+  storyBox(c,684,21,37,24,"#516877","#324958");
+  c.strokeStyle="#a4b9bc";c.lineWidth=2;for(let i=0;i<3;i++){c.beginPath();c.moveTo(693+i*7,25);c.lineTo(693+i*7,40);c.stroke();}
+  for(const x of [325,567]) {storyBox(c,x,243,103,13,"#886548");storyBox(c,x-8,215,119,33,"#d5a86d","#977247");}
+  let heroX=235,heroY=207,leaderX=661;
+  if(page===0)heroX=-45+280*ease;
+  if(page===6){heroX=440-210*ease;leaderX=615-275*ease;}
+  if(page===7)heroY=215;
+  storyStudent(c,heroX,heroY,t,(page===0||page===6)&&progress<1);
+  storyStudent(c,leaderX,205,t,page===6&&progress<1,true);
+  if(page===0) {
+    c.fillStyle="#edf1d5";c.font="900 26px 'Noto Sans TC',sans-serif";c.fillText("歡迎新同學",458,112);
+    c.strokeStyle="#f2e1a4";c.lineWidth=3;c.beginPath();c.moveTo(leaderX-23,198);c.lineTo(leaderX-39,186+(reduced?0:Math.sin(t*5)*6));c.stroke();
+  } else if(page===1) {
+    c.fillStyle="#ecf0d3";c.font="900 26px 'Noto Sans TC',sans-serif";c.fillText(t<1.2?"下課鐘……":"鐘聲停住了",458,111);
+    if(!reduced&&t<3.5){c.strokeStyle="#e0b979";c.lineWidth=3;for(let i=0;i<3;i++){c.beginPath();c.arc(702,33,32+i*12+Math.sin(t*9)*3,.2,Math.PI-.2);c.stroke();}}
+    c.fillStyle="#244238";c.globalAlpha=.08;c.fillRect(0,0,900,300);c.globalAlpha=1;
+  } else if(page===2) {
+    const words="完成三十節課，才能離開";
+    c.fillStyle="#f4f0c8";c.font="900 23px 'Noto Sans TC',sans-serif";c.fillText(words.slice(0,Math.min(words.length,Math.floor(t*7))),458,111);
+    for(let i=0;i<3;i++){const reveal=clamp((t-.8-i*.2)/.5,0,1);c.save();c.globalAlpha=reveal;c.translate(380+i*66,198);storyBox(c,-12,-17,24,30,"#829b93","#4c6a68");storyBox(c,-14,-40,28,25,"#829b93","#4c6a68");c.fillStyle="#253d46";c.fillRect(-8,-30,4,5);c.fillRect(5,-30,4,5);c.restore();}
+  } else if(page===3) {
+    const bookX=628-365*ease,bookY=179-Math.sin(progress*Math.PI)*26;
+    c.save();c.translate(bookX,bookY);c.rotate((1-ease)*-.3);storyBox(c,-27,-31,54,62,"#d6b578","#826447");storyBox(c,-19,-25,40,50,"#f6ecd4","#b8a482");c.fillStyle="#596d60";c.font="900 15px 'Noto Sans TC',sans-serif";c.fillText("筆記",1,-2);c.restore();
+    c.fillStyle="#e4edce";c.font="900 21px 'Noto Sans TC',sans-serif";c.fillText("每十節課 · 一道封印",458,108);
+    c.strokeStyle="#8a5b49";c.lineWidth=5;c.beginPath();c.moveTo(70,155);c.lineTo(70+75*ease,155);c.stroke();
+  } else if(page===4) {
+    c.fillStyle="#ecf2d1";c.font="900 18px 'Noto Sans TC',sans-serif";c.fillText("Lv.5 ＋ 對應天賦 → 超級進化",458,84);
+    for(const [i,id] of ["blueberry","bow","firecracker"].entries()){
+      const x=348+i*108,y=126+(reduced?0:Math.sin(t*3+i)*5);
+      c.globalAlpha=clamp(t*1.8-i*.25,0,1);drawTool(c,id,5,x,y,.66,0,true);c.globalAlpha=1;
+    }
+    c.strokeStyle="#ceb888";c.lineWidth=2;c.setLineDash([4,5]);c.beginPath();c.moveTo(270,186);c.lineTo(628,186);c.stroke();c.setLineDash([]);
+  } else if(page===5) {
+    c.fillStyle="#f2e8c8";c.font="900 29px 'Noto Sans TC',sans-serif";c.fillText("一起撐到放學！",458,113);
+    c.save();c.translate(heroX+18,heroY);c.rotate(-.55+clamp(t/1.2,0,1)*.9);storyBox(c,0,-3,40,6,"#edc66c","#a97f43",2);c.fillStyle="#405264";c.beginPath();c.moveTo(40,-3);c.lineTo(47,0);c.lineTo(40,3);c.fill();c.restore();
+    c.strokeStyle="#fff0bf";c.lineWidth=4;c.beginPath();c.arc(heroX,heroY,48,-1.2,-1.2+clamp(t/1.3,0,1)*2);c.stroke();
+  } else if(page===6) {
+    c.fillStyle="#f6ecc9";c.font="900 29px 'Noto Sans TC',sans-serif";c.fillText("歡迎加入 102 班",458,113);
+    c.fillStyle="#dceecd55";c.fillRect(48,39,105,191);
+    for(let i=0;i<18;i++){const fall=reduced?i*13:((t*45+i*27)%260);c.save();c.translate(185+i*32,fall);c.rotate(reduced?0:t+i);c.fillStyle=["#e6bd64","#83bb9f","#e99478"][i%3];c.fillRect(-3,-3,6,9);c.restore();}
+  } else {
+    c.fillStyle="#e5edce";c.font="900 24px 'Noto Sans TC',sans-serif";c.fillText("筆記還沒合上，再試一次",458,112);
+    storyBox(c,355,199+motion*2,49,37,"#e9d4a8","#967653");c.strokeStyle="#fbdf97";c.lineWidth=2;c.beginPath();c.arc(380,216,35+motion*2,0,Math.PI*2);c.stroke();
+  }
+  const captions=["轉學生走進教室","廣播響起，時鐘停住","黑板自己寫出規則","班長交出神祕筆記","工具與天賦的進化線索","握緊鉛筆，準備迎戰","下課鐘響，教室重獲平靜","休息一下，下一次再出發"];
+  storyBox(c,160,253,580,43,"#173b3bed",null,8);c.fillStyle="#fff7e5";c.font="900 30px 'Noto Sans TC',sans-serif";c.fillText(captions[page],450,284);
+  c.restore();
 }
 function renderStoryJournal() {
   for(const id of ["pause-story-log","end-story-log"]) {
@@ -373,20 +480,27 @@ function renderStoryJournal() {
   }
 }
 function nextDialogue() {
+  dialogueEntrance?.cancel();dialogueEntrance=null;
   activeDialogue=narrativeQueue.shift()||null;
   dialogueTime=15;
   $("chapter-dialogue").hidden=!activeDialogue;
   if(activeDialogue) {
+    const bossEntrance=activeDialogue.id?.startsWith("boss-arrival-");
+    $("chapter-dialogue").classList.toggle("story-boss-cue",!!bossEntrance);
     $("dialogue-speaker").textContent=activeDialogue.speaker;
     $("dialogue-title").textContent=activeDialogue.title;
     $("dialogue-text").textContent=activeDialogue.text;
     $("dialogue-next").textContent=narrativeQueue.length?"下一段 →":"收起對話 ×";
+    if(!storyReducedMotion) dialogueEntrance=$("chapter-dialogue").animate?.([
+      {opacity:0,transform:`translateY(${bossEntrance?22:12}px) scale(.97)`},
+      {opacity:1,transform:"translateY(0) scale(1)"}
+    ],{duration:bossEntrance?550:350,easing:"cubic-bezier(.2,.8,.2,1)"})||null;
   }
 }
 function queueNarrative(id,entry) {
   if(narrativeSeen.has(id)) return;
   narrativeSeen.add(id);
-  const record={...entry,lesson:currentLesson()};narrativeHistory.push(record);narrativeQueue.push(record);
+  const record={...entry,id,lesson:currentLesson()};narrativeHistory.push(record);narrativeQueue.push(record);
   renderStoryJournal();
   if(!activeDialogue) nextDialogue();
   else $("dialogue-next").textContent="下一段 →";
@@ -530,7 +644,7 @@ function makeEnemy(x, y, kind = "basic") {
   const practice = kind === "practice";
   const boss = BOSS_SCHEDULE.find(b => b.id === kind);
   const baseHealth = 37 + (currentLesson() - 1) * 5;
-  const health = boss ? boss.hp : practice ? 20 : kind === "deepblue" ? Math.round(baseHealth * 1.8) : kind === "spider" || kind === "dog" ? Math.round(baseHealth * .45) : ["weilong","bit","handler","shepherd"].includes(kind) ? Math.round(baseHealth * 1.6) : kind === "water" ? Math.round(baseHealth * 1.25) : baseHealth;
+  const health = boss ? boss.hp : practice ? 20 : kind === "deepblue" ? Math.round(baseHealth * 1.8) : kind === "spider" || kind === "dog" ? Math.round(baseHealth * .45) : ["weilong","bit","handler","shepherd","boxer","striker"].includes(kind) ? Math.round(baseHealth * 1.6) : kind === "water" ? Math.round(baseHealth * 1.25) : baseHealth;
   return { x, y, kind, boss, hp: health, maxHp: health, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "deepblue" ? 65 : kind === "mini2" ? 110 : boss ? 77 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), windup: 0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) };
 }
 function spawnEnemy(kind) {
@@ -551,6 +665,10 @@ function spawnEnemy(kind) {
 function spawnScheduledBosses() {
   for (const boss of BOSS_SCHEDULE) {
     if (currentLesson() >= boss.lesson && !spawnedBosses.has(boss.id)) {
+      for(const enemy of enemies) if(!enemy.boss) enemy.hp=0;
+      enemies=enemies.filter(enemy=>enemy.boss&&enemy.hp>0);
+      enemyProjectiles=[];
+      effects=effects.filter(effect=>!["enemy-trap","wet-tissue","water-swing","enemy-explosion","eye-poke","shield-swing","shield-block","martial-step","martial-uppercut","martial-heavy"].includes(effect.type));
       spawnedBosses.add(boss.id);
       for (let i = 0; i < (boss.members || 1); i++) spawnEnemy(boss.id).memberIndex = i;
       showToast(`第 ${boss.lesson} 節：${boss.name} 登場！`);
@@ -1033,6 +1151,7 @@ function chooseUpgrade(id) {
 
 function updatePickups(dt) {
   for (const pickup of pickups) {
+    if(mode!=="playing"&&mode!=="tutorial")break;
     pickup.age += dt;
     const d = distance(pickup, player);
     if (d < (pickup.type === "xp" ? 135 : 55) && d > 1) {
@@ -1081,6 +1200,7 @@ function damagePlayer(amount) {
   if ((mode !== "playing" && mode !== "tutorial") || player.hp <= 0 || player.invulnerable > 0) return false;
   player.hp = Math.max(mode==='tutorial'?30:0, player.hp - amount);
   player.invulnerable = .68;
+  player.damageFlash = .18;
   addEffect(player.x, player.y - 28, "number", { text: `-${amount}`, color: "#ff806e" });
   playSound(160, .18, "sawtooth", .055);
   if (player.hp <= 0) finishGame(false);
@@ -1131,17 +1251,31 @@ function throwEnemyGrenade(enemy) {
     life:1.35,r:10,damage:18,blastRadius:85,angle:0});
 }
 function throwBottleCaps(enemy) {
-  const count = enemy.hp < enemy.maxHp / 2 ? 5 : 3;
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?7:4,speed=rage?340:280;
   for (let i = 0; i < count; i++) {
     const angle = enemy.throwAngle + (i - (count - 1) / 2) * .18;
-    enemyProjectiles.push({ type: "cap", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * 230, vy: Math.sin(angle) * 230, r: 10, damage: enemy.damage, life: 4.5, angle });
+    enemyProjectiles.push({ type: "cap", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 10, damage: enemy.damage, life: 4, angle });
   }
   playSound(310, .08, "triangle", .04);
 }
 function throwTire(enemy) {
-  const angle = enemy.throwAngle;
-  enemyProjectiles.push({ type: "tire", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * 220, vy: Math.sin(angle) * 220, r: 17, damage: enemy.damage, life: 5.5, angle });
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?3:1,speed=rage?335:280;
+  for(let i=0;i<count;i++) {
+    const angle = enemy.throwAngle+(i-(count-1)/2)*.22;
+    enemyProjectiles.push({ type: "tire", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 17, damage: enemy.damage, life: 4.5, angle });
+  }
   playSound(230, .12, "triangle", .04);
+}
+function bossShockwave(enemy) {
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?10:5;
+  const direction=Math.atan2(enemy.lungeVY,enemy.lungeVX);
+  for(let i=0;i<count;i++) {
+    const angle=rage?i*Math.PI*2/count:direction+(i-2)*.28,speed=rage?250:210;
+    enemyProjectiles.push({type:"boss-wave",x:enemy.x,y:enemy.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
+      r:12,damage:22,life:2.6,angle});
+  }
+  addEffect(enemy.x,enemy.y,"boss-enrage",{radius:100,duration:.45});
+  playSound(150,.18,"triangle",.04);
 }
 function waterBottleAttack(enemy) {
   const angle = enemy.throwAngle;
@@ -1199,6 +1333,62 @@ function updateEnemyProjectiles(dt) {
   }
   enemyProjectiles = enemyProjectiles.filter(p => p.life > 0 && p.x > 20 && p.x < MAP.w - 20 && p.y > 60 && p.y < MAP.h - 20);
 }
+function updateMartialEnemy(enemy,dt,movementSpeed) {
+  const boxer=enemy.kind==="boxer";
+  enemy.martialMove ||= boxer?"step":"kick";
+  if(enemy.windup>0) {
+    enemy.windup=Math.max(0,enemy.windup-dt);
+    if(enemy.windup===0) {
+      if(enemy.martialMove==="step"||enemy.martialMove==="kick") {
+        enemy.lungeTime=boxer?.2:.48;enemy.hitPlayer=false;enemy.trailClock=0;
+      } else {
+        const uppercut=enemy.martialMove==="uppercut";
+        const origin=uppercut?enemy:{x:enemy.targetX,y:enemy.targetY};
+        const angle=Math.atan2(player.y-enemy.y,player.x-enemy.x);
+        const difference=Math.atan2(Math.sin(angle-enemy.throwAngle),Math.cos(angle-enemy.throwAngle));
+        addEffect(origin.x,origin.y,uppercut?"martial-uppercut":"martial-heavy",{radius:uppercut?100:90,angle:enemy.throwAngle,duration:.45});
+        if(distance(origin,player)<(uppercut?100:90)+player.r&&(!uppercut||Math.abs(difference)<1)&&damagePlayer(uppercut?20:26)) {
+          const push=uppercut?45:60;
+          player.x=clamp(player.x+Math.cos(angle)*push,45,MAP.w-45);
+          player.y=clamp(player.y+Math.sin(angle)*push,87,MAP.h-45);
+        }
+        enemy.martialRecovery=uppercut?.65:.8;enemy.attackClock=boxer?2.4:3;
+        enemy.martialMove=boxer?"step":"kick";
+      }
+    }
+    return;
+  }
+  if(enemy.lungeTime>0) {
+    const travel=Math.min(dt,enemy.lungeTime)*(enemy.slowTime>0?.55:1);
+    enemy.trailClock-=dt;
+    if(enemy.trailClock<=0){addEffect(enemy.x,enemy.y,"martial-step",{duration:.22,color:boxer?"#82dcd5":"#d6a5ed"});enemy.trailClock=.06;}
+    enemy.x=clamp(enemy.x+enemy.lungeVX*travel,40,MAP.w-40);
+    enemy.y=clamp(enemy.y+enemy.lungeVY*travel,85,MAP.h-40);
+    enemy.lungeTime=Math.max(0,enemy.lungeTime-dt);
+    if(!boxer&&!enemy.hitPlayer&&distance(enemy,player)<enemy.r+player.r&&damagePlayer(20))enemy.hitPlayer=true;
+    if(enemy.lungeTime===0) {
+      enemy.martialMove=boxer?"uppercut":"heavy";enemy.windup=boxer?.5:.75;
+      enemy.throwAngle=Math.atan2(player.y-enemy.y,player.x-enemy.x);
+      enemy.targetX=enemy.x+Math.cos(enemy.throwAngle)*40;
+      enemy.targetY=enemy.y+Math.sin(enemy.throwAngle)*40;
+    }
+    return;
+  }
+  if(enemy.martialRecovery>0){enemy.martialRecovery=Math.max(0,enemy.martialRecovery-dt);return;}
+  const dx=player.x-enemy.x,dy=player.y-enemy.y,d=Math.hypot(dx,dy)||1;
+  if(enemy.attackClock<=0&&d<(boxer?250:430)) {
+    enemy.windup=boxer?.35:.65;
+    enemy.throwAngle=Math.atan2(dy,dx);
+    if(boxer) {
+      const side=Math.random()<.5?-1:1,forward=Math.max(0,d-75);
+      enemy.lungeVX=(dx/d*forward-dy/d*side*55)/.2;
+      enemy.lungeVY=(dy/d*forward+dx/d*side*55)/.2;
+    } else {enemy.lungeVX=dx/d*700;enemy.lungeVY=dy/d*700;}
+  } else if(d>75) {
+    enemy.x=clamp(enemy.x+dx/d*movementSpeed*dt,40,MAP.w-40);
+    enemy.y=clamp(enemy.y+dy/d*movementSpeed*dt,85,MAP.h-40);
+  }
+}
 function updateEnemies(dt) {
   let summons = 0;
   const spidersToSpawn = [];
@@ -1213,6 +1403,11 @@ function updateEnemies(dt) {
     enemy.rulerHitCooldown = Math.max(0, enemy.rulerHitCooldown - dt);
     enemy.waterSwingTime = Math.max(0, enemy.waterSwingTime - dt);
     enemy.blockFlash = Math.max(0,(enemy.blockFlash||0)-dt);
+    if(enemy.boss&&enemy.hp<=enemy.maxHp/2&&!enemy.enraged) {
+      enemy.enraged=true;
+      showToast(`${enemy.boss.name} 半血暴走！`);
+      addEffect(enemy.x,enemy.y,"boss-enrage",{radius:enemy.r*2,duration:.8});
+    }
     enemy.slowTime = Math.max(0,enemy.slowTime-dt);
     enemy.stunTime = Math.max(0,enemy.stunTime-dt);
     if (enemy.stunTime > 0) continue;
@@ -1220,8 +1415,10 @@ function updateEnemies(dt) {
     const dx = player.x - enemy.x, dy = player.y - enemy.y;
     const d = Math.hypot(dx, dy) || 1;
     const wasLunging=enemy.lungeTime>0;
-    const movementSpeed = enemy.speed * (enemy.slowTime > 0 ? .55 : 1);
+    const rage=!!enemy.boss&&enemy.hp<=enemy.maxHp/2;
+    const movementSpeed = enemy.speed * (enemy.slowTime > 0 ? .55 : 1) * (rage?1.15:1);
     enemy.attackClock -= dt;
+    if(enemy.kind==="boxer"||enemy.kind==="striker") {updateMartialEnemy(enemy,dt,movementSpeed);continue;}
     if(enemy.kind==="kicker") {
       if(enemy.windup>0) {
         enemy.windup-=dt;
@@ -1441,8 +1638,8 @@ function updateEnemies(dt) {
       if (enemy.windup > 0) {
         enemy.windup -= dt;
         if (enemy.windup <= 0) {
-          if (enemy.kind === "mini1") { throwBottleCaps(enemy); enemy.attackClock = enemy.hp < enemy.maxHp / 2 ? 1.2 : 1.8; }
-          else { throwTire(enemy); enemy.attackClock = 2.2; }
+          if (enemy.kind === "mini1") { throwBottleCaps(enemy); enemy.attackClock = rage ? .95 : 1.5; }
+          else { throwTire(enemy); enemy.attackClock = rage ? 1.35 : 1.9; }
         }
       } else {
         const direction = d > 320 ? 1 : d < 200 ? -1 : 0;
@@ -1455,7 +1652,7 @@ function updateEnemies(dt) {
     if (enemy.windup > 0) {
       enemy.windup -= dt;
       if (enemy.windup <= 0) {
-        enemy.lungeTime = enemy.trainingThreat ? .5 : enemy.kind === "mini2" ? .52 : .32;
+        enemy.lungeTime = enemy.trainingThreat ? .5 : enemy.kind === "mini2" ? (rage?.6:.52) : enemy.kind==="final"?(rage?.5:.42):.32;
         enemy.hitPlayer = false;
       }
     } else if (enemy.lungeTime > 0) {
@@ -1467,14 +1664,15 @@ function updateEnemies(dt) {
         enemy.x += dx / d * movementSpeed * dt;
         enemy.y += dy / d * movementSpeed * dt;
       }
-      if (d < (enemy.kind === "mini2" ? 400 : 235) && enemy.attackClock <= 0) {
-        enemy.windup = enemy.trainingThreat ? .9 : enemy.kind === "mini2" ? .7 : .45;
-        enemy.attackClock = random(2.2, 2.8);
-        const lungeSpeed = enemy.trainingThreat ? 260 : enemy.kind === "mini2" ? 620 : 520;
+      if (d < (enemy.kind === "mini2" ? 450 : enemy.kind==="final"?460:235) && enemy.attackClock <= 0) {
+        enemy.windup = enemy.trainingThreat ? .9 : enemy.kind === "mini2" ? (rage?.6:.7) : enemy.kind==="final"?(rage?.65:.8):.45;
+        enemy.attackClock = enemy.boss?(rage?1.55:2.1):random(2.2, 2.8);
+        const lungeSpeed = enemy.trainingThreat ? 260 : enemy.kind === "mini2" ? (rage?840:720) : enemy.kind==="final"?(rage?780:640):520;
         enemy.lungeVX = dx / d * lungeSpeed;
         enemy.lungeVY = dy / d * lungeSpeed;
       }
     }
+    if(enemy.kind==="final"&&wasLunging&&enemy.lungeTime<=0) bossShockwave(enemy);
     if (enemy.lungeTime > 0 && !enemy.hitPlayer && distance(enemy, player) < enemy.r + player.r && player.invulnerable <= 0) {
       if (damagePlayer(enemy.damage)) {
         enemy.hitPlayer = true;
@@ -1515,6 +1713,7 @@ function update(dt) {
     }
   }
   player.invulnerable = Math.max(0, player.invulnerable - dt);
+  player.damageFlash = Math.max(0, player.damageFlash - dt);
   player.pencilCooldown = Math.max(0, player.pencilCooldown - dt);
   player.swingTime = Math.max(0, player.swingTime - dt);
   if (mode === "playing") {
@@ -1526,7 +1725,7 @@ function update(dt) {
       gameTime=Math.min(gameTime+dt,nextBossTime,GAME_LENGTH);
     }
     if (currentLesson() !== previousLesson) {
-      const firstAppearances={2:"水壺方塊人登場！",3:"橡皮筋方塊人登場！",4:"溼衛生紙方塊人登場！",5:"威龍登場！小心噴射衝刺與爆炸物！",6:"比特登場！小心機械蜘蛛！",7:"深藍登場！繞到盾牌側面或背後！",8:"訓犬員登場！小心追咬的狗！",9:"戳眼方塊人登場！別讓他靠近眼睛！",10:"牧羊人登場！避開陷阱與手雷！",11:"大聲公方塊人登場！音波命中會眩暈！",12:"飛踢方塊人登場！小心被踢飛的倒楣蛋！"};
+      const firstAppearances={2:"水壺方塊人登場！",3:"橡皮筋方塊人登場！",4:"溼衛生紙方塊人登場！",5:"威龍登場！小心噴射衝刺與爆炸物！",6:"比特登場！小心機械蜘蛛！",7:"深藍登場！繞到盾牌側面或背後！",8:"訓犬員登場！小心追咬的狗！",9:"戳眼方塊人登場！別讓他靠近眼睛！",10:"牧羊人登場！避開陷阱與手雷！",11:"大聲公方塊人登場！音波命中會眩暈！",12:"飛踢方塊人登場！小心被踢飛的倒楣蛋！",13:"閃身拳手登場！側移後會接昇龍拳！",14:"飛踢重擊手登場！躲開飛踢與重擊提示圈！"};
       const announcement = hasActiveBoss() ? "Boss 戰持續中！" : firstAppearances[currentLesson()] || "更多方塊人來了！";
       showToast(`第 ${currentLesson()} / 30 節課！${announcement}`);
       if (!hasActiveBoss()) spawnClock = 0;
@@ -1543,13 +1742,14 @@ function update(dt) {
       }
     }
   }
-  updateEnemies(dt);
-  updateEnemyProjectiles(dt);
-  weaponAttacks(dt);
-  updateProjectiles(dt);
-  updatePickups(dt);
+  for(const step of [updateEnemies,updateEnemyProjectiles,weaponAttacks,updateProjectiles,updatePickups]) {
+    step(dt);
+    if(mode!=="playing"&&mode!=="tutorial"){updateHud();return;}
+  }
   if (mode === "playing" && player.xp >= player.xpNeed) gainExperience(0);
+  if(mode!=="playing"&&mode!=="tutorial"){updateHud();return;}
   updateEffects(dt);
+  if(mode!=="playing"&&mode!=="tutorial"){updateHud();return;}
   tutorialTick();
   if(mode==="playing") updateNarrative(dt);
   if (mode === "playing" && gameTime >= GAME_LENGTH && defeatedBosses.size === BOSS_SCHEDULE.length) finishGame(true);
@@ -1557,7 +1757,13 @@ function update(dt) {
 }
 function regularEnemyKind() {
   if(currentLesson()<2) return "basic";
-  const roll=Math.random();
+  let roll=Math.random();
+  if(currentLesson()>=13) {
+    if(roll<.07)return "boxer";
+    if(currentLesson()>=14&&roll<.14)return "striker";
+    const reserved=currentLesson()>=14?.14:.07;
+    roll=(roll-reserved)/(1-reserved);
+  }
   if(currentLesson()>=5) {
     const pool=[["water",2,.15],["rubber",3,.12],["tissue",4,.12],["weilong",5,.1],["bit",6,.08],["deepblue",7,.08],["handler",8,.06],["eye",9,.05],["shepherd",10,.05],["megaphone",11,.06],["kicker",12,.06]];
     let threshold=0;
@@ -1572,6 +1778,7 @@ function regularEnemyKind() {
 function finishGame(won) {
   if (mode === "ended") return;
   mode = "ended";
+  endingWon=won;storyAnimationTime=0;
   $("end-kicker").textContent = won ? "CLASS DISMISSED!" : "GAME OVER";
   $("end-title").textContent = won ? "放學了！" : "再試一次！";
   $("end-description").textContent = won ? "轉學生撐過了 30 節課，打敗兩個小 Boss 和最終 Boss！終於可以放學了。" : `轉學生在第 ${currentLesson()} 節課倒下了。調整走位和升級選擇，再挑戰一次！`;
@@ -1581,18 +1788,22 @@ function finishGame(won) {
   $("end-epilogue").textContent=won?"下課鐘響了。門鎖鬆開，方塊人的影子也散去。班長笑著伸出手：「歡迎加入 102 班。」你把鉛筆收回筆袋：這一次，明天還要來上課。":"班長扶著你退回講台後：「先休息，102 班還在等你。」那本筆記沒有合上。下次，你會更清楚該怎麼走出這間教室。";
   $("chapter-dialogue").hidden=true;
   narrativeQueue=[];activeDialogue=null;
+  dialogueEntrance?.cancel();dialogueEntrance=null;
   renderStoryJournal();
   showScreen("end-screen");
   playSound(won ? 880 : 190, .5, "triangle", .06);
 }
 function formatTime(seconds) { return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`; }
 function updateHud() {
+  if(batchingHud)return;
   $("chapter-dialogue").classList.toggle("boss-dialogue",hasActiveBoss());
   $("hp-text").textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
   $("hp-fill").style.width = `${player.hp / player.maxHp * 100}%`;
   $("level-text").textContent = `Lv. ${player.level}`;
   $("xp-text").textContent = `${player.xp} / ${player.xpNeed}`;
-  $("xp-fill").style.width = `${player.xp / player.xpNeed * 100}%`;
+  $("xp-fill").style.width = `${clamp(player.xp/player.xpNeed*100,0,100)}%`;
+  $("lesson-fill").style.width = `${gameTime>=GAME_LENGTH?100:(gameTime%LESSON_LENGTH)/LESSON_LENGTH*100}%`;
+  $("hp-warning").hidden=player.hp<=0||player.hp>player.maxHp*.25;
   $("lesson-label").textContent = `第 ${currentLesson()} / ${TOTAL_LESSONS} 節`;
   if(hasActiveBoss()) $("lesson-label").textContent += " · Boss 戰，計時暫停";
   $("timer").textContent = formatTime(gameTime >= GAME_LENGTH ? 0 : Math.ceil(LESSON_LENGTH - gameTime % LESSON_LENGTH));
@@ -1610,11 +1821,30 @@ function updateHud() {
   const activeBoss = [...enemies].reverse().find(e => e.boss && e.hp > 0);
   $("boss-health").hidden = !activeBoss;
   if (activeBoss) {
-    $("boss-name").textContent = activeBoss.boss.name;
+    const groupRage=enemies.some(e=>e.kind===activeBoss.kind&&e.hp>0&&e.hp<=e.maxHp/2);
+    $("boss-name").textContent = activeBoss.boss.name+(groupRage?" · 暴走":"");
     const hp = enemies.filter(e => e.kind === activeBoss.kind && e.hp > 0).reduce((total, e) => total + e.hp, 0);
     const maxHp = activeBoss.maxHp * (activeBoss.boss.members || 1);
     $("boss-hp").textContent = `${Math.ceil(hp)} / ${maxHp}`;
     $("boss-fill").style.width = `${hp / maxHp * 100}%`;
+  }
+}
+function renderLoadoutGuide() {
+  const list=$("loadout-guide");list.replaceChildren();
+  const add=(title,text)=>{
+    const article=document.createElement("article"),heading=document.createElement("strong"),body=document.createElement("p");
+    heading.textContent=title;body.textContent=text;article.append(heading);article.append(body);list.append(article);
+  };
+  add("✎ 鉛筆 · 開局武器","自動揮砍附近敵人，不占 6 個道具欄位。選到工具與天賦後，記得走過去撿起來。");
+  for(const tool of CONTENT.weapons) {
+    const level=player.weapons[tool.id],talent=matchingTalent(tool.id),hasTalent=!!player.talents[talent.id];
+    const waiting=pickups.some(p=>!p.collected&&((p.type==='weapon'&&p.weaponId===tool.id)||(p.type==='talent'&&p.talentId===talent.id)));
+    if(!level&&!hasTalent&&!waiting)continue;
+    const evolved=isEvolved(tool.id);
+    const title=`${tool.icon} ${tool.name} · ${evolved?'超級進化':level?`Lv.${level} / 5`:'尚未裝備'}`;
+    const effect=level?toolStats(tool.id,level).upgrade:hasTalent?talent.description:'這組裝備正在地上等你拾取。';
+    const progress=evolved?`已進化：${SUPER_TOOLS[tool.id].name}`:`進化條件：${level>=5?'✓':'○'} 工具 Lv.5 ＋ ${hasTalent?'✓':'○'} ${talent.name}`;
+    add(title,`${effect} ${progress}${waiting?'。附近有這組的待拾取裝備。':''}`);
   }
 }
 function renderTalentHud() {
@@ -1973,7 +2203,21 @@ function drawEnemy(enemy, time) {
   roundedRect(-17, -26, 34, 29, 2, main, edge, 3);
   ctx.fillStyle = "#253d46"; ctx.fillRect(-9, -13, 4, 5); ctx.fillRect(6, -13, 4, 5);
   ctx.strokeStyle = "#253d46"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-4, -5); ctx.lineTo(4, -5); ctx.stroke();
-  if(enemy.kind==="kicker") {
+  if(enemy.kind==="boxer"||enemy.kind==="striker") {
+    const boxer=enemy.kind==="boxer",trim=boxer?"#64d9d0":"#ca8cdb";
+    roundedRect(-19,-29,38,7,2,trim,"#465568",2);
+    ctx.fillStyle=trim;ctx.beginPath();ctx.moveTo(17,-26);ctx.lineTo(35,-20);ctx.lineTo(24,-15);ctx.closePath();ctx.fill();
+    roundedRect(-13,3,26,21,2,boxer?"#e6f5ed":"#725487","#465568",2);
+    ctx.fillStyle=boxer?"#397d83":"#fff0d9";ctx.font="900 12px sans-serif";ctx.textAlign="center";ctx.fillText(boxer?"13":"14",0,18);
+    roundedRect(-26,boxer&&enemy.martialMove==="uppercut"?-12:4,12,13,3,trim,"#465568",2);
+    roundedRect(15,boxer&&enemy.martialMove==="uppercut"?-23:4,12,13,3,trim,"#465568",2);
+    if(!boxer) {
+      roundedRect(-14,22,13,13,2,"#d76e67","#594552",2);
+      ctx.save();ctx.translate(4,20);
+      if(enemy.lungeTime>0)ctx.rotate(Math.atan2(enemy.lungeVY,enemy.lungeVX)-Math.PI/2);
+      roundedRect(0,0,12,enemy.lungeTime>0?35:15,2,"#d76e67","#594552",2);ctx.restore();
+    }
+  } else if(enemy.kind==="kicker") {
     roundedRect(-20,-31,40,8,2,"#f2c885","#94623f",2);
     roundedRect(-11,4,22,16,3,"#edd4ac","#94623f",2);
     ctx.fillStyle="#885741";ctx.font="900 11px sans-serif";ctx.textAlign="center";ctx.fillText("12",0,16);
@@ -2086,11 +2330,20 @@ function drawEnemy(enemy, time) {
     drawUnlucky(ctx,x+Math.cos(enemy.throwAngle)*45,y+Math.sin(enemy.throwAngle)*45,0,.7);
   }
   if(enemy.stunTime>0){ctx.strokeStyle="#c6b7ff";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-enemy.r-12,16,5,time*3,0,Math.PI*2);ctx.stroke();}
-  const name={weilong:"威龍",bit:"比特",deepblue:"深藍",handler:"訓犬員",eye:"戳眼方塊人",shepherd:"牧羊人",megaphone:"大聲公方塊人",kicker:"飛踢方塊人"}[enemy.kind];
+  if(enemy.boss&&enemy.hp<=enemy.maxHp/2){ctx.strokeStyle="#ff9f6b99";ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y+15,enemy.r+8,enemy.r*.42,0,0,Math.PI*2);ctx.stroke();}
+  const name={weilong:"威龍",bit:"比特",deepblue:"深藍",handler:"訓犬員",eye:"戳眼方塊人",shepherd:"牧羊人",megaphone:"大聲公方塊人",kicker:"飛踢方塊人",boxer:"閃身拳手",striker:"飛踢重擊手"}[enemy.kind];
   if(name){const width=name.length*11+12;roundedRect(x-width/2,y-56,width,17,4,"#29464bde");ctx.fillStyle="#d9f5ec";ctx.font="900 11px sans-serif";ctx.textAlign="center";ctx.fillText(name,x,y-43);}
   if (enemy.windup > 0) {
     ctx.strokeStyle = `rgba(221,99,78,${.4 + Math.sin(time * 35) * .25})`;
     ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x, y, enemy.r + 8, 0, 7); ctx.stroke();
+    if(enemy.kind==="boxer"||enemy.kind==="striker") {
+      ctx.strokeStyle=enemy.kind==="boxer"?"#99eee4cc":"#f2b9ffcc";ctx.lineWidth=3;
+      ctx.beginPath();
+      if(enemy.martialMove==="uppercut") {ctx.moveTo(x,y);ctx.arc(x,y,100,enemy.throwAngle-1,enemy.throwAngle+1);ctx.closePath();}
+      else if(enemy.martialMove==="heavy")ctx.arc(enemy.targetX,enemy.targetY,90,0,Math.PI*2);
+      else {const duration=enemy.kind==="boxer"?.2:.48;ctx.setLineDash([7,6]);ctx.moveTo(x,y);ctx.lineTo(x+enemy.lungeVX*duration,y+enemy.lungeVY*duration);}
+      ctx.stroke();ctx.setLineDash([]);
+    }
     if (enemy.kind === "water" && enemy.waterAttack === "swing") {
       ctx.strokeStyle = "#80d6efaa"; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(x, y); ctx.arc(x, y, 100, enemy.throwAngle - 1.1, enemy.throwAngle + 1.1); ctx.closePath(); ctx.stroke();
@@ -2103,10 +2356,10 @@ function drawEnemy(enemy, time) {
     if ((enemy.kind === "weilong" && enemy.jetAttack === "grenade") || enemy.kind === "shepherd") {
       ctx.strokeStyle="#ff956baa";ctx.lineWidth=2;ctx.beginPath();ctx.arc(enemy.targetX,enemy.targetY,enemy.kind==="shepherd"&&enemy.trapAttack==="trap"?22:85,0,Math.PI*2);ctx.stroke();
     }
-    if (["mini1","mini2","water","rubber","tissue","weilong","shepherd","megaphone","kicker"].includes(enemy.kind)) {
+    if (["mini1","mini2","final","water","rubber","tissue","weilong","shepherd","megaphone","kicker"].includes(enemy.kind)) {
       ctx.strokeStyle = "#f0b46cb0"; ctx.lineWidth = 3; ctx.setLineDash([7, 8]);
-      const angle = enemy.kind === "mini2" && enemy.memberIndex === 0 ? Math.atan2(enemy.lungeVY, enemy.lungeVX) : enemy.throwAngle;
-      const length=enemy.kind==="weilong"&&enemy.jetAttack==="dash"?338:170;
+      const angle = enemy.kind === "final" || (enemy.kind === "mini2" && enemy.memberIndex === 0) ? Math.atan2(enemy.lungeVY, enemy.lungeVX) : enemy.throwAngle;
+      const length=enemy.kind==="final"?(enemy.hp<=enemy.maxHp/2?390:269):enemy.kind==="weilong"&&enemy.jetAttack==="dash"?338:170;
       ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(angle) * length, y + Math.sin(angle) * length); ctx.stroke(); ctx.setLineDash([]);
     }
   }
@@ -2206,6 +2459,10 @@ function drawTissueBall(c,x,y,radius=12) {
   c.strokeStyle="#bdd2cb";c.beginPath();c.moveTo(-5,-4);c.lineTo(3,-1);c.lineTo(-2,5);c.moveTo(6,-3);c.lineTo(6,4);c.stroke();c.restore();
 }
 function drawEnemyProjectile(cap) {
+  if(cap.type==="boss-wave") {
+    ctx.save();ctx.translate(cap.x,cap.y);ctx.rotate(Math.atan2(cap.vy,cap.vx));ctx.strokeStyle="#ffae82";ctx.lineWidth=5;
+    ctx.beginPath();ctx.arc(-9,0,19,-.9,.9);ctx.stroke();ctx.strokeStyle="#fff0c8";ctx.lineWidth=2;ctx.beginPath();ctx.arc(-9,0,12,-.9,.9);ctx.stroke();ctx.restore();return;
+  }
   if(cap.type==="unlucky") {
     ctx.strokeStyle="#efd69d88";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(cap.x-cap.vx*.065,cap.y-cap.vy*.065);ctx.lineTo(cap.x,cap.y);ctx.stroke();
     drawUnlucky(ctx,cap.x,cap.y,cap.angle,.8);return;
@@ -2263,7 +2520,23 @@ function drawUnlucky(c,x,y,angle,size=1) {
 }
 function drawEffect(effect) {
   const t = effect.age / effect.duration;
-  if(effect.type==="enemy-trap") {
+  if(effect.type==="martial-step") {
+    ctx.globalAlpha=(1-t)*.45;
+    roundedRect(effect.x-17,effect.y-26,34,29,2,effect.color);
+    roundedRect(effect.x-15,effect.y+4,30,25,2,effect.color);ctx.globalAlpha=1;
+  } else if(effect.type==="martial-uppercut"||effect.type==="martial-heavy") {
+    ctx.save();ctx.translate(effect.x,effect.y);ctx.globalAlpha=1-t;ctx.lineWidth=7*(1-t)+2;
+    ctx.strokeStyle=effect.type==="martial-uppercut"?"#9ff8eb":"#f6b8e8";
+    ctx.beginPath();
+    if(effect.type==="martial-uppercut") {
+      ctx.arc(0,-t*25,effect.radius*(.6+t*.4),effect.angle-1,effect.angle+1);
+      ctx.moveTo(10,12-t*45);ctx.lineTo(10,-30-t*45);ctx.lineTo(0,-18-t*45);
+    } else ctx.arc(0,0,effect.radius*(.5+t*.5),0,Math.PI*2);
+    ctx.stroke();ctx.restore();
+  } else if(effect.type==="boss-enrage") {
+    ctx.globalAlpha=1-t;ctx.strokeStyle="#ff9c72";ctx.lineWidth=6*(1-t)+1;
+    ctx.beginPath();ctx.arc(effect.x,effect.y,effect.radius*(.4+t*.6),0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;
+  } else if(effect.type==="enemy-trap") {
     ctx.save();ctx.translate(effect.x,effect.y);ctx.globalAlpha=Math.min(1,(1-t)*4);
     ctx.strokeStyle=effect.age<.6?"#a6a39a":"#ff8e66";ctx.lineWidth=2;ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(0,0,effect.radius,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
     roundedRect(-14,-8,28,16,4,"#51645a","#c1cbac",2);
@@ -2324,18 +2597,42 @@ function render(timestamp) {
   camera.y = clamp(player.y - viewH * (isTutorialSession()&&ch<550?.68:.5), 0, Math.max(0, MAP.h - viewH));
   ctx.save(); ctx.scale(scale, scale); ctx.translate(-camera.x, -camera.y);
   drawClassroom();
-  for (const pickup of pickups) drawPickup(pickup, timestamp);
-  for (const enemy of enemies) drawEnemy(enemy, timestamp);
+  const visible=(entity,margin=100)=>entity.x>=camera.x-margin&&entity.x<=camera.x+viewW+margin&&entity.y>=camera.y-margin&&entity.y<=camera.y+viewH+margin;
+  for (const pickup of pickups) if(visible(pickup))drawPickup(pickup, timestamp);
+  for (const enemy of enemies) if(enemy.windup>0||visible(enemy))drawEnemy(enemy, timestamp);
   drawPlayer(timestamp);
-  for (const projectile of projectiles) drawProjectile(projectile);
-  for (const cap of enemyProjectiles) drawEnemyProjectile(cap);
-  for (const effect of effects) drawEffect(effect);
+  for (const projectile of projectiles) if(visible(projectile))drawProjectile(projectile);
+  for (const cap of enemyProjectiles) if(visible(cap))drawEnemyProjectile(cap);
+  for (const effect of effects) if(visible(effect,(effect.radius||0)+100))drawEffect(effect);
   if(isTutorialSession()) drawTutorialGuide(timestamp);
   ctx.restore();
   const shade = ctx.createRadialGradient(cw / 2, ch / 2, Math.min(cw, ch) * .2, cw / 2, ch / 2, Math.max(cw, ch) * .7);
   shade.addColorStop(0, "#172b3c00"); shade.addColorStop(1, "#172b3c59");
   ctx.fillStyle = shade; ctx.fillRect(0, 0, cw, ch);
+  drawNavigationHints();
+  if(player.damageFlash>0&&!storyReducedMotion&&mode!=="menu"&&mode!=="story") {
+    ctx.strokeStyle=`rgba(239,99,82,${player.damageFlash/.18*.6})`;ctx.lineWidth=12;ctx.strokeRect(6,6,cw-12,ch-12);
+  }
   drawVisionOverlay();
+}
+function navigationHints() {
+  if(mode!=="playing")return [];
+  const offscreen=target=>{const x=(target.x-camera.x)*scale,y=(target.y-camera.y)*scale;return x<25||x>cw-25||y<25||y>ch-25;};
+  const nearest=items=>items.reduce((best,item)=>!best||distance(item,player)<distance(best,player)?item:best,null);
+  const equipment=nearest(pickups.filter(p=>!p.collected&&p.type!=='xp'&&offscreen(p)));
+  const boss=nearest(enemies.filter(e=>e.boss&&e.hp>0&&offscreen(e)));
+  return [equipment&&{target:equipment,label:equipment.type==='talent'?'天賦':'道具',color:'#bfe6a1'},boss&&{target:boss,label:'Boss',color:'#ffce86'}].filter(Boolean);
+}
+function drawNavigationHints() {
+  for(const hint of navigationHints()) {
+    const angle=Math.atan2(hint.target.y-player.y,hint.target.x-player.x);
+    const dx=Math.cos(angle),dy=Math.sin(angle),halfW=Math.max(30,cw/2-58),halfH=Math.max(30,ch/2-Math.min(160,ch*.3));
+    const radius=Math.min(halfW/Math.max(.001,Math.abs(dx)),halfH/Math.max(.001,Math.abs(dy)));
+    const x=cw/2+dx*radius,y=ch/2+dy*radius;
+    ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.fillStyle=hint.color;ctx.strokeStyle='#233e4e';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(13,0);ctx.lineTo(-8,-9);ctx.lineTo(-4,0);ctx.lineTo(-8,9);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+    roundedRect(x-26,y+16,52,22,6,'#17384ded');ctx.fillStyle=hint.color;ctx.textAlign='center';ctx.font="900 13px 'Noto Sans TC',sans-serif";ctx.fillText(hint.label,x,y+32);
+  }
 }
 function drawVisionOverlay() {
   if(player.visionTime<=0||!["playing","paused","upgrade"].includes(mode)) return;
@@ -2357,18 +2654,26 @@ function drawTutorialGuide(time) {
 function frame(now) {
   const dt = Math.min((now - lastFrame) / 1000 || 0, .1);
   lastFrame = now;
+  if(mode==="story"||mode==="ended") storyAnimationTime+=dt;
   advanceSimulation(dt);
   render(now / 1000);
+  if(mode==="story") drawStoryFrame($("story-canvas").getContext("2d"),storyIndex,storyAnimationTime,storyReducedMotion);
+  else if(mode==="ended") drawStoryFrame($("ending-canvas").getContext("2d"),endingWon?6:7,storyAnimationTime,storyReducedMotion);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 function advanceSimulation(realDt) {
+  if(mode!=="playing"&&mode!=="tutorial")return;
   let remaining = clamp(realDt, 0, .1) * (mode === "playing"||(mode==='tutorial'&&tutorialStep===14) ? gameSpeed : 1);
-  while (remaining > 1e-9 && (mode === "playing" || mode === "tutorial")) {
-    const step = Math.min(.02, remaining);
-    update(step);
-    remaining -= step;
-  }
+  // Fast simulation still draws the DOM HUD only once per animation frame.
+  batchingHud=true;
+  try {
+    while (remaining > 1e-9 && (mode === "playing" || mode === "tutorial")) {
+      const step = Math.min(.02, remaining);
+      update(step);
+      remaining -= step;
+    }
+  } finally {batchingHud=false;updateHud();}
 }
 function isTutorialSession() {return mode==='tutorial'||mode==='tutorial-upgrade'||(mode==='paused'&&pauseReturnMode==='tutorial');}
 function updateSpeedButton() {
@@ -2389,6 +2694,7 @@ function togglePause() {
     if(mode==='tutorial'&&tutorialStep===14)tutorialControls.paused=true;
     pauseReturnMode = mode;
     mode = "paused";
+    renderLoadoutGuide();
     showScreen("pause-screen");
   } else if (mode === "paused") {
     mode = pauseReturnMode;
@@ -2405,6 +2711,7 @@ $("skip-tutorial").addEventListener("click", startGame);
 $("upgrade-skip-tutorial").addEventListener("click", startGame);
 $("tutorial-next").addEventListener("click",()=>{if(mode==='tutorial'&&tutorialStep===15)tutorialAdvance();});
 $("practice-btn").addEventListener("click",startTutorial);
+$("quick-start-btn").addEventListener("click",startGame);
 $("tutorial-replay-btn").addEventListener("click",startTutorial);
 $("tutorial-done-btn").addEventListener("click", startGame);
 $("pause-btn").addEventListener("click", togglePause);
@@ -2421,18 +2728,21 @@ $("sound-btn").addEventListener("click", () => {
 $("sound-btn").classList.add("muted");
 document.addEventListener("keydown", event => {
   const key = event.key.toLowerCase();
-  if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) event.preventDefault();
-  keys.add(key);
+  const interactive=event.target?.closest?.('button,summary,input,textarea,select');
+  if (!interactive&&["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) event.preventDefault?.();
+  if(mode==="playing"||mode==="tutorial")keys.add(key);
   if ((key === "p" || key === "escape")&&!event.repeat) togglePause();
   if (key === "f" && !event.repeat) cycleGameSpeed();
-  if (mode === "story" && key === "enter") nextStory();
-  if ((mode === "upgrade"||mode==='tutorial-upgrade') && ["1", "2", "3"].includes(key)) {
+  if (mode === "story" && key === "enter"&&!event.repeat&&!interactive) {event.preventDefault?.();nextStory();}
+  if ((mode === "upgrade"||mode==='tutorial-upgrade') && !event.repeat && ["1", "2", "3"].includes(key)) {
     const choice = upgradeChoices[Number(key) - 1];
     if (choice) chooseUpgrade(choice.id);
   }
 });
 document.addEventListener("keyup", event => keys.delete(event.key.toLowerCase()));
-window.addEventListener("blur", () => { keys.clear(); if (mode === "playing" || mode === "tutorial") togglePause(); });
+function pauseWhenAway() {resetInput();if(mode==="playing"||mode==="tutorial")togglePause();}
+window.addEventListener("blur",pauseWhenAway);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)pauseWhenAway();});
 
 const joystick = $("joystick");
 function moveStick(event) {
@@ -2446,6 +2756,7 @@ function moveStick(event) {
   $("stick").style.transform = `translate(${pointer.x * 39}px,${pointer.y * 39}px)`;
 }
 joystick.addEventListener("pointerdown", event => {
+  if(pointer.active||(mode!=="playing"&&mode!=="tutorial"))return;
   pointer.active = true; pointer.id = event.pointerId;
   joystick.setPointerCapture(event.pointerId);
   moveStick(event);
@@ -2458,3 +2769,4 @@ function releaseStick(event) {
 }
 joystick.addEventListener("pointerup", releaseStick);
 joystick.addEventListener("pointercancel", releaseStick);
+joystick.addEventListener("lostpointercapture", releaseStick);

@@ -1,0 +1,54 @@
+/* Keep menus and upgrade choices reachable on narrow and short screens. */
+#game-shell { min-height: 0; }
+.overlay { padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); overflow-y: auto; }
+.hero-card, .modal-card, .story-card { max-height: calc(100dvh - 36px); overflow-y: auto; overscroll-behavior: contain; }
+.hero-card, .modal-card { flex-shrink: 0; }
+button:focus-visible, summary:focus-visible { outline: 3px solid #358b9a; outline-offset: 4px; }
+.lesson-progress { height: 4px; margin-top: 5px; overflow: hidden; border-radius: 4px; background: #d7dfd3; }
+.lesson-progress > div { height: 100%; width: 0; background: #47998d; }
+.hp-warning { display: block; margin-bottom: 7px; color: #ffd69a; font-size: 11px; font-weight: 900; line-height: 1.5; }
+.hp-warning[hidden] { display: none; }
+.toast { max-width: calc(100vw - 32px); white-space: normal; text-align: center; line-height: 1.6; }
+.loadout-guide-panel { margin: 15px 0; padding: 12px; border: 1px solid #c5d9cc; border-radius: 10px; background: #e7eee2; text-align: left; }
+.loadout-guide-panel summary { color: #365e59; font-size: 15px; font-weight: 900; cursor: pointer; }
+#loadout-guide { max-height: 210px; overflow-y: auto; margin-top: 8px; }
+#loadout-guide article { padding: 9px 0; border-top: 1px dashed #b6c7b8; }
+#loadout-guide strong { color: #244e58; font-size: 14px; }
+#loadout-guide p { margin: 5px 0 0; color: #496568; font-size: 14px; line-height: 1.7; }
+.upgrade-card small { font-size: 12px; }
+.upgrade-card .upgrade-stats, .upgrade-card .evolution-hint { font-size: 11px; }
+.upgrade-card .upgrade-effect { min-height: 0; }
+@media (pointer: coarse) {
+  .icon-btn, .speed-btn { min-width: 44px; min-height: 44px; }
+  .secondary-btn, .text-btn, .chapter-dialogue button, .tutorial-panel button { min-height: 44px; }
+  .joystick { left: max(20px, env(safe-area-inset-left)); bottom: max(24px, env(safe-area-inset-bottom)); }
+}
+@media (max-width: 650px) {
+  .status-panel { bottom: max(12px, env(safe-area-inset-bottom)); }
+  .talent-slot:not(.equipped) { display: none; }
+  .talent-slots { gap: 3px; }
+  .toast { top: 112px; font-size: 14px; }
+  .timer-box { max-width: 155px; }
+  .hud-label { line-height: 1.4; }
+  .chapter-dialogue { max-height: min(230px, calc(100dvh - 270px)); }
+}
+@media (max-width: 520px) {
+  .topbar .brand { display: none; }
+  .topbar { gap: 8px; }
+  .upgrade-options { grid-template-columns: 1fr; gap: 12px; }
+  .upgrade-card { min-height: 0; padding: 16px; }
+  .upgrade-card .up-icon { float: left; margin: 0 12px 8px 0; }
+  .upgrade-card strong { font-size: 18px; }
+  .upgrade-card .tool-role, .upgrade-card .tool-meter { font-size: 12px; }
+  .upgrade-card small, .upgrade-card .upgrade-stats, .upgrade-card .evolution-hint { font-size: 13px; }
+  .upgrade-card .upgrade-effect { clear: both; padding-top: 5px; }
+  .upgrade-modal h2 { font-size: 29px; }
+  .upgrade-modal > p { font-size: 14px; line-height: 1.6; }
+}
+@media (max-height: 550px) {
+  .overlay { padding-top: 12px; padding-bottom: 12px; }
+  .hero-card, .modal-card, .story-card { max-height: calc(100dvh - 24px); }
+  .status-panel { max-height: 135px; overflow-y: auto; }
+  .chapter-dialogue { max-height: 140px; }
+  #loadout-guide { max-height: 130px; }
+}

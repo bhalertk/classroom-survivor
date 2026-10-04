@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="story.css">
   <link rel="stylesheet" href="tools.css">
+  <link rel="stylesheet" href="polish.css">
 </head>
 <body>
   <main id="game-shell" aria-label="下課生存戰遊戲">
@@ -16,7 +17,7 @@
     <div class="topbar">
       <div class="brand"><span class="brand-icon">✎</span><span>下課生存戰</span><small>國中 102 班</small></div>
       <div class="hud-center">
-        <div class="timer-box"><span id="lesson-label" class="hud-label">第 1 / 30 節</span><strong id="timer">00:30</strong></div>
+        <div class="timer-box"><span id="lesson-label" class="hud-label">第 1 / 30 節</span><strong id="timer">00:30</strong><div class="lesson-progress" aria-hidden="true"><div id="lesson-fill"></div></div></div>
         <div class="wave-box"><span class="hud-label">距離放學</span><strong id="wave">15:00</strong></div>
       </div>
       <div class="hud-right"><span id="kill-count">擊退 0</span><button id="speed-btn" class="icon-btn speed-btn" aria-label="遊戲速度 1 倍，點擊切換" title="切換 1×、2×、3×（F）">1×</button><button id="sound-btn" class="icon-btn" aria-label="開啟音效" title="音效">♪</button><button id="pause-btn" class="icon-btn" aria-label="暫停遊戲" title="暫停">Ⅱ</button></div>
@@ -27,6 +28,7 @@
       <div class="talent-loadout"><span id="talent-label">天賦 0 / 6</span><div id="talent-slots" class="talent-slots"></div></div>
       <small id="slow-label" class="slow-label" hidden>減速 3.0 秒</small>
       <small id="stun-label" class="stun-label" hidden>眩暈 1.0 秒</small>
+      <small id="hp-warning" class="hp-warning" hidden role="status">體力偏低！保持移動、等候回血</small>
       <div class="status-row"><span title="每秒自動回復 2 點體力">體力 · 自動回復</span><strong id="hp-text">200 / 200</strong></div>
       <div class="bar hp-bar"><div id="hp-fill"></div></div>
       <div class="status-row xp-row"><span id="level-text">Lv. 1</span><strong id="xp-text">0 / 6</strong></div>
@@ -54,10 +56,12 @@
         <li>避開手雷與陷阱警示，先處理召喚者；深藍可從側面或背後攻擊。被戳眼時半邊視野會遮蔽 3 秒。</li>
         <li>第 11 節起，大聲公方塊人會發射音波；命中後眩暈 1 秒，暫時不能移動或發動攻擊。</li>
         <li>第 12 節起，飛踢方塊人會叫出倒楣蛋，再把他踢飛當成遠程武器；看到準備動作就側移閃避。</li>
+        <li>第 13 節起，閃身拳手會快速側移接昇龍拳，離開前方扇形或繞背閃避；第 14 節起，飛踢重擊手會直線飛踢再重擊，先側移躲飛踢，再離開落地提示圈。</li>
         <li>第 10 節：瓶蓋收藏家會丟瓶蓋。</li>
         <li>第 20 節：雙人單車隊，一人衝撞、一人丟輪胎；兩人都倒下才算擊敗。</li>
         <li>第 30 節：擊敗最終 Boss，撐到放學鐘響才能通關。</li>
-        <li>Boss 戰暫停課節計時與新小怪生成；原有敵人繼續活動。整組 Boss 擊敗後恢復倒數。</li>
+        <li>Boss 登場時場上小怪與敵方投射物、陷阱消失；Boss 戰暫停課節計時與小怪生成。整組 Boss 擊敗後恢復倒數。</li>
+        <li>Boss 半血後會暴走，加快攻擊；看到蓄力方向先閃避，再找空檔反擊。</li>
         <li>工具與天賦各最多裝備 6 個，鉛筆另外保留。每種工具最多 5 級。</li>
       </ul>
       <div class="tutorial-actions"><button id="tutorial-next" type="button" hidden>我準備好了 →</button><button id="skip-tutorial" type="button">跳過教學，開始挑戰</button></div>
@@ -76,6 +80,7 @@
         </div>
         <button id="start-btn" class="primary-btn">開始故事 <span>→</span></button>
         <button id="practice-btn" class="secondary-btn">直接練習新手教學</button>
+        <button id="quick-start-btn" class="secondary-btn">已熟悉操作，直接挑戰</button>
         <p class="microcopy">30 節課 · 每節 30 秒 · 支援 1× / 2× / 3× 加速</p>
       </div>
     </section>
@@ -83,7 +88,7 @@
     <section id="story-screen" class="overlay" aria-labelledby="story-title">
       <div class="story-card">
         <div class="story-top"><span>102 班 · 轉學第一天</span><span id="story-progress">01 / 06</span></div>
-        <div id="story-art" class="story-art" aria-hidden="true"></div>
+        <div id="story-art" class="story-art animated-story-art" aria-hidden="true"><canvas id="story-canvas" width="900" height="300"></canvas></div>
         <h2 id="story-title"></h2>
         <p id="story-text"></p>
         <div class="story-actions"><button id="story-skip" class="text-btn">跳過劇情</button><button id="story-next" class="primary-btn">下一頁 <span>→</span></button></div>
@@ -118,6 +123,7 @@
         <div class="modal-kicker">TAKE A BREATH</div>
         <h2 id="pause-title">暫停一下</h2>
         <p>準備好再回教室。</p>
+        <details class="loadout-guide-panel" open><summary>我的裝備與進化條件</summary><div id="loadout-guide"></div></details>
         <details class="story-journal"><summary>102 班劇情回顧</summary><div id="pause-story-log"></div></details>
         <button id="resume-btn" class="primary-btn">繼續遊戲 <span>→</span></button>
         <button id="pause-restart-btn" class="secondary-btn">重新開始</button>
@@ -129,9 +135,10 @@
         <div id="end-kicker" class="modal-kicker">GAME OVER</div>
         <h2 id="end-title">再試一次！</h2>
         <p id="end-description"></p>
+        <div class="ending-art" aria-hidden="true"><canvas id="ending-canvas" width="900" height="300"></canvas></div>
         <p id="end-epilogue" class="end-epilogue"></p>
         <details class="story-journal"><summary>102 班劇情回顧</summary><div id="end-story-log"></div></details>
-        <div class="result-stats"><div><strong id="result-time">00:00</strong><span>存活時間</span></div><div><strong id="result-kills">0</strong><span>擊退敵人</span></div><div><strong id="result-level">1</strong><span>達到等級</span></div></div>
+        <div class="result-stats"><div><strong id="result-time">00:00</strong><span>課程進度</span></div><div><strong id="result-kills">0</strong><span>擊退敵人</span></div><div><strong id="result-level">1</strong><span>達到等級</span></div></div>
         <button id="restart-btn" class="primary-btn">再玩一局 <span>↻</span></button>
       </div>
     </section>
