@@ -304,6 +304,41 @@ function showScreen(id) {
   if(id)resetInput();
   for (const name of screens) $(name).classList.toggle("visible", name === id);
 }
+function bindButtonAction(button, action) {
+  let touch=null,suppressClickUntil=0;
+  const clearTouch=()=>{touch=null;button.classList.remove('touch-pressed');};
+  button.addEventListener('pointerdown',event=>{
+    if(event.pointerType!=='touch'){suppressClickUntil=0;return;}
+    if(button.disabled||touch)return;
+    // Secondary fingers receive Pointer Events even when no click is synthesized.
+    touch={id:event.pointerId,x:event.clientX,y:event.clientY,moved:false};
+    button.classList.add('touch-pressed');
+  });
+  button.addEventListener('pointermove',event=>{
+    if(touch?.id!==event.pointerId)return;
+    if(Math.hypot(event.clientX-touch.x,event.clientY-touch.y)>12){touch.moved=true;button.classList.remove('touch-pressed');}
+  });
+  button.addEventListener('pointerup',event=>{
+    if(touch?.id!==event.pointerId)return;
+    const rect=button.getBoundingClientRect();
+    const inside=event.clientX>=rect.left&&event.clientX<=rect.left+rect.width&&event.clientY>=rect.top&&event.clientY<=rect.top+rect.height;
+    const activate=!button.disabled&&!touch.moved&&inside;
+    clearTouch();suppressClickUntil=Date.now()+800;
+    event.preventDefault();
+    if(activate)action();
+  });
+  const cancel=event=>{
+    if(touch?.id!==event.pointerId)return;
+    clearTouch();suppressClickUntil=Date.now()+800;
+  };
+  button.addEventListener('pointercancel',cancel);
+  button.addEventListener('lostpointercapture',cancel);
+  button.addEventListener('click',event=>{
+    // Preserve keyboard/assistive activation; ignore the extra click after a tap.
+    if(event?.detail>0&&Date.now()<suppressClickUntil){event.preventDefault();return;}
+    if(!button.disabled)action();
+  });
+}
 
 function resize() {
   cw = window.innerWidth;
@@ -1060,7 +1095,7 @@ function renderTalentCard(talent, index) {
   const effect = document.createElement("small"); effect.className = "upgrade-stats"; effect.textContent = "超級進化：" + SUPER_TOOLS[talent.toolId].upgrade;
   button.append(icon); button.append(title); button.append(role); button.append(description); button.append(evolution); button.append(effect);
   button.setAttribute("aria-label", `${index + 1}，天賦${talent.name}，${description.textContent}，${evolution.textContent}`);
-  button.addEventListener("click", () => chooseUpgrade(talent.id));
+  bindButtonAction(button, () => chooseUpgrade(talent.id));
   $("upgrade-options").append(button);
 }
 function renderUpgrades(tutorialChoices = null) {
@@ -1114,7 +1149,7 @@ function renderUpgrades(tutorialChoices = null) {
     button.append(icon); button.append(title); button.append(role); button.append(appearance); button.append(description); button.append(meter);
     button.append(stats); button.append(evolution);
     button.setAttribute("aria-label", `${index + 1}，${weapon.name}，${maxed ? description.textContent : `升至 ${nextLevel} 級，${appearance.textContent}，${description.textContent}，${stats.textContent}`}，${evolution.textContent}`);
-    button.addEventListener("click", () => chooseUpgrade(weapon.id));
+    bindButtonAction(button, () => chooseUpgrade(weapon.id));
     $("upgrade-options").append(button);
   });
 }
@@ -2703,23 +2738,23 @@ function togglePause() {
   }
   updateSpeedButton();
 }
-$("start-btn").addEventListener("click", startStory);
-$("story-next").addEventListener("click", nextStory);
-$("story-skip").addEventListener("click", startTutorial);
-$("dialogue-next").addEventListener("click",nextDialogue);
-$("skip-tutorial").addEventListener("click", startGame);
-$("upgrade-skip-tutorial").addEventListener("click", startGame);
-$("tutorial-next").addEventListener("click",()=>{if(mode==='tutorial'&&tutorialStep===15)tutorialAdvance();});
-$("practice-btn").addEventListener("click",startTutorial);
-$("quick-start-btn").addEventListener("click",startGame);
-$("tutorial-replay-btn").addEventListener("click",startTutorial);
-$("tutorial-done-btn").addEventListener("click", startGame);
-$("pause-btn").addEventListener("click", togglePause);
-$("speed-btn").addEventListener("click", cycleGameSpeed);
-$("resume-btn").addEventListener("click", togglePause);
-$("pause-restart-btn").addEventListener("click",()=>isTutorialSession()?startTutorial():startGame());
-$("restart-btn").addEventListener("click", startGame);
-$("sound-btn").addEventListener("click", () => {
+bindButtonAction($("start-btn"), startStory);
+bindButtonAction($("story-next"), nextStory);
+bindButtonAction($("story-skip"), startTutorial);
+bindButtonAction($("dialogue-next"),nextDialogue);
+bindButtonAction($("skip-tutorial"), startGame);
+bindButtonAction($("upgrade-skip-tutorial"), startGame);
+bindButtonAction($("tutorial-next"),()=>{if(mode==='tutorial'&&tutorialStep===15)tutorialAdvance();});
+bindButtonAction($("practice-btn"),startTutorial);
+bindButtonAction($("quick-start-btn"),startGame);
+bindButtonAction($("tutorial-replay-btn"),startTutorial);
+bindButtonAction($("tutorial-done-btn"), startGame);
+bindButtonAction($("pause-btn"), togglePause);
+bindButtonAction($("speed-btn"), cycleGameSpeed);
+bindButtonAction($("resume-btn"), togglePause);
+bindButtonAction($("pause-restart-btn"),()=>isTutorialSession()?startTutorial():startGame());
+bindButtonAction($("restart-btn"), startGame);
+bindButtonAction($("sound-btn"), () => {
   soundEnabled = !soundEnabled;
   $("sound-btn").classList.toggle("muted", !soundEnabled);
   $("sound-btn").setAttribute("aria-label", soundEnabled ? "關閉音效" : "開啟音效");

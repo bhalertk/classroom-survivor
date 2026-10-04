@@ -917,4 +917,51 @@ evalGame('startGame();spawnClock=100;gameSpeed=3;player.hp=80');hpWrites=0;
 evalGame('advanceSimulation(.1)');assert.equal(hpWrites,1);assert.equal(hpDisplay,'81 / 200');
 evalGame("startGame();cw=800;ch=600;scale=1;enemies=[makeEnemy(50,90),makeEnemy(60,90),makeEnemy(player.x+80,player.y)];enemies[1].windup=.5;var savedDrawEnemy=drawEnemy;var drawnEnemyCount=0;drawEnemy=(...args)=>{drawnEnemyCount++;savedDrawEnemy(...args);};render(1);drawEnemy=savedDrawEnemy");
 assert.equal(evalGame('drawnEnemyCount'),2,'An offscreen attack warning remains drawable while idle offscreen enemies are skipped');
-console.log("PASS: 14 enemies, story/tutorial/evolution, boss rules, lossless XP, fatal-hit freeze, touch/visibility pause, loadout guide, navigation, and standalone build");
+// Secondary touch pointers activate buttons without releasing the movement finger.
+function touchEvent(pointerId,extra={}) {
+  return {pointerId,pointerType:'touch',isPrimary:false,clientX:58,clientY:58,preventDefault(){},...extra};
+}
+function touchTap(button,pointerId=102) {
+  button.listeners.pointerdown(touchEvent(pointerId));
+  button.listeners.pointerup(touchEvent(pointerId));
+}
+evalGame('startGame();spawnClock=100');
+elements.joystick.listeners.pointerdown(touchEvent(101,{isPrimary:true,clientX:115}));
+touchTap(elements['speed-btn']);
+assert.equal(evalGame('gameSpeed'),2,'A non-primary finger changes speed while the primary finger holds the joystick');
+assert.equal(evalGame('pointer.id'),101);assert(evalGame('pointer.x>0'));
+evalGame('var touchStartX=player.x;advanceSimulation(.1)');
+assert(evalGame('player.x>touchStartX'),'Movement continues after the second finger taps');
+elements['speed-btn'].listeners.click({detail:1,pointerType:'touch',preventDefault(){}});
+assert.equal(evalGame('gameSpeed'),2,'The browser compatibility click does not change speed a second time');
+elements.joystick.listeners.pointerup(touchEvent(102));assert.equal(evalGame('pointer.id'),101,'Releasing another finger cannot release the stick');
+touchTap(elements['speed-btn'],103);assert.equal(evalGame('gameSpeed'),3,'Repeated taps work while the same movement finger remains held');
+evalGame("while(activeDialogue)nextDialogue();queueNarrative('touch-test',{speaker:'班長',title:'移動中的對話',text:'測試對話'});soundEnabled=true");
+touchTap(elements['dialogue-next'],104);assert.equal(elements['chapter-dialogue'].hidden,true);
+touchTap(elements['sound-btn'],105);assert.equal(evalGame('soundEnabled'),false);assert.equal(evalGame('pointer.id'),101);
+// Dragging out, scrolling a card, cancellation, and disabled controls never activate.
+elements['speed-btn'].listeners.pointerdown(touchEvent(106));
+elements['speed-btn'].listeners.pointermove(touchEvent(106,{clientX:100}));
+elements['speed-btn'].listeners.pointerup(touchEvent(106));assert.equal(evalGame('gameSpeed'),3);
+elements['speed-btn'].listeners.pointerdown(touchEvent(107));
+elements['speed-btn'].listeners.pointerup(touchEvent(107,{clientX:200}));assert.equal(evalGame('gameSpeed'),3);
+elements['speed-btn'].listeners.pointerdown(touchEvent(108));
+elements['speed-btn'].listeners.pointercancel(touchEvent(108));
+elements['speed-btn'].listeners.pointerup(touchEvent(108));assert.equal(evalGame('gameSpeed'),3);
+elements['speed-btn'].disabled=true;touchTap(elements['speed-btn'],109);assert.equal(evalGame('gameSpeed'),3);elements['speed-btn'].disabled=false;
+touchTap(elements['pause-btn'],110);assert.equal(evalGame('mode'),'paused','The second finger can pause immediately');
+elements['pause-btn'].listeners.click({detail:1,preventDefault(){}});assert.equal(evalGame('mode'),'paused','A synthetic click cannot accidentally resume');
+assert.equal(evalGame('pointer.active'),false,'Pausing still clears movement safely');
+touchTap(elements['resume-btn'],111);assert.equal(evalGame('mode'),'playing');
+// Keyboard and mouse clicks retain their original behavior after touch use.
+elements['speed-btn'].listeners.click({detail:0});assert.equal(evalGame('gameSpeed'),1);
+elements['speed-btn'].listeners.pointerdown({pointerType:'mouse'});
+elements['speed-btn'].listeners.click({detail:1});assert.equal(evalGame('gameSpeed'),2);
+evalGame('gainExperience(player.xpNeed)');
+const touchChoice=elements['upgrade-options'].children.find(button=>!button.disabled);
+touchChoice.listeners.pointerdown(touchEvent(112));touchChoice.listeners.pointercancel(touchEvent(112));
+touchChoice.listeners.pointerup(touchEvent(112));assert.equal(evalGame('mode'),'upgrade');
+touchTap(touchChoice,113);assert.equal(evalGame('mode'),'playing','Dynamically created upgrade cards also support secondary touch');
+assert.equal(evalGame("pickups.filter(p=>p.type!=='xp').length"),1);
+touchChoice.listeners.click({detail:1,preventDefault(){}});assert.equal(evalGame("pickups.filter(p=>p.type!=='xp').length"),1);
+console.log("PASS: gameplay regression suite and multi-touch controls (joystick + buttons, cancellation, click deduplication, keyboard/mouse, dynamic upgrade cards)");
