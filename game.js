@@ -564,22 +564,33 @@ function storyBox(c,x,y,w,h,fill,stroke="#785e48",radius=4) {
   if(stroke){c.strokeStyle=stroke;c.lineWidth=2;c.stroke();}
 }
 function drawStudentHairBack(c,headY) {
-  storyBox(c,-20,headY-9,40,38,'#394258',null,10);
-  c.fillStyle='#394258';c.beginPath();c.ellipse(24,headY+9,8,18,-.25,0,Math.PI*2);c.fill();
-  c.fillStyle='#e891a5';c.beginPath();c.arc(22,headY-4,4,0,Math.PI*2);c.fill();
+  storyBox(c,-21,headY-18,42,46,'#623f59',null,12);
+  c.fillStyle='#623f59';c.beginPath();c.ellipse(29,headY+13,10,23,-.28,0,Math.PI*2);c.fill();
+  c.fillStyle='#f6bb66';c.beginPath();c.arc(22,headY-8,5,0,Math.PI*2);c.fill();
+}
+function drawStudentHairFront(c,headY) {
+  c.fillStyle='#623f59';c.beginPath();c.arc(0,headY-7,19,Math.PI,Math.PI*2);c.lineTo(18,headY+2);c.lineTo(6,headY-13);c.lineTo(-18,headY+3);c.fill();
+  c.beginPath();c.moveTo(-19,headY-4);c.lineTo(-10,headY-4);c.lineTo(-14,headY+14);c.lineTo(-20,headY+10);c.fill();
+}
+function drawStudentSkirt(c,top,bottom) {
+  c.fillStyle='#574668';c.beginPath();c.moveTo(-18,top);c.lineTo(18,top);c.lineTo(23,bottom);c.lineTo(-23,bottom);c.closePath();c.fill();
+  c.strokeStyle='#9f82a2';c.lineWidth=1.5;c.beginPath();c.moveTo(-9,top+3);c.lineTo(-11,bottom);c.moveTo(0,top+3);c.lineTo(0,bottom);c.moveTo(9,top+3);c.lineTo(11,bottom);c.stroke();
 }
 function storyStudent(c,x,y,time,walking,leader=false,emotion='calm') {
   c.save();c.translate(x,y+(walking?Math.sin(time*10)*2:0));
-  if(!leader&&player?.gender==='girl')drawStudentHairBack(c,-25);
+  const girl=!leader&&player?.gender==='girl';
+  if(girl)drawStudentHairBack(c,-25);
   c.fillStyle="#43595933";c.beginPath();c.ellipse(0,29,25,6,0,0,Math.PI*2);c.fill();
   if(!leader)storyBox(c,12,-12,15,30,"#cf9b5f","#876b4d");
   for(const side of [-1,1])storyBox(c,side<0?-13:3,20+(walking?Math.sin(time*10+side)*4:0),10,12,"#3d536b","#284959");
-  storyBox(c,-18,-7,36,31,leader?"#528c7b":"#527a9d","#284c69",7);
+  storyBox(c,-18,-7,36,31,leader?"#528c7b":girl?"#d78391":"#527a9d",girl?"#834f6d":"#284c69",7);
   storyBox(c,-24,-4,8,20,"#f5c7a5","#bc917e");storyBox(c,16,-4,8,20,"#f5c7a5","#bc917e");
   c.fillStyle="#f0c49f";c.beginPath();c.arc(0,-25,18,0,Math.PI*2);c.fill();
-  c.fillStyle=leader?"#3e524e":"#394258";c.beginPath();c.arc(0,-31,18,Math.PI,Math.PI*2);c.lineTo(18,-20);c.lineTo(6,-31);c.lineTo(-18,-21);c.fill();
+  if(girl)drawStudentHairFront(c,-25);
+  else {c.fillStyle=leader?"#3e524e":"#394258";c.beginPath();c.arc(0,-31,18,Math.PI,Math.PI*2);c.lineTo(18,-20);c.lineTo(6,-31);c.lineTo(-18,-21);c.fill();}
   drawStoryFace(c,emotion,time);
-  c.fillStyle="#f0cf78";c.fillRect(-17,0,34,4);
+  c.fillStyle=girl?"#fff1cf":"#f0cf78";c.fillRect(-17,0,34,4);
+  if(girl)drawStudentSkirt(c,18,31);
   if(leader){c.strokeStyle="#334e54";c.lineWidth=2;c.strokeRect(-11,-28,10,9);c.strokeRect(2,-28,10,9);c.beginPath();c.moveTo(-1,-24);c.lineTo(2,-24);c.stroke();}
   c.restore();
 }
@@ -2628,14 +2639,17 @@ function drawPlayer(time) {
   ctx.save(); ctx.translate(x, y);
   if (player.invulnerable > 0 && Math.floor(time * 16) % 2) ctx.globalAlpha = .5;
   ctx.fillStyle = "#334f5744"; ctx.beginPath(); ctx.ellipse(0, 25, 24, 8, 0, 0, Math.PI * 2); ctx.fill();
-  if(player.gender==='girl')drawStudentHairBack(ctx,-15);
-  roundedRect(-20, -2, 40, 30, 10, "#527a9d", "#284c69", 3);
+  const girl=player.gender==='girl';
+  if(girl)drawStudentHairBack(ctx,-15);
+  roundedRect(-20, -2, 40, 30, 10, girl?"#d78391":"#527a9d", girl?"#834f6d":"#284c69", 3);
   roundedRect(-26, 3, 9, 20, 3, "#f5c7a5", "#bc917e", 2); roundedRect(17, 3, 9, 20, 3, "#f5c7a5", "#bc917e", 2);
   roundedRect(-14, 23, 11, 10, 3, "#3e4f70"); roundedRect(3, 23, 11, 10, 3, "#3e4f70");
   ctx.fillStyle = "#eec39e"; ctx.beginPath(); ctx.arc(0, -15, 18, 0, 7); ctx.fill();
-  ctx.fillStyle = "#394258"; ctx.beginPath(); ctx.arc(0, -22, 18, Math.PI, Math.PI * 2); ctx.lineTo(18, -16); ctx.lineTo(8, -26); ctx.lineTo(-18, -13); ctx.fill();
+  if(girl)drawStudentHairFront(ctx,-15);
+  else {ctx.fillStyle = "#394258"; ctx.beginPath(); ctx.arc(0, -22, 18, Math.PI, Math.PI * 2); ctx.lineTo(18, -16); ctx.lineTo(8, -26); ctx.lineTo(-18, -13); ctx.fill();}
   ctx.fillStyle = "#283c4a"; ctx.fillRect(-8, -13, 3, 4); ctx.fillRect(5, -13, 3, 4);
-  ctx.fillStyle = "#f1d072"; ctx.fillRect(-18, 4, 36, 4);
+  ctx.fillStyle = girl?"#fff1cf":"#f1d072"; ctx.fillRect(-18, 4, 36, 4);
+  if(girl)drawStudentSkirt(ctx,18,31);
   ctx.save(); ctx.rotate(player.facing); roundedRect(19, -3, 25, 5, 2, "#e6b95e", "#a46f3e", 1); ctx.fillStyle = "#3d4953"; ctx.beginPath(); ctx.moveTo(44, -3); ctx.lineTo(51, -.5); ctx.lineTo(44, 2); ctx.fill(); ctx.restore();
   ctx.restore();
   if(player.stunTime>0) {
