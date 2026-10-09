@@ -25,7 +25,7 @@ function element() {
 const elements = Object.fromEntries(ids.map(id => [id, element()]));
 const drawing = new Proxy({}, { get(_target, key) {
   if(key in _target) return _target[key];
-  if (key === "createRadialGradient") return () => ({ addColorStop() {} });
+  if (key === "createRadialGradient" || key === "createLinearGradient") return () => ({ addColorStop() {} });
   return () => {};
 } });
 elements.game.getContext = () => drawing;
@@ -54,7 +54,12 @@ assert.equal(elements["upgrade-options"].children.length,3);
 assert.equal(elements["tutorial-next"].hidden,true,"Practical lessons cannot be skipped with the next button");
 click("tutorial-next");assert.equal(evalGame("tutorialStep"),3);
 function tutorialCollect() {
-  evalGame("player.x=pickups[0].x;player.y=pickups[0].y;updatePickups(.02)");
+  evalGame("freePosition(pickups[0]);player.x=pickups[0].x;player.y=pickups[0].y;updatePickups(.02)");
+}
+function completeTutorialToolLoadout() {
+  for(let i=0;i<5&&evalGame('mode')==='tutorial';i++)tutorialCollect();
+  assert.equal(evalGame('equippedToolCount()'),6,'Tutorial unlocks talents only after six tools are picked up');
+  assert.equal(evalGame('mode'),'tutorial-upgrade');
 }
 function runUntilTutorialStep(step,limit=500) {
   for(let i=0;i<limit&&evalGame("tutorialStep")<step;i++)evalGame("update(.02)");
@@ -80,7 +85,9 @@ for(let level=2;level<=5;level++) {
   tutorialCollect();assert.equal(evalGame("player.weapons.blueberry"),level);
 }
 assert.equal(evalGame("tutorialStep"),7);
-assert.equal(evalGame("mode"),'tutorial-upgrade');
+assert.equal(evalGame("mode"),'tutorial');
+assert.equal(evalGame("canAcquireTalent('harvest')"),false);
+completeTutorialToolLoadout();
 assert.equal(evalGame("upgradeChoices[0].id"),'harvest');
 document.listeners.keydown({key:'1'});
 assert.equal(evalGame("tutorialStep"),8);
@@ -93,7 +100,7 @@ math.random=()=>0;
 evalGame("damagePlayer(999)");
 assert.equal(evalGame("player.hp"),30,"Tutorial protection prevents defeat during practice");
 assert.equal(evalGame("mode"),'tutorial');
-evalGame("enemies[0].attackClock=0;updateEnemies(.01);keys.add('w')");
+evalGame("player.x=900;player.y=735;enemies[0].x=1050;enemies[0].y=735;enemies[0].attackClock=0;updateEnemies(.01);keys.add('d')");
 runUntilTutorialStep(11,200);evalGame("keys.clear()");
 assert.equal(evalGame("enemies.length"),2,"Ranged lesson introduces both water and rubber enemies");
 for(let i=0;i<600&&evalGame('tutorialStep')===11;i++) {
@@ -209,23 +216,23 @@ evalGame("startGame(); for (const t of CONTENT.talents.slice(0,6)) player.talent
 assert.equal(elements["upgrade-options"].children.filter(b => !b.disabled).length, 1, "With one eligible tool, maxed cards are disabled");
 evalGame("startGame(); enemies = [makeEnemy(player.x + 80, player.y), makeEnemy(player.x + 150, player.y), makeEnemy(player.x + 230, player.y)]; player.weapons.bow = 5; shootAt(enemies[0], 'bow', 670, 10); projectiles[0].x = enemies[0].x; updateProjectiles(.001)");
 assert.equal(evalGame("projectiles.length"), 1, "Arrow passes through the first enemy even at level 5");
-assert.equal(evalGame("enemies[0].hp"), 27);
+assert.equal(evalGame("enemies[0].hp"), 64);
 evalGame("updateProjectiles(.001)");
-assert.equal(evalGame("enemies[0].hp"), 27, "Arrow never hits the same enemy twice");
+assert.equal(evalGame("enemies[0].hp"), 64, "Arrow never hits the same enemy twice");
 evalGame("projectiles[0].x = enemies[1].x; updateProjectiles(.001)");
 assert.equal(evalGame("projectiles.length"), 0, "Arrow stops after the second enemy");
-assert.equal(evalGame("enemies[1].hp"), 22, "Gold arrows deal 50% more damage to their second target");
-assert.equal(evalGame("enemies[2].hp"), 37);
+assert.equal(evalGame("enemies[1].hp"), 59, "Gold arrows deal 50% more damage to their second target");
+assert.equal(evalGame("enemies[2].hp"), 74);
 evalGame("startGame(); enemies = [makeEnemy(player.x + 100, player.y)]; player.weapons.eraser = 1; shootAt(enemies[0], 'eraser', 510, 10); projectiles[0].x = enemies[0].x; updateProjectiles(.001); updateProjectiles(.001)");
-assert.equal(evalGame("enemies[0].hp"), 27, "Eraser hits once on the outward pass");
+assert.equal(evalGame("enemies[0].hp"), 64, "Eraser hits once on the outward pass");
 evalGame("projectiles[0].age = .55; updateProjectiles(.001)");
-assert.equal(evalGame("enemies[0].hp"), 17, "Eraser can hit the same enemy on its return");
+assert.equal(evalGame("enemies[0].hp"), 54, "Eraser can hit the same enemy on its return");
 evalGame("projectiles[0].x = player.x; projectiles[0].y = player.y; updateProjectiles(.001)");
 assert.equal(evalGame("projectiles.length"), 0, "Returning eraser is removed at the player");
 evalGame("startGame(); player.weapons.ruler = 1; player.pencilCooldown = 1; const rulerPoint = rulerPosition(); enemies = [makeEnemy(rulerPoint.x,rulerPoint.y)]; weaponAttacks(.001)");
-assert.equal(evalGame("enemies[0].hp"), 20, "Orbiting ruler deals contact damage");
+assert.equal(evalGame("enemies[0].hp"), 57, "Orbiting ruler deals contact damage");
 evalGame("weaponAttacks(.001)");
-assert.equal(evalGame("enemies[0].hp"), 20, "Ruler cannot damage every frame");
+assert.equal(evalGame("enemies[0].hp"), 57, "Ruler cannot damage every frame");
 evalGame("drawPlayer(1); render(1)");
 
 // Exercise each tool's distinct upgrade mechanics through the actual attack loop.
@@ -240,8 +247,8 @@ evalGame("player.weapons.pistol = 2; weaponAttacks(.001)");
 assert.equal(evalGame("projectiles.length"), 1, "Long barrel upgrade extends targeting range while keeping single shots");
 
 evalGame("startGame(); player.weapons.blueberry = 3; enemies = [makeEnemy(player.x + 200,player.y),makeEnemy(player.x + 225,player.y + 20)]; shootAt(enemies[0],'blueberry',450,10); projectiles[0].x = enemies[0].x; updateProjectiles(.001)");
-assert.equal(evalGame("enemies[0].hp"), 27);
-assert.equal(evalGame("enemies[1].hp"), 31, "Watermelon impact damages nearby enemies with its shockwave");
+assert.equal(evalGame("enemies[0].hp"), 64);
+assert.equal(evalGame("enemies[1].hp"), 68, "Watermelon impact damages nearby enemies with its shockwave");
 assert(evalGame("enemies[0].x > player.x + 250"), "Fruit knocks its direct target forward");
 assert(evalGame("enemies[1].x > player.x + 225"), "The splash also pushes nearby enemies");
 assert.equal(evalGame("effects.some(e => e.type === 'fruit-impact')"), true);
@@ -258,13 +265,13 @@ evalGame("updateEffects(1)");
 assert.equal(evalGame("enemies[0].hp"), 815, "Delayed shockwave damages only once");
 
 evalGame("startGame(); player.weapons.eraser = 3; enemies = [makeEnemy(player.x + 100,player.y)]; shootAt(enemies[0],'eraser',550,10); projectiles[0].x = enemies[0].x; updateProjectiles(.001)");
-assert.equal(evalGame("enemies[0].hp"), 27);
+assert.equal(evalGame("enemies[0].hp"), 64);
 evalGame("projectiles[0].age = .7; updateProjectiles(.001)");
-assert.equal(evalGame("enemies[0].hp"), 12, "Reinforced eraser deals 50% more damage on return");
+assert.equal(evalGame("enemies[0].hp"), 49, "Reinforced eraser deals 50% more damage on return");
 
 evalGame("startGame(); player.weapons.ruler = 3; player.pencilCooldown = 1; enemies = rulerPositions().map(p => makeEnemy(p.x,p.y)); weaponAttacks(.001)");
 assert.equal(evalGame("enemies.length"), 2);
-assert.equal(evalGame("enemies.every(e => e.hp === 12)"), true, "Two rulers cover opposite sides of the player");
+assert.equal(evalGame("enemies.every(e => e.hp === 49)"), true, "Two rulers cover opposite sides of the player");
 evalGame("player.weapons.ruler = 5");
 assert.equal(evalGame("rulerPositions().length"), 3, "Gold ruler forms a three-sided defense");
 
@@ -287,7 +294,7 @@ assert.equal(elements["lesson-label"].textContent, "第 2 / 30 節");
 assert.equal(elements.timer.textContent, "00:30");
 assert.equal(evalGame("GAME_LENGTH"), 900);
 evalGame("startGame(); update(.01)");
-assert.equal(evalGame("enemies.length"), 2, "First lesson starts with two enemies per batch");
+assert.equal(evalGame("enemies.length"), 3, "Hard mode opens with three enemies per batch");
 const earlySpawns = evalGame("spawnSettings()");
 evalGame("gameTime = 29 * LESSON_LENGTH");
 const lateSpawns = evalGame("spawnSettings()");
@@ -298,8 +305,19 @@ evalGame("update(.02)");
 assert.equal(evalGame("enemies.filter(e => e.kind === 'mini1').length"), 1, "Boss cannot spawn twice");
 evalGame("damageEnemy(enemies.find(e => e.kind === 'mini1'), 99999, 'pistol'); gameTime = 19 * LESSON_LENGTH - .02; update(.02)");
 assert.equal(evalGame("enemies.filter(e => e.kind === 'mini2').length"), 2, "Both cyclists appear in lesson twenty");
+assert.equal(elements['boss-team-health'].hidden,false,'The cyclists display separate health bars');
+assert.equal(elements['boss-rider-0-hp'].textContent,'1900 / 1900');
+assert.equal(elements['boss-rider-1-hp'].textContent,'1900 / 1900');
+evalGame("damageEnemy(enemies.find(e=>e.kind==='mini2'&&e.memberIndex===0),100,'pistol');updateHud()");
+assert.equal(elements['boss-rider-0-hp'].textContent,'1800 / 1900');
+assert.equal(elements['boss-rider-1-hp'].textContent,'1900 / 1900','Damaging one rider does not affect the other');
 evalGame("damageEnemy(enemies.find(e => e.kind === 'mini2' && e.hp > 0),99999,'pistol')");
 assert.equal(evalGame("defeatedBosses.has('mini2')"), false, "Defeating one cyclist does not finish the encounter");
+evalGame('updateHud()');assert.equal(elements['boss-rider-0-hp'].textContent,'0 / 1900');
+assert.equal(elements['boss-rider-1-hp'].textContent,'1900 / 1900');
+assert.equal(evalGame('mini2FirstFallen'),0);
+assert.equal(elements['dialogue-story-canvas'].hidden,false,'The first rider defeat shows its animated story');
+evalGame("drawDialogueStoryFrame($('dialogue-story-canvas').getContext('2d'),activeDialogue,2.4,true)");
 evalGame("damageEnemy(enemies.find(e => e.kind === 'mini2' && e.hp > 0), 99999, 'pistol'); gameTime = 29 * LESSON_LENGTH - .02; update(.02)");
 assert.equal(evalGame("enemies.filter(e => e.kind === 'final').length"), 1, "Final boss appears in lesson thirty");
 assert.equal(elements["boss-name"].textContent, "最終 Boss");
@@ -311,6 +329,7 @@ assert.equal(evalGame("mode"), "ended", "Victory requires all thirty lessons and
 assert.equal(elements["end-title"].textContent, "放學了！");
 evalGame("startGame(); enemies = [makeEnemy(player.x + 250,player.y,'mini1')]; enemies[0].windup = .01; enemies[0].throwAngle = Math.PI; updateEnemies(.02)");
 assert.equal(evalGame("enemyProjectiles.length"), 6, "Collector throws a stronger spread of bottle caps");
+assert.equal(evalGame("enemyProjectiles[0].life"),5,"Bottle caps last five seconds");
 assert.equal(evalGame("enemies[0].lungeTime"), 0, "Collector uses ranged attacks");
 evalGame("enemyProjectiles[0].x = player.x; enemyProjectiles[0].y = player.y; enemyProjectiles[0].vx = 0; enemyProjectiles[0].vy = 0; updateEnemyProjectiles(.02)");
 assert.equal(evalGame("player.hp"), evalGame("player.maxHp-24"), "Bottle cap collision damages the player");
@@ -429,7 +448,7 @@ for (const [id, count] of Object.entries({blueberry:5,pistol:1,firecracker:1,bow
 }
 evalGame("startGame(); player.weapons.ruler=5; player.talents.geometry=true; player.pencilCooldown=10; enemies=rulerPositions().map(p=>makeEnemy(p.x,p.y)); weaponAttacks(.001)");
 assert.equal(evalGame("rulerPositions().length"), 5);
-assert.equal(evalGame("enemies.every(e=>e.hp<=0)"), true, "Super ruler damages enemies at all five orbit positions");
+assert.equal(evalGame("enemies.every(e=>e.hp<e.maxHp)"), true, "Super ruler damages enemies at all five orbit positions");
 evalGame("startGame(); player.weapons.bow=5; player.talents.trajectory=true; player.pencilCooldown=10; enemies=[makeEnemy(player.x+200,player.y),makeEnemy(player.x+300,player.y),makeEnemy(player.x+400,player.y)]; for(const e of enemies)e.hp=1000; weaponAttacks(.001); projectiles=[projectiles[2]]; projectiles[0].x=enemies[0].x; updateProjectiles(.001)");
 assert.equal(evalGame("enemies[0].hp"), 912);
 evalGame("projectiles[0].x=enemies[1].x; updateProjectiles(.001)");
@@ -496,17 +515,17 @@ for(const id of ["football","plane","chalk","stapler","book","bell"]){
   evalGame(`drawTool(ctx,'${id}',5,0,0,1,0,true); drawTalent(ctx,matchingTalent('${id}'),0,0)`);
 }
 evalGame("startGame(); player.weapons.football=1; enemies=[makeEnemy(player.x+150,player.y),makeEnemy(player.x+250,player.y),makeEnemy(player.x+350,player.y),makeEnemy(player.x+450,player.y)]; shootAt(enemies[0],'football',400,10); projectiles[0].x=enemies[0].x; updateProjectiles(.001)");
-assert.equal(evalGame("enemies[0].hp"),27);
+assert.equal(evalGame("enemies[0].hp"),64);
 assert.equal(evalGame("projectiles[0].target===enemies[1]"),true,"Football redirects to another enemy after hitting");
 evalGame("projectiles[0].x=enemies[1].x; updateProjectiles(.001); projectiles[0].x=enemies[2].x; updateProjectiles(.001)");
 assert.equal(evalGame("projectiles.length"),0,"Basic football stops after its third distinct target");
-assert.equal(evalGame("enemies[3].hp"),37);
+assert.equal(evalGame("enemies[3].hp"),74);
 
 evalGame("startGame(); player.weapons.plane=3; enemies=[makeEnemy(player.x+150,player.y),makeEnemy(player.x+250,player.y+80)]; shootAt(enemies[0],'plane',390,10); projectiles[0].x=enemies[0].x; updateProjectiles(.001)");
 assert.equal(evalGame("projectiles[0].target===enemies[1]"),true,"Paper plane finds a second target");
 evalGame("projectiles[0].x=enemies[1].x; projectiles[0].y=enemies[1].y; updateProjectiles(.001)");
 assert.equal(evalGame("projectiles.length"),0);
-assert.equal(evalGame("enemies[1].hp"),27);
+assert.equal(evalGame("enemies[1].hp"),64);
 
 evalGame("startGame(); player.weapons.chalk=1; enemies=[makeEnemy(player.x+150,player.y)]; enemies[0].hp=1000; shootAt(enemies[0],'chalk',350,10); projectiles[0].x=enemies[0].x; updateProjectiles(.001); updateEffects(.06)");
 assert.equal(evalGame("enemies[0].hp"),978,"Powder cloud deals periodic damage after chalk impact");
@@ -800,6 +819,7 @@ for(const id of ['pistol','firecracker']) {
     tutorialCollect();document.listeners.keydown({key:'1'});tutorialCollect();
     assert.equal(evalGame(`player.weapons.${id}`),level);
   }
+  completeTutorialToolLoadout();
   const talent=evalGame(`matchingTalent('${id}').id`);
   assert.equal(evalGame('upgradeChoices[0].id'),talent);
   document.listeners.keydown({key:'1'});tutorialCollect();
@@ -1038,11 +1058,11 @@ for(const kind of ['mini1','mini2','final']) {
   evalGame(`queueBossVictory('${kind}')`);
   assert.equal(evalGame(`narrativeHistory.filter(e=>e.id.startsWith('boss-defeat-${kind}')).length`),3,'Victory stories do not repeat');
 }
-// Current settings are the hard preset; easier modes apply to every enemy and Boss.
-for(const [id,hp,regen,enemyHp,bossHps,damage,cap] of [
-  ['easy',280,3,24,[1365,1235,5850],12,119],
-  ['normal',240,2.5,30,[1722,1558,7380],16,156],
-  ['hard',200,2,37,[2100,1900,9000],20,183]
+// Difficulties change health, incoming damage, chase speed and encounter size.
+for(const [id,hp,regen,enemyHp,bossHps,damage,cap,count,speed] of [
+  ['easy',280,3,48,[1365,1235,5850],12,119,1,1],
+  ['normal',240,2.5,61,[1722,1558,7380],16,156,1,1],
+  ['hard',200,2,74,[2100,1900,9000],20,183,3,1.08]
 ]) {
   evalGame('returnToMenu()');click(`difficulty-${id}`);click('quick-start-btn');
   assert.equal(evalGame('runDifficulty'),id);assert.equal(evalGame('player.maxHp'),hp);assert.equal(evalGame('player.healthRegen'),regen);
@@ -1050,11 +1070,12 @@ for(const [id,hp,regen,enemyHp,bossHps,damage,cap] of [
   for(const [i,kind] of ['mini1','mini2','final'].entries())assert.equal(evalGame(`makeEnemy(100,100,'${kind}').maxHp`),bossHps[i]);
   evalGame('damagePlayer(20)');assert.equal(evalGame('player.hp'),hp-damage);
   assert.equal(evalGame('spawnSettings().cap'),cap);
-  assert.equal(evalGame('spawnSettings().count'),id==='hard'?2:1);
-  if(id==='hard')assert.equal(evalGame('spawnSettings().interval'),1.25);else assert(evalGame('spawnSettings().interval')>1.25);
+  assert.equal(evalGame('spawnSettings().count'),count);
+  assert.equal(evalGame('difficultySettings().enemySpeed'),speed);
+  if(id==='hard')assert.equal(evalGame('spawnSettings().interval'),1.125);else assert(evalGame('spawnSettings().interval')>1.25);
   evalGame("chooseDifficulty('easy')");assert.equal(evalGame('runDifficulty'),id,'A running game cannot switch its balance');
   click('practice-btn');assert.equal(evalGame('player.maxHp'),200);assert.equal(evalGame('player.healthRegen'),2);
-  assert.equal(evalGame('makeEnemy(100,100).maxHp'),37,'Tutorial enemies keep consistent practice health');
+  assert.equal(evalGame('makeEnemy(100,100).maxHp'),74,'Tutorial enemies keep consistent practice health');
   click('skip-tutorial');assert.equal(evalGame('runDifficulty'),id);assert.equal(evalGame('player.maxHp'),hp,'Tutorial exit uses the selected difficulty');
   evalGame('gainExperience(player.xpNeed)');assert.equal(evalGame('upgradeRerolls'),1);
 }
@@ -1088,14 +1109,85 @@ for(const kind of ['basic','mini2','final']) {
   assert(evalGame('allClear'),'Enemies stay outside tables while navigating');
   assert(evalGame('closestApproach<100'),`${kind} can navigate around the desk to approach the player`);
 }
-for(const kind of ['cap','rubber','sound-wave','summoned-ball','grenade','tissue']) {
+for(const kind of ['rubber','sound-wave','summoned-ball','grenade','tissue']) {
   evalGame(`startGame();player.x=440;player.y=420;enemyProjectiles=[{type:'${kind}',x:170,y:420,vx:1000,vy:0,r:10,damage:20,life:3,travelTime:1,fuse:2}];updateEnemyProjectiles(.3)`);
   assert.equal(evalGame('enemyProjectiles.length'),0,`${kind} cannot pass through a desk`);
   assert.equal(evalGame('player.hp'),200);
 }
+evalGame("startGame();player.x=440;player.y=420;enemyProjectiles=[{type:'cap',x:170,y:420,vx:1000,vy:0,r:10,damage:24,life:5,angle:0}];updateEnemyProjectiles(.1)");
+assert(evalGame("enemyProjectiles.length===1&&enemyProjectiles[0].vx<0&&enemyProjectiles[0].x<225"),'Bottle caps bounce off desks');
+assert.equal(evalGame('player.hp'),200,'Desk cover protects against a bounced bottle cap');
+assert(Math.abs(evalGame('enemyProjectiles[0].life')-4.9)<1e-8);
+evalGame("startGame();player.x=900;player.y=735;enemyProjectiles=[{type:'cap',x:45,y:735,vx:-300,vy:0,r:10,damage:24,life:5,angle:0}];updateEnemyProjectiles(.1)");
+assert(evalGame("enemyProjectiles.length===1&&enemyProjectiles[0].vx>0&&enemyProjectiles[0].x>30"),'Bottle caps bounce off classroom walls');
+evalGame('enemyProjectiles[0].life=.01;updateEnemyProjectiles(.02)');
+assert.equal(evalGame('enemyProjectiles.length'),0,'Bottle caps disappear when their five-second lifespan ends');
 evalGame('startGame();player.x=290;player.y=490;damagePlayer(20,{x:290,y:350})');
 assert.equal(evalGame('player.hp'),200,'Tables block damage across cover');
 evalGame('damagePlayer(20,{x:290,y:510})');assert.equal(evalGame('player.hp'),180,'Nearby attacks in the same aisle still hit');
 evalGame("startGame();var relocated=makeEnemy(290,415);pickups=[{type:'xp',x:290,y:415,r:8,value:1,age:0}];updatePickups(.02)");
 assert(evalGame('clearOfTables(relocated,relocated.r)&&clearOfTables(pickups[0],pickups[0].r)'),'Spawns and drops never stay inside desks');
-console.log("PASS: gameplay, multi-touch, HUD, reroll, Boss stories, difficulty, gender selection, solid desks/navigation/attacks, tutorial and standalone build");
+// A reserved sixth slot is not enough: the player must actually pick up six different tools.
+evalGame('startGame();gainExperience(player.xpNeed)');
+assert(evalGame("upgradeChoices.every(c=>c.kind==='weapon')"),'Talents cannot appear in the first upgrade');
+evalGame('rerollUpgrades()');
+assert(evalGame("upgradeChoices.every(c=>c.kind==='weapon')"),'Rerolling cannot reveal locked talents');
+evalGame("startGame();for(const w of CONTENT.weapons.slice(0,5))player.weapons[w.id]=5;pickups=[{type:'weapon',weaponId:CONTENT.weapons[5].id,level:1,x:player.x+80,y:player.y,r:15,age:0}]");
+assert.equal(evalGame('reservedToolSlots()'),6);
+assert.equal(evalGame('equippedToolCount()'),5);
+assert.equal(evalGame("canAcquireTalent('harvest')"),false);
+evalGame('gainExperience(player.xpNeed)');
+assert(evalGame("upgradeChoices.every(c=>c.kind==='weapon')"),'Pending sixth tool does not unlock talent cards');
+evalGame("chooseUpgrade('harvest')");
+assert.equal(evalGame("pickups.filter(p=>p.type==='talent').length"),0,'A locked talent cannot be chosen');
+evalGame('mode="playing";freePosition(pickups[0]);player.x=pickups[0].x;player.y=pickups[0].y;updatePickups(.02)');
+assert.equal(evalGame('equippedToolCount()'),6);
+assert.equal(evalGame("canAcquireTalent('harvest')"),true);
+evalGame('for(const w of CONTENT.weapons.slice(0,6))player.weapons[w.id]=5;gainExperience(player.xpNeed)');
+assert(evalGame("upgradeChoices.every(c=>c.kind==='talent')"),'Talents join the pool once six tools are equipped');
+for(const [kind,hp] of Object.entries({basic:74,water:92,weilong:118,deepblue:134,eye:74,boxer:118,dog:34,spider:34}))
+  assert.equal(evalGame(`makeEnemy(100,100,'${kind}').maxHp`),hp,`${kind} melee health doubles`);
+for(const [kind,hp] of Object.entries({rubber:37,tissue:37,striker:59,mini1:2100,practice:20}))
+  assert.equal(evalGame(`makeEnemy(100,100,'${kind}').maxHp`),hp,`${kind} health keeps its original scaling`);
+for(const [kind,lesson,roll] of [['medic',15,.17],['commander',16,.23],['beam',17,.29],['heavykick',18,.35]]) {
+  math.random=()=>roll;evalGame(`gameTime=(${lesson}-1)*LESSON_LENGTH`);
+  assert.equal(evalGame('regularEnemyKind()'),kind);
+  evalGame(`gameTime=(${lesson}-2)*LESSON_LENGTH`);assert.notEqual(evalGame('regularEnemyKind()'),kind);
+}
+math.random=()=>.999;
+evalGame("startGame();enemies=[makeEnemy(1200,735,'medic'),makeEnemy(1210,735,'basic'),makeEnemy(1600,735,'basic')];enemies[0].healClock=.01;enemies[1].hp-=30;enemies[2].hp-=30;var woundedBefore=enemies[1].hp;var distantBefore=enemies[2].hp;updateEnemies(.02)");
+assert.equal(evalGame('enemies[1].hp'),evalGame('woundedBefore+12'),'Medic heals a nearby wounded ally');
+assert.equal(evalGame('enemies[2].hp'),evalGame('distantBefore'),'Medic cannot heal beyond its radius');
+assert(evalGame("effects.some(e=>e.type==='heal-pulse')"));
+evalGame('enemies[1].hp=enemies[1].maxHp-3;enemies[0].healClock=.01;updateEnemies(.02)');
+assert.equal(evalGame('enemies[1].hp'),evalGame('enemies[1].maxHp'),'Medic cannot heal past maximum health');
+evalGame('enemies[0].stunTime=1;enemies[0].healClock=.01;var stunnedHeal=enemies[1].hp;updateEnemies(.02)');
+assert.equal(evalGame('enemies[1].hp'),evalGame('stunnedHeal'),'A stunned medic cannot heal');
+evalGame("startGame();enemies=[makeEnemy(1020,735,'commander'),makeEnemy(1050,735,'basic')];enemies[1].attackClock=2;var followerX=enemies[1].x;updateEnemies(.02)");
+assert.equal(evalGame('enemies[1].rallyBoost'),true);
+assert(Math.abs(evalGame('followerX-enemies[1].x')-79*1.5*1.08*.02)<.1,'Commander multiplies nearby movement speed by 1.5');
+assert(Math.abs(evalGame('enemies[1].attackClock')-1.96)<1e-8,'Commander halves attack interval');
+evalGame('damagePlayer(20,enemies[1])');assert.equal(evalGame('player.hp'),175,'Commander raises ally damage by 25%');
+evalGame('player.invulnerable=0;enemyShot(enemies[1],{type:"rubber",x:player.x,y:player.y,vx:0,vy:0,r:8,damage:20,life:1,angle:0});updateEnemyProjectiles(.01)');
+assert.equal(evalGame('player.hp'),150,'Ranged attacks keep the damage bonus after launch');
+evalGame('enemies[0].stunTime=1;updateEnemies(.02)');assert.equal(evalGame('enemies[1].rallyBoost'),false,'Stunning the commander ends its aura');
+evalGame("startGame();player.x=430;player.y=420;enemies=[makeEnemy(170,420,'beam')];enemies[0].attackClock=0;updateEnemies(.02)");
+assert.equal(evalGame('enemies[0].windup'),1.4,'Beam enemy warns before firing');
+assert.equal(evalGame('enemyProjectiles.length'),0);
+evalGame('mode="paused";advanceSimulation(.4)');assert.equal(evalGame('enemies[0].windup'),1.4,'Pause freezes the beam warning');
+evalGame('mode="playing";enemies[0].windup=.01;enemies[0].throwAngle=0;updateEnemies(.02)');
+assert.equal(evalGame('enemyProjectiles[0].type'),'beam');
+evalGame('updateEnemyProjectiles(.4)');
+assert.equal(evalGame('player.hp'),177,'The charged beam passes through a desk and hits the player');
+assert.equal(evalGame('enemyProjectiles.length'),1,'The beam continues after hitting the player');
+evalGame('player.invulnerable=0;updateEnemyProjectiles(.1)');assert.equal(evalGame('player.hp'),177,'A single beam cannot repeatedly damage the player');
+evalGame("startGame();player.x=470;player.y=650;enemies=[makeEnemy(390,650,'heavykick')];enemies[0].windup=.01;enemies[0].throwAngle=0;updateEnemies(.02)");
+assert.equal(evalGame('player.hp'),178);
+assert(evalGame('player.wallLaunch&&player.wallLaunch.vx>0'));
+evalGame('enemies=[];spawnClock=100;for(var launchFrames=0;launchFrames<100&&player.wallLaunch;launchFrames++)update(.02)');
+assert.equal(evalGame('player.x'),1755,'Heavy kick carries the player across desks to the wall');
+assert.equal(evalGame('player.wallLaunch'),null);assert(evalGame('player.stunTime>0'));
+evalGame("startGame();player.x=470;player.y=800;enemies=[makeEnemy(390,650,'heavykick')];enemies[0].windup=.01;enemies[0].throwAngle=0;updateEnemies(.02)");
+assert.equal(evalGame('player.wallLaunch'),null,'Sidestepping the warning avoids the heavy kick');
+evalGame("for(const kind of ['medic','commander','beam','heavykick']){var e=makeEnemy(player.x+150,player.y,kind);e.windup=.5;e.throwAngle=0;drawEnemy(e,1)}drawEnemyProjectile({type:'beam',x:200,y:200,vx:650,vy:0,r:16});for(const type of ['heal-pulse','heavy-kick','wall-impact'])drawEffect({type,x:200,y:200,age:.2,duration:.4,radius:80})");
+console.log("PASS: gameplay, six-tool talent unlock, melee health, ricocheting caps, support auras, penetrating beam, wall kick, Boss stories, difficulty, solid desks, tutorial and standalone build");

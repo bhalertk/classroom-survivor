@@ -40,10 +40,18 @@
     <aside id="chapter-dialogue" class="chapter-dialogue" hidden aria-label="102 班劇情對話">
       <canvas id="dialogue-portrait" class="dialogue-portrait" width="144" height="144" aria-hidden="true" hidden></canvas>
       <div class="dialogue-heading"><span id="dialogue-speaker"></span><strong id="dialogue-title"></strong></div>
+      <canvas id="dialogue-story-canvas" class="dialogue-story-canvas" width="440" height="120" aria-label="劇情動畫" hidden></canvas>
       <p id="dialogue-text" aria-live="polite"></p>
       <button id="dialogue-next" type="button">收起對話 ×</button>
     </aside>
-    <div id="boss-health" class="boss-health" hidden><div><strong id="boss-name">Boss</strong><span id="boss-hp"></span></div><div class="bar"><div id="boss-fill"></div></div></div>
+    <div id="boss-health" class="boss-health" hidden>
+      <div><strong id="boss-name">Boss</strong><span id="boss-hp"></span></div>
+      <div id="boss-single-bar" class="bar"><div id="boss-fill"></div></div>
+      <div id="boss-team-health" class="boss-team-health" hidden>
+        <div class="boss-member"><div><strong>衝撞手</strong><span id="boss-rider-0-hp"></span></div><div class="bar"><div id="boss-rider-0-fill"></div></div></div>
+        <div class="boss-member"><div><strong>擲胎手</strong><span id="boss-rider-1-hp"></span></div><div class="bar"><div id="boss-rider-1-fill"></div></div></div>
+      </div>
+    </div>
     <div class="bottom-hint">WASD / 方向鍵移動　·　自動攻擊　·　P 暫停</div>
     <div id="joystick" class="joystick" aria-hidden="true"><div id="stick"></div></div>
     <div id="tutorial-panel" class="tutorial-panel" hidden role="region" aria-label="新手教學">
@@ -59,13 +67,15 @@
         <li>第 11 節起，大聲公方塊人會發射音波；命中後眩暈 1 秒，暫時不能移動或發動攻擊。</li>
         <li>第 12 節起，飛踢方塊人會叫出倒楣蛋，再把他踢飛當成遠程武器；看到準備動作就側移閃避。</li>
         <li>第 13 節起，瞬移拳手會瞬移到身旁再出拳，現身後離開扇形或繞背閃避；第 14 節起，三球召喚者會召喚 3 顆球，看到方向線就側移閃避。</li>
-        <li>第 10 節：瓶蓋收藏家會丟瓶蓋。</li>
+        <li>第 15 節起，保健股長每隔一段時間幫附近敵人回血；第 16 節起，助威方塊人讓周圍敵人移動 1.5 倍速、攻擊間隔減半、傷害增加 25%。</li>
+        <li>第 17 節起，氣功方塊人會蓄力發射穿透課桌的光束；第 18 節起，重踢方塊人會先蓄力，再把命中的玩家踢飛到教室邊界。</li>
+        <li>第 10 節：瓶蓋收藏家丟出的瓶蓋會從課桌和牆壁反彈，5 秒後消失。</li>
         <li>第 20 節：雙人單車隊，一人衝撞、一人丟輪胎；一人倒下就觸發劇情，兩人都倒下才結束 Boss 戰。</li>
         <li>課桌和講桌是實體障礙，會擋住你、敵人和敵方攻擊；沿著走道移動，也能利用桌子掩護。</li>
         <li>第 30 節：擊敗最終 Boss，撐到放學鐘響才能通關。</li>
         <li>Boss 登場時場上小怪與敵方投射物、陷阱消失；Boss 戰暫停課節計時與小怪生成。整組 Boss 擊敗後恢復倒數。</li>
         <li>Boss 半血後會暴走，加快攻擊；看到蓄力方向先閃避，再找空檔反擊。</li>
-        <li>工具與天賦各最多裝備 6 個，鉛筆另外保留。每種工具最多 5 級。</li>
+        <li>先撿起並裝備 6 個不同道具，天賦才會出現在升級選項；天賦最多 6 個。鉛筆另外保留，每種工具最多 5 級。</li>
       </ul>
       <div class="tutorial-actions"><button id="tutorial-next" type="button" hidden>我準備好了 →</button><button id="skip-tutorial" type="button">跳過教學，開始挑戰</button></div>
     </div>
@@ -116,7 +126,7 @@
       <div class="modal-card upgrade-modal">
         <div class="modal-kicker">LEVEL UP!</div>
         <h2 id="upgrade-title">課間靈感</h2>
-        <p>工具與天賦隨機三選一，選完要撿起。工具滿 5 級＋對應天賦可超級進化。</p>
+        <p>先撿起並裝備滿 6 個道具，天賦才會加入三選一。選完還要撿起；工具滿 5 級＋對應天賦可超級進化。</p>
         <p id="tutorial-upgrade-guide" class="tutorial-upgrade-guide" hidden></p>
         <div id="upgrade-refresh" class="upgrade-refresh" hidden><button id="upgrade-reroll" type="button" title="免費刷新升級選項（R）">↻ 刷新一次（免費）</button><span id="upgrade-refresh-note" role="status">每次升級限用一次，也可按 R。</span></div>
         <div id="upgrade-options" class="upgrade-options"></div>

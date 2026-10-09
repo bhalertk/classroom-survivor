@@ -39,12 +39,33 @@ button.touch-pressed { filter: brightness(1.12); }
 .difficulty-picker button.selected { border-color: #297b77; background: #377f79; color: #fff8dc; box-shadow: inset 0 0 0 2px #ffffff40; }
 .difficulty-description { margin-bottom: 18px; font-size: 14px; color: #526d70; line-height: 1.6; }
 .difficulty-indicator { margin-bottom: 7px; color: #efd298; font-size: 11px; font-weight: 900; }
+/* Give the classroom HUD a clearer hierarchy against the brighter floor. */
+.brand, #kill-count, .icon-btn, .status-panel { background: #173447ee; border-color: #e2e9dc50; box-shadow: 0 5px 0 #0b1c2bb3, 0 10px 22px #19373d36; }
+.brand-icon { background: linear-gradient(140deg, #ffeb9a, #edb85d); box-shadow: inset 0 -3px 0 #b47c41; }
+.timer-box, .wave-box { background: #fff9eaf2; border-color: #ffffff; box-shadow: 0 5px 0 #8c745b73, 0 9px 22px #564f3e30; }
+.timer-box strong { color: #235e62; }
+.lesson-progress { height: 6px; background: #d6d2be; }
+.lesson-progress > div { background: linear-gradient(90deg, #50a891, #b7d884); }
+.status-panel { border-left: 5px solid #84d4c1; }
+.hp-bar { height: 13px; }
+.hp-bar > div { background: linear-gradient(90deg, #f06462, #ffb27c); }
+.xp-bar > div { background: linear-gradient(90deg, #58c9ca, #b4e8b6); }
+.boss-health { box-shadow: 0 5px 0 #241727b5, 0 12px 28px #341e2870; }
+.boss-team-health[hidden], .dialogue-story-canvas[hidden], #boss-single-bar[hidden] { display: none; }
+.boss-team-health { display: grid; gap: 8px; }
+.boss-member > div:first-child { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 4px; color: #ffe6c3; font-size: 11px; font-weight: 900; }
+.boss-member:nth-child(2) > div:first-child { color: #cceefa; }
+.boss-member .bar { height: 9px; }
+.boss-member:nth-child(2) .bar > div { background: linear-gradient(90deg, #6598ca, #b7e5ed); }
+.dialogue-story-canvas { display: block; clear: both; width: 100%; height: auto; max-height: 120px; margin: 8px 0; border: 2px solid #bca97e; border-radius: 8px; background: #e9dbc1; }
+.difficulty-picker button.selected { box-shadow: inset 0 0 0 2px #ffffff55, 0 4px 0 #215856; }
 @media (pointer: coarse) {
   .icon-btn, .speed-btn { min-width: 44px; min-height: 44px; }
   .secondary-btn, .text-btn, .chapter-dialogue button, .tutorial-panel button { min-height: 44px; }
   .joystick { left: max(20px, env(safe-area-inset-left)); bottom: max(24px, env(safe-area-inset-bottom)); }
 }
 @media (max-width: 650px) {
+  .dialogue-story-canvas { max-height: 78px; }
   .status-panel { bottom: max(12px, env(safe-area-inset-bottom)); }
   .talent-slot:not(.equipped) { display: none; }
   .talent-slots { gap: 3px; }
@@ -67,6 +88,7 @@ button.touch-pressed { filter: brightness(1.12); }
   .upgrade-modal > p { font-size: 14px; line-height: 1.6; }
 }
 @media (max-height: 550px) {
+  .dialogue-story-canvas { max-height: 55px; }
   .overlay { padding-top: 12px; padding-bottom: 12px; }
   .hero-card, .modal-card, .story-card { max-height: calc(100dvh - 24px); }
   .status-panel { max-height: 135px; overflow-y: auto; }

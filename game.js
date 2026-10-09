@@ -72,6 +72,7 @@ const screens = ["start-screen", "story-screen", "tutorial-done-screen", "upgrad
 const keys = new Set();
 const pointer = { active: false, id: null, x: 0, y: 0 };
 const MAP = { w: 1800, h: 1200 };
+const SUPPORT_RADIUS=280;
 const CLASSROOM_DESKS=Array.from({length:15},(_,i)=>({x:290+i%5*300,y:415+Math.floor(i/5)*230,left:225+i%5*300,top:384+Math.floor(i/5)*230,right:355+i%5*300,bottom:460+Math.floor(i/5)*230}));
 const SOLID_TABLES=[...CLASSROOM_DESKS,{left:800,top:250,right:1000,bottom:337}];
 const navigationFields=new Map();
@@ -81,12 +82,14 @@ const GAME_LENGTH = TOTAL_LESSONS * LESSON_LENGTH;
 const MAX_TOOL_LEVEL = 5;
 const MAX_EQUIPPED_TOOLS = 6;
 const MAX_EQUIPPED_TALENTS = 6;
+const MELEE_ENEMY_KINDS = new Set(['basic','water','weilong','deepblue','eye','boxer','dog','spider','heavykick']);
 const PLAYER_MAX_HP = 200;
 const DIFFICULTIES = {
-  easy:{name:'簡單',hp:280,regen:3,enemyHealth:.65,enemyDamage:.6,spawnCount:.6,spawnInterval:1.35,spawnCap:.65,description:'280 體力、每秒回復 3 點；敵人血量 65%、傷害 60%，出怪較少。'},
-  normal:{name:'普通',hp:240,regen:2.5,enemyHealth:.82,enemyDamage:.8,spawnCount:.8,spawnInterval:1.15,spawnCap:.85,description:'240 體力、每秒回復 2.5 點；敵人血量 82%、傷害 80%，出怪適中。'},
-  hard:{name:'困難',hp:PLAYER_MAX_HP,regen:2,enemyHealth:1,enemyDamage:1,spawnCount:1,spawnInterval:1,spawnCap:1,description:'200 體力、每秒回復 2 點；保留目前完整的敵人與 Boss 強度。'}
+  easy:{name:'簡單',hp:280,regen:3,enemyHealth:.65,enemyDamage:.6,enemySpeed:1,spawnCount:.6,spawnInterval:1.35,spawnCap:.65,description:'280 體力、每秒回復 3 點；敵人血量 65%、傷害 60%，出怪較少。'},
+  normal:{name:'普通',hp:240,regen:2.5,enemyHealth:.82,enemyDamage:.8,enemySpeed:1,spawnCount:.8,spawnInterval:1.15,spawnCap:.85,description:'240 體力、每秒回復 2.5 點；敵人血量 82%、傷害 80%，出怪適中。'},
+  hard:{name:'困難',hp:PLAYER_MAX_HP,regen:2,enemyHealth:1,enemyDamage:1,enemySpeed:1.08,spawnCount:1.5,spawnInterval:.9,spawnCap:1,description:'200 體力、每秒回復 2 點；敵人追擊更快，每批敵人更多、出怪更頻繁。'}
 };
+const PRACTICE_DIFFICULTY={hp:PLAYER_MAX_HP,regen:2,enemyHealth:1,enemyDamage:1,enemySpeed:1,spawnCount:1,spawnInterval:1,spawnCap:1};
 CONTENT.talents = [
   {id: "harvest", toolId: "blueberry", name: "豐收之力", icon: "♧", description: "藍莓與西瓜傷害增加 10%", bonus: {damage: 1.1}},
   {id: "focus", toolId: "pistol", name: "精準瞄準", icon: "◎", description: "手槍與加特林射程增加 15%", bonus: {range: 1.15}},
@@ -249,6 +252,7 @@ let runDifficulty='hard';
 let pauseReturnMode = "playing";
 let storyIndex = 0;
 let storyAnimationTime = 0;
+let mini2FirstFallen = null;
 let endingWon = false;
 let dialogueEntrance = null;
 const storyMotionPreference = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
@@ -281,8 +285,8 @@ const TUTORIAL_STEPS = [
   {title:"選完還要撿起",text:"選擇只會讓道具掉到地上。走過去撿起，它才會裝備並開始自動攻擊。",goal:"撿起發光的工具，觀察道具欄。"},
   {title:"試試新工具",text:"工具會自動瞄準附近敵人。這次練習目標只接受剛取得工具的攻擊。",goal:"走到射程內，用新工具擊敗目標。"},
   {title:"親手強化到 5 級",text:"重複「收集經驗 → 選擇強化 → 撿起工具」。每種工具最多 5 級，外型與效果逐級變強。",goal:"本次練習把剛取得的工具升到 5 級。"},
-  {title:"選擇配對天賦",text:"道具與天賦各有 12 種，各最多裝備 6 個。天賦有被動效果，每種只能取得一次。",goal:"在三選一中選擇這個工具的配對天賦。"},
-  {title:"拾取天賦、超級進化",text:"工具滿 5 級＋裝備對應天賦就會自動進化。取得順序不限；尚未撿起的不算裝備。",goal:"撿起紫色天賦徽章，完成超級進化。"},
+  {title:"先裝滿六件道具",text:"還要實際撿起另外五件練習道具，裝滿六個道具欄位後才會出現天賦。接著選擇滿級工具的配對天賦。",goal:"撿滿六件道具，再選擇配對天賦。"},
+  {title:"拾取天賦、超級進化",text:"先裝滿六件道具才能解鎖天賦；工具滿 5 級＋裝備對應天賦就會自動進化。尚未撿起的不算裝備。",goal:"撿起紫色天賦徽章，完成超級進化。"},
   {title:"試用超級進化",text:"進化工具會出現皇冠與紫色星芒，道具欄顯示「超」，攻擊能力也會增強。",goal:"用超級進化工具擊敗練習目標。"},
   {title:"避開方塊人的突刺",text:"看到敵人蓄力，就往側邊移動。正式戰鬥中，敵人 1 造成傷害時有 1% 機率召喚 100 隻同伴。",goal:"移動閃避，成功躲開一次突刺。"},
   {title:"躲開水壺與橡皮筋",text:"敵人 2 會丟水壺，水壺揮擊還會射出 3 顆水珠。敵人 3 會用橡皮筋射擊。保持移動，避開投射物。",goal:"移動並躲過 3 顆投射物。"},
@@ -405,7 +409,7 @@ function spawnSettings() {
   const settings=difficultySettings();
   return { count: Math.max(1,Math.floor((2 + Math.floor((lesson - 1) / 5))*settings.spawnCount)), interval: Math.max(.38, 1.25 - (lesson - 1) * .03)*settings.spawnInterval, cap: Math.round((180 + lesson * 3)*settings.spawnCap) };
 }
-function difficultySettings(){return DIFFICULTIES[isTutorialSession()?'hard':runDifficulty];}
+function difficultySettings(){return isTutorialSession()?PRACTICE_DIFFICULTY:DIFFICULTIES[runDifficulty];}
 function renderDifficultyPicker() {
   for(const id of Object.keys(DIFFICULTIES)) {
     $(`difficulty-${id}`).classList.toggle('selected',selectedDifficulty===id);
@@ -496,7 +500,7 @@ function makePlayer() {
   return {
     gender:selectedGender,
     x: MAP.w / 2, y: MAP.h / 2 + 135, r: 21,
-    hp: difficultySettings().hp, maxHp: difficultySettings().hp, healthRegen: difficultySettings().regen, speed: 225, invulnerable: 0, damageFlash:0, slowTime: 0, stunTime:0, visionTime:0, visionSide:null,
+    hp: difficultySettings().hp, maxHp: difficultySettings().hp, healthRegen: difficultySettings().regen, speed: 225, invulnerable: 0, damageFlash:0, slowTime: 0, stunTime:0, visionTime:0, visionSide:null, wallLaunch:null,
     facing: 0, moving: false, level: 1, xp: 0, xpNeed: 6,
     pencilCooldown: 0, swingTime: 0, swingAngle: 0,
     blueberryCooldown: 0, pistolCooldown: 0, firecrackerCooldown: 0,
@@ -510,6 +514,7 @@ function makePlayer() {
 
 function resetWorld() {
   player = makePlayer();
+  mini2FirstFallen=null;
   narrativeSeen=new Set();narrativeHistory=[];narrativeQueue=[];activeDialogue=null;dialogueTime=0;
   dialogueEntrance?.cancel();dialogueEntrance=null;
   $("chapter-dialogue").hidden=true;
@@ -622,6 +627,78 @@ function drawDialoguePortrait() {
   c.save();c.translate(72,111);c.scale(2.5,2.5);
   storyStudent(c,0,0,portraitTime,false,activeDialogue.speaker==='班長',activeDialogue.emotion||'calm');c.restore();
 }
+function drawStoryCyclist(c,x,y,time,index,fallen=false) {
+  c.save();c.translate(x,y);if(fallen)c.rotate(.9);
+  const color=index===0?'#d7a36e':'#78a5c4',rim=index===0?'#f4d49c':'#c8e5ef';
+  c.strokeStyle='#405667';c.lineWidth=3;
+  for(const wx of [-20,20]) {
+    c.beginPath();c.arc(wx,17,12,0,Math.PI*2);c.stroke();
+    for(let spoke=0;spoke<4;spoke++){const angle=time*8+spoke*Math.PI/2;c.beginPath();c.moveTo(wx,17);c.lineTo(wx+Math.cos(angle)*10,17+Math.sin(angle)*10);c.stroke();}
+  }
+  c.strokeStyle=rim;c.lineWidth=4;c.beginPath();c.moveTo(-20,17);c.lineTo(-6,-8);c.lineTo(7,17);c.closePath();c.moveTo(-6,-8);c.lineTo(20,17);c.lineTo(7,17);c.stroke();
+  storyBox(c,-13,-35,27,28,color,'#466071',3);storyBox(c,-14,-62,28,25,color,'#466071',3);
+  c.fillStyle='#263e4b';c.fillRect(-8,-51,4,4);c.fillRect(5,-51,4,4);
+  storyBox(c,-16,-67,32,6,index===0?'#f4d59b':'#d9edf7','#466071',2);
+  c.strokeStyle='#405667';c.lineWidth=3;c.beginPath();c.moveTo(9,-8);c.lineTo(25,-8);c.lineTo(25,-16);c.stroke();
+  c.restore();
+}
+function drawBossStoryFrame(c,dialogue,time,reduced=false) {
+  const stage=dialogue.id==='boss-arrival-mini2'?'arrival':dialogue.id==='boss-clear-mini2'?'clear':'one-down';
+  const t=reduced?2.4:time,progress=clamp(t/1.6,0,1);
+  c.save();c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,440,120);
+  c.fillStyle='#e8dac0';c.fillRect(0,0,440,120);
+  c.fillStyle='#b5ccb7';c.fillRect(0,0,440,25);c.fillStyle='#b18d69';c.fillRect(0,91,440,29);
+  c.strokeStyle='#c6ae86';c.lineWidth=2;for(let x=0;x<440;x+=55){c.beginPath();c.moveTo(x,91);c.lineTo(x,120);c.stroke();}
+  storyBox(c,182,7,76,18,'#315f5c','#d2be97',3);c.fillStyle='#e9f0d0';c.textAlign='center';c.font="900 11px 'Noto Sans TC',sans-serif";c.fillText('第二道封印',220,20);
+  if(stage==='arrival') {
+    drawStoryCyclist(c,62+progress*92,75,t,0);drawStoryCyclist(c,378-progress*92,75,-t,1);
+    c.fillStyle='#344f58';c.font="900 12px 'Noto Sans TC',sans-serif";c.fillText('衝撞',80,38);c.fillText('輪胎',360,38);
+  } else if(stage==='one-down') {
+    const fallen=mini2FirstFallen??0,survivor=1-fallen;
+    drawStoryCyclist(c,fallen===0?148:292,75,0,fallen,true);
+    const survivorX=survivor===0?100+progress*70:340-progress*70;
+    drawStoryCyclist(c,survivorX,75,t,survivor);
+    c.fillStyle='#344f58';c.font="900 12px 'Noto Sans TC',sans-serif";c.fillText('還有一人！',220,42);
+    if(survivor===1){const tyreX=survivorX-35-progress*50;c.strokeStyle='#47657a';c.lineWidth=5;c.beginPath();c.arc(tyreX,60,11,0,Math.PI*2);c.stroke();}
+    else {c.strokeStyle='#f6bd72';c.lineWidth=3;c.beginPath();c.moveTo(survivorX-50,70);c.lineTo(survivorX-25,70);c.stroke();}
+  } else {
+    drawStoryCyclist(c,145,76,0,0,true);drawStoryCyclist(c,295,76,0,1,true);
+    c.strokeStyle='#ffe19a';c.lineWidth=3;c.beginPath();c.arc(220,58,13+progress*24,0,Math.PI*2);c.stroke();
+    storyBox(c,182,47,76,18,'#fff4d5','#a9885b',3);
+    c.fillStyle='#345955';c.font="900 12px 'Noto Sans TC',sans-serif";c.fillText('封印解除',220,60);
+  }
+  c.restore();
+}
+function drawDialogueStoryFrame(c,dialogue,time,reduced=false) {
+  if(dialogue.id.includes('mini2')){drawBossStoryFrame(c,dialogue,time,reduced);return;}
+  const t=reduced?2.4:time,progress=clamp(t/1.8,0,1);
+  const firstBoss=dialogue.id.includes('mini1'),lastBoss=dialogue.id.includes('final');
+  const victory=dialogue.id.startsWith('boss-defeat-');
+  c.save();c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,440,120);
+  c.fillStyle=lastBoss?'#b8c5bc':'#e8dac0';c.fillRect(0,0,440,120);
+  c.fillStyle=lastBoss?'#768f89':'#b4caba';c.fillRect(0,0,440,25);
+  c.fillStyle='#b39270';c.fillRect(0,91,440,29);
+  c.strokeStyle='#c6ad84';c.lineWidth=1;for(let x=0;x<440;x+=55){c.beginPath();c.moveTo(x,91);c.lineTo(x,120);c.stroke();}
+  storyBox(c,135,5,170,24,lastBoss?'#244749':'#336d64','#bba883',3);
+  c.fillStyle='#f4efcf';c.font="900 12px 'Noto Sans TC',sans-serif";c.textAlign='center';c.fillText(dialogue.title,220,22,160);
+  if(firstBoss) {
+    c.save();c.translate(350-(victory?progress*15:progress*95),76);if(victory)c.rotate(progress*.65);
+    storyBox(c,-20,-33,40,36,'#ab8052','#644934',4);storyBox(c,-21,-58,42,25,'#bd9771','#644934',3);
+    c.fillStyle='#3b4b50';c.fillRect(-9,-48,4,4);c.fillRect(6,-48,4,4);c.restore();
+    for(let i=0;i<4;i++){const capX=victory?345-i*47-progress*120:300-i*49-progress*85,capY=67-Math.abs(Math.sin(t*3+i))*18;c.fillStyle='#f8e8c8';c.strokeStyle='#8c8069';c.lineWidth=2;c.beginPath();c.arc(capX,capY,6,0,Math.PI*2);c.fill();c.stroke();}
+    storyStudent(c,85+progress*28,79,t,!reduced,false,victory?'relieved':'nervous');
+  } else if(lastBoss) {
+    const shade=victory?1-progress:1;
+    c.save();c.globalAlpha=shade;c.translate(335,88);c.fillStyle='#344b4e';c.beginPath();c.moveTo(-34,2);c.lineTo(-19,-60);c.lineTo(0,-82);c.lineTo(20,-60);c.lineTo(38,2);c.closePath();c.fill();c.fillStyle='#f3b96b';c.fillRect(-12,-47,6,4);c.fillRect(7,-47,6,4);c.restore();
+    c.strokeStyle='#f7d68c';c.lineWidth=3;c.beginPath();c.arc(225,61,15+progress*(victory?38:12),0,Math.PI*2);c.stroke();
+    storyStudent(c,90+progress*45,79,t,!reduced,false,victory?'happy':'determined');
+  } else {
+    storyStudent(c,82+progress*34,78,t,!reduced,false,dialogue.speaker==='轉學生'?'determined':'nervous');
+    storyStudent(c,355-progress*30,78,t,!reduced,true,dialogue.speaker==='班長'?'determined':'calm');
+    c.save();c.translate(220,66);c.fillStyle='#fff3d8';c.strokeStyle='#9a7858';c.lineWidth=3;c.beginPath();c.arc(0,0,22,0,Math.PI*2);c.fill();c.stroke();c.rotate(reduced?0:t*.8);c.strokeStyle='#345955';c.beginPath();c.moveTo(0,0);c.lineTo(0,-15);c.stroke();c.restore();
+  }
+  c.restore();
+}
 function drawStoryFrame(c,page,elapsed,reduced=false) {
   function sceneStudent(c,x,y,time,walking,leader=false) {
     const emotions=leader?['happy','nervous','determined','nervous','happy','determined','happy','nervous']:['nervous','surprised','nervous','determined','relieved','determined','happy','tired'];
@@ -714,11 +791,13 @@ function nextDialogue() {
     $("chapter-dialogue").classList.toggle("story-boss-cue",!!bossEntrance);
     const hasPortrait=['班長','轉學生'].includes(activeDialogue.speaker);
     $("dialogue-portrait").hidden=!hasPortrait;
+    $("dialogue-story-canvas").hidden=false;
     $("dialogue-speaker").textContent=activeDialogue.speaker+(activeDialogue.emotion?` · ${EMOTION_LABELS[activeDialogue.emotion]}`:'');
     $("dialogue-title").textContent=activeDialogue.title;
     $("dialogue-text").textContent=activeDialogue.text;
     $("dialogue-next").textContent=narrativeQueue.length?"下一段 →":"收起對話 ×";
     drawDialoguePortrait();
+    drawDialogueStoryFrame($("dialogue-story-canvas").getContext("2d"),activeDialogue,0,storyReducedMotion);
     if(!storyReducedMotion) dialogueEntrance=$("chapter-dialogue").animate?.([
       {opacity:0,transform:`translateY(${bossEntrance?22:12}px) scale(.97)`},
       {opacity:1,transform:"translateY(0) scale(1)"}
@@ -768,7 +847,8 @@ function updateTutorialPanel() {
   if(tutorialStep===0) progress=`移動 ${Math.min(105,Math.floor(tutorialDistance))} / 105`;
   if(tutorialStep===4) progress="尚未裝備：走向地上的工具。";
   if(tutorialStep===6) progress=`${CONTENT.weapons.find(w=>w.id===tutorialToolId).name} Lv.${player.weapons[tutorialToolId]} / 5 · ${pickups.some(p=>p.type==='weapon')?'記得撿起強化！':'收集下一份經驗。'}`;
-  if(tutorialStep===7||tutorialStep===8) progress=`配對天賦：${matchingTalent(tutorialToolId).name}`;
+  if(tutorialStep===7) progress=mode==='tutorial-upgrade'?`已裝備 6 / 6 · 選擇 ${matchingTalent(tutorialToolId).name}`:`已裝備 ${equippedToolCount()} / 6 件道具`;
+  if(tutorialStep===8) progress=`配對天賦：${matchingTalent(tutorialToolId).name}`;
   if(tutorialStep===11) progress=`閃避 ${Math.min(3,tutorialProjectileDodges)} / 3 · 持續移動`;
   if(tutorialStep===12) progress=tutorialWetHit?`減速剩餘 ${player.slowTime.toFixed(1)} 秒`:"碰一下地上的溼衛生紙球。";
   if(tutorialStep===13) progress=`體力 ${Math.floor(player.hp)} / 95`;
@@ -796,6 +876,14 @@ function tutorialDummy(hp=40) {
   const enemy=makeEnemy(point.x,point.y,"practice"); enemy.hp=enemy.maxHp=hp;
   enemies.push(enemy);
 }
+function tutorialNextTool() {
+  const extra=CONTENT.weapons.filter(w=>w.id!==tutorialToolId).slice(0,5);
+  const next=extra.find(w=>!player.weapons[w.id]);
+  if(!next){openTutorialUpgrade();updateTutorialPanel();return;}
+  const index=extra.indexOf(next),point=tutorialPoint(140,[-60,-30,0,30,60][index]);
+  pickups.push({...point,r:15,type:'weapon',weaponId:next.id,level:1,age:0,tutorial:true});
+  updateTutorialPanel();
+}
 function enterTutorialStep(step) {
   tutorialStep=step;
   enemies=[];projectiles=[];enemyProjectiles=[];pickups=[];effects=[];upgradeChoices=[];
@@ -809,7 +897,8 @@ function enterTutorialStep(step) {
   if(step===1||step===5||step===9) tutorialDummy(step===9?180:40);
   if(step===9) addEffect(player.x,player.y,"evolution",{radius:115,duration:.9});
   if(step===2||step===6) tutorialXpTicket();
-  if(step===3||step===7) openTutorialUpgrade();
+  if(step===3) openTutorialUpgrade();
+  if(step===7) tutorialNextTool();
   if(step===4) pickups.push({...tutorialPoint(140),r:15,type:"weapon",weaponId:tutorialToolId,level:1,age:0,tutorial:true});
   if(step===8) pickups.push({...tutorialPoint(140),r:15,type:"talent",talentId:matchingTalent(tutorialToolId).id,age:0,tutorial:true});
   if(step===10) {
@@ -884,9 +973,9 @@ function makeEnemy(x, y, kind = "basic") {
   const practice = kind === "practice";
   const boss = BOSS_SCHEDULE.find(b => b.id === kind);
   const baseHealth = 37 + (currentLesson() - 1) * 5;
-  const health = boss ? boss.hp : practice ? 20 : kind === "deepblue" ? Math.round(baseHealth * 1.8) : kind === "spider" || kind === "dog" ? Math.round(baseHealth * .45) : ["weilong","bit","handler","shepherd","boxer","striker"].includes(kind) ? Math.round(baseHealth * 1.6) : kind === "water" ? Math.round(baseHealth * 1.25) : baseHealth;
-  const scaledHealth=practice?health:Math.max(1,Math.round(health*difficultySettings().enemyHealth));
-  return freePosition({ x, y, kind, boss, hp: scaledHealth, maxHp: scaledHealth, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "deepblue" ? 65 : kind === "mini2" ? 110 : boss ? 77 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), windup: 0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) });
+  const health = boss ? boss.hp : practice ? 20 : kind === "deepblue" ? Math.round(baseHealth * 1.8) : kind === "spider" || kind === "dog" ? Math.round(baseHealth * .45) : ["weilong","bit","handler","shepherd","boxer","striker","medic","commander","beam","heavykick"].includes(kind) ? Math.round(baseHealth * 1.6) : kind === "water" ? Math.round(baseHealth * 1.25) : baseHealth;
+  const scaledHealth=practice?health:Math.max(1,Math.round(health*(MELEE_ENEMY_KINDS.has(kind)?2:1)*difficultySettings().enemyHealth));
+  return freePosition({ x, y, kind, boss, hp: scaledHealth, maxHp: scaledHealth, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "deepblue" ? 65 : kind === "mini2" ? 110 : boss ? 77 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), healClock:2.4, windup: 0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) });
 }
 function spawnEnemy(kind) {
   const viewW = cw / scale;
@@ -1007,7 +1096,7 @@ function damageEnemy(enemy, amount, source, origin = player) {
     }
     kills++;
     if (enemy.boss) {
-      if(enemy.kind==='mini2')queueBossVictory('mini2');
+      if(enemy.kind==='mini2'&&mini2FirstFallen===null){mini2FirstFallen=enemy.memberIndex??0;queueBossVictory('mini2');}
       if (!enemies.some(e => e !== enemy && e.kind === enemy.kind && e.hp > 0)) {
         defeatedBosses.add(enemy.kind);
         showToast(`${enemy.boss.name} 已擊敗！`);
@@ -1244,6 +1333,7 @@ function reservedToolLevel(id) {
 function reservedToolSlots() {
   return new Set([...Object.keys(player.weapons).filter(id => player.weapons[id] > 0), ...pickups.filter(p => p.type === "weapon" && !p.collected).map(p => p.weaponId)]).size;
 }
+function equippedToolCount() {return Object.values(player.weapons).filter(level=>level>0).length;}
 function canUpgradeTool(id) {
   const level = reservedToolLevel(id);
   return level < MAX_TOOL_LEVEL && (level > 0 || reservedToolSlots() < MAX_EQUIPPED_TOOLS);
@@ -1252,7 +1342,7 @@ function reservedTalentSlots() {
   return new Set([...Object.keys(player.talents).filter(id => player.talents[id]), ...pickups.filter(p => p.type === "talent" && !p.collected).map(p => p.talentId)]).size;
 }
 function canAcquireTalent(id) {
-  return !player.talents[id] && !pickups.some(p => p.type === "talent" && p.talentId === id && !p.collected) && reservedTalentSlots() < MAX_EQUIPPED_TALENTS;
+  return equippedToolCount()===MAX_EQUIPPED_TOOLS && !player.talents[id] && !pickups.some(p => p.type === "talent" && p.talentId === id && !p.collected) && reservedTalentSlots() < MAX_EQUIPPED_TALENTS;
 }
 function upgradePool() {
   return [...CONTENT.weapons.map(w => ({...w, kind: "weapon"})), ...CONTENT.talents.map(t => ({...t, kind: "talent"}))];
@@ -1326,7 +1416,7 @@ function renderUpgrades(tutorialChoices = null, previous = new Set()) {
   // Prefer unseen choices; reuse current ones only when the eligible pool is small.
   const refreshed=[...available.filter(choice=>!previous.has(choice.id)),...available.filter(choice=>previous.has(choice.id))];
   upgradeChoices = tutorialChoices||refreshed.slice(0, 3);
-  if (!tutorialChoices&&upgradeChoices.length < 3) upgradeChoices.push(...pool.filter(w => !canChooseUpgrade(w)).slice(0, 3 - upgradeChoices.length));
+  if (!tutorialChoices&&upgradeChoices.length < 3) upgradeChoices.push(...pool.filter(w => (equippedToolCount()===MAX_EQUIPPED_TOOLS||w.kind==='weapon')&&!canChooseUpgrade(w)).slice(0, 3 - upgradeChoices.length));
   const canRefresh=available.some(choice=>!upgradeChoices.some(current=>current.id===choice.id));
   $("upgrade-refresh").hidden=mode!=="upgrade";
   $("upgrade-reroll").disabled=mode!=="upgrade"||upgradeRerolls<=0||!canRefresh;
@@ -1429,9 +1519,10 @@ function updatePickups(dt) {
           if(tutorialStep===4) tutorialAdvance();
           else if(tutorialStep===6) {if(player.weapons[tutorialToolId]>=5) tutorialAdvance();else tutorialXpTicket();}
         }
+        else if(mode==='tutorial'&&tutorialStep===7&&pickup.tutorial) tutorialNextTool();
       } else if (pickup.type === "talent") {
         const talent = CONTENT.talents.find(t => t.id === pickup.talentId);
-        if (talent && (player.talents[talent.id] || Object.values(player.talents).filter(Boolean).length < MAX_EQUIPPED_TALENTS)) {
+        if (talent && equippedToolCount()===MAX_EQUIPPED_TOOLS && (player.talents[talent.id] || Object.values(player.talents).filter(Boolean).length < MAX_EQUIPPED_TALENTS)) {
           player.talents[talent.id] = true;
           showToast(`已裝備天賦：${talent.name}`);
           checkEvolutions();
@@ -1454,10 +1545,10 @@ function checkEvolutions() {
     }
   }
 }
-function damagePlayer(amount,origin=null) {
-  if ((mode !== "playing" && mode !== "tutorial") || player.hp <= 0 || player.invulnerable > 0) return false;
-  if(origin&&tableHit(origin,player))return false;
-  amount=Math.max(0,Math.round(amount*difficultySettings().enemyDamage));
+function damagePlayer(amount,origin=null,ignoreCover=false) {
+  if ((mode !== "playing" && mode !== "tutorial") || player.hp <= 0 || player.invulnerable > 0 || player.wallLaunch) return false;
+  if(origin&&!ignoreCover&&tableHit(origin,player))return false;
+  amount=Math.max(0,Math.round(amount*(origin?.rallyBoost?1.25:1)*difficultySettings().enemyDamage));
   player.hp = Math.max(mode==='tutorial'?30:0, player.hp - amount);
   player.invulnerable = .68;
   player.damageFlash = .18;
@@ -1465,6 +1556,19 @@ function damagePlayer(amount,origin=null) {
   playSound(160, .18, "sawtooth", .055);
   if (player.hp <= 0) finishGame(false);
   return true;
+}
+function kickPlayerToWall(enemy) {
+  if(!damagePlayer(22,enemy))return false;
+  const angle=enemy.throwAngle;
+  player.wallLaunch={vx:Math.cos(angle)*1300,vy:Math.sin(angle)*1300};
+  player.facing=angle;
+  addEffect(player.x,player.y,'heavy-kick',{radius:80,angle,duration:.35});
+  playSound(115,.2,'sawtooth',.05);
+  return true;
+}
+function enemyShot(enemy,projectile) {
+  projectile.rallyBoost=!!enemy.rallyBoost;
+  enemyProjectiles.push(projectile);
 }
 function slowPlayer(duration) {
   if ((mode !== "playing" && mode !== "tutorial") || player.hp <= 0) return;
@@ -1491,21 +1595,21 @@ function stunPlayer(duration) {
 }
 function fireEnemySoundWave(enemy) {
   const angle=enemy.throwAngle;
-  enemyProjectiles.push({type:"sound-wave",x:enemy.x+Math.cos(angle)*35,y:enemy.y+Math.sin(angle)*35,
+  enemyShot(enemy,{type:"sound-wave",x:enemy.x+Math.cos(angle)*35,y:enemy.y+Math.sin(angle)*35,
     vx:Math.cos(angle)*320,vy:Math.sin(angle)*320,r:17,damage:9,life:2.2,angle});
   enemy.attackClock=2.8;
   playSound(260,.18,"triangle",.035);
 }
 function kickUnlucky(enemy) {
   const angle=enemy.throwAngle;
-  enemyProjectiles.push({type:"unlucky",x:enemy.x+Math.cos(angle)*45,y:enemy.y+Math.sin(angle)*45,
+  enemyShot(enemy,{type:"unlucky",x:enemy.x+Math.cos(angle)*45,y:enemy.y+Math.sin(angle)*45,
     vx:Math.cos(angle)*360,vy:Math.sin(angle)*360,r:18,damage:14,life:2.4,angle});
   addEffect(enemy.x,enemy.y,"burst",{color:"#f1c389"});
   enemy.attackClock=3;
   playSound(180,.12,"triangle",.035);
 }
 function throwEnemyGrenade(enemy) {
-  enemyProjectiles.push({type:"grenade",x:enemy.x,y:enemy.y,
+  enemyShot(enemy,{type:"grenade",x:enemy.x,y:enemy.y,
     vx:(enemy.targetX-enemy.x)/.75,vy:(enemy.targetY-enemy.y)/.75,
     targetX:enemy.targetX,targetY:enemy.targetY,travelTime:.75,
     life:1.35,r:10,damage:18,blastRadius:85,angle:0});
@@ -1514,7 +1618,7 @@ function throwBottleCaps(enemy) {
   const rage=enemy.hp<=enemy.maxHp/2,count=rage?9:6,speed=rage?360:300;
   for (let i = 0; i < count; i++) {
     const angle = enemy.throwAngle + (i - (count - 1) / 2) * .18;
-    enemyProjectiles.push({ type: "cap", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 10, damage: enemy.damage, life: 4, angle });
+    enemyShot(enemy,{ type: "cap", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 10, damage: enemy.damage, life: 5, angle });
   }
   playSound(310, .08, "triangle", .04);
 }
@@ -1522,7 +1626,7 @@ function throwTire(enemy) {
   const rage=enemy.hp<=enemy.maxHp/2,count=rage?3:1,speed=rage?335:280;
   for(let i=0;i<count;i++) {
     const angle = enemy.throwAngle+(i-(count-1)/2)*.22;
-    enemyProjectiles.push({ type: "tire", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 17, damage: enemy.damage, life: 4.5, angle });
+    enemyShot(enemy,{ type: "tire", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 17, damage: enemy.damage, life: 4.5, angle });
   }
   playSound(230, .12, "triangle", .04);
 }
@@ -1531,7 +1635,7 @@ function bossShockwave(enemy) {
   const direction=Math.atan2(enemy.lungeVY,enemy.lungeVX);
   for(let i=0;i<count;i++) {
     const angle=rage?i*Math.PI*2/count:direction+(i-(count-1)/2)*.28,speed=rage?285:240;
-    enemyProjectiles.push({type:"boss-wave",x:enemy.x,y:enemy.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
+    enemyShot(enemy,{type:"boss-wave",x:enemy.x,y:enemy.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
       r:12,damage:26,life:2.6,angle});
   }
   addEffect(enemy.x,enemy.y,"boss-enrage",{radius:100,duration:.45});
@@ -1540,7 +1644,7 @@ function bossShockwave(enemy) {
 function waterBottleAttack(enemy) {
   const angle = enemy.throwAngle;
   if (enemy.waterAttack === "throw") {
-    enemyProjectiles.push({type: "bottle", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * 260, vy: Math.sin(angle) * 260, r: 13, damage: 12, life: 3.2, angle});
+    enemyShot(enemy,{type: "bottle", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * 260, vy: Math.sin(angle) * 260, r: 13, damage: 12, life: 3.2, angle});
     enemy.waterAttack = "swing";
   } else {
     enemy.waterSwingTime = .25;
@@ -1550,7 +1654,7 @@ function waterBottleAttack(enemy) {
     if (distance(enemy, player) < 100 + player.r && Math.abs(difference) < 1.1) damagePlayer(enemy.damage,enemy);
     for (let i = -1; i <= 1; i++) {
       const shotAngle = angle + i * .25;
-      enemyProjectiles.push({type: "droplet", x: enemy.x + Math.cos(shotAngle) * 30, y: enemy.y + Math.sin(shotAngle) * 30, vx: Math.cos(shotAngle) * 300, vy: Math.sin(shotAngle) * 300, r: 7, damage: 7, life: 2.8, angle: shotAngle});
+      enemyShot(enemy,{type: "droplet", x: enemy.x + Math.cos(shotAngle) * 30, y: enemy.y + Math.sin(shotAngle) * 30, vx: Math.cos(shotAngle) * 300, vy: Math.sin(shotAngle) * 300, r: 7, damage: 7, life: 2.8, angle: shotAngle});
     }
     enemy.waterAttack = "throw";
   }
@@ -1561,12 +1665,48 @@ function throwClassroomProjectile(enemy) {
   const angle = enemy.throwAngle;
   const tissue = enemy.kind === "tissue";
   const speed = tissue ? 240 : 420;
-  enemyProjectiles.push({type:tissue?"tissue":"rubber",x:enemy.x,y:enemy.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:tissue?12:8,damage:tissue?0:10,life:tissue?Math.max(.1,enemy.throwDistance/speed):2.5,angle});
+  enemyShot(enemy,{type:tissue?"tissue":"rubber",x:enemy.x,y:enemy.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:tissue?12:8,damage:tissue?0:10,life:tissue?Math.max(.1,enemy.throwDistance/speed):2.5,angle});
   enemy.attackClock = tissue ? 2.6 : 1.7;
   playSound(tissue?210:570,.08,"triangle",.03);
 }
+function moveBouncingCap(cap,dt) {
+  let remaining=Math.min(dt,cap.life);
+  for(let bounce=0;bounce<8&&remaining>0.00001;bounce++) {
+    const to={x:cap.x+cap.vx*remaining,y:cap.y+cap.vy*remaining};
+    let hit=tableHit(cap,to,cap.r);
+    const walls=[
+      {t:cap.vx<0?(30-cap.x)/(cap.vx*remaining):cap.vx>0?(MAP.w-30-cap.x)/(cap.vx*remaining):Infinity,nx:cap.vx<0?1:-1,ny:0},
+      {t:cap.vy<0?(70-cap.y)/(cap.vy*remaining):cap.vy>0?(MAP.h-30-cap.y)/(cap.vy*remaining):Infinity,nx:0,ny:cap.vy<0?1:-1}
+    ];
+    for(const wall of walls)if(wall.t>=0&&wall.t<=1&&(!hit||wall.t<hit.t))hit=wall;
+    if(!hit){cap.x=to.x;cap.y=to.y;break;}
+    cap.x+=cap.vx*remaining*hit.t+hit.nx*.1;
+    cap.y+=cap.vy*remaining*hit.t+hit.ny*.1;
+    if(hit.nx)cap.vx=-cap.vx;
+    if(hit.ny)cap.vy=-cap.vy;
+    remaining*=1-hit.t;
+    addEffect(cap.x,cap.y,'burst',{color:'#f3d19a'});
+  }
+  cap.life-=dt;
+  cap.angle+=dt*8;
+}
 function updateEnemyProjectiles(dt) {
   for (const cap of enemyProjectiles) {
+    if(cap.type==='beam') {
+      const start={x:cap.x,y:cap.y},travel=Math.min(dt,Math.max(0,cap.life));
+      cap.x+=cap.vx*travel;cap.y+=cap.vy*travel;cap.life-=dt;
+      const dx=cap.x-start.x,dy=cap.y-start.y,length=dx*dx+dy*dy;
+      const t=length?clamp(((player.x-start.x)*dx+(player.y-start.y)*dy)/length,0,1):0;
+      if(cap.life>0&&!cap.hitPlayer&&distance({x:start.x+dx*t,y:start.y+dy*t},player)<cap.r+player.r) {
+        if(damagePlayer(cap.damage,cap,true))cap.hitPlayer=true;
+      }
+      continue;
+    }
+    if(cap.type==='cap') {
+      moveBouncingCap(cap,dt);
+      if(cap.life>0&&distance(cap,player)<cap.r+player.r){damagePlayer(cap.damage,cap);cap.life=-1;cap.hitPlayer=true;}
+      continue;
+    }
     const travel=cap.type==='grenade'?Math.min(dt,Math.max(0,cap.travelTime)):dt;
     const collision=tableHit(cap,{x:cap.x+cap.vx*travel,y:cap.y+cap.vy*travel},cap.r||0);
     if(collision) {
@@ -1616,6 +1756,37 @@ function summonedBallShots(enemy) {
     return {x,y,angle:Math.atan2(enemy.targetY-y,enemy.targetX-x)+(i-1)*.14};
   });
 }
+function updateSupportEnemy(enemy,dt,movementSpeed,d,dx,dy) {
+  if(enemy.kind==='medic') {
+    enemy.healClock-=dt;
+    if(enemy.healClock<=0) {
+      let healed=0;
+      for(const ally of enemies)if(ally!==enemy&&ally.hp>0&&ally.hp<ally.maxHp&&distance(enemy,ally)<=SUPPORT_RADIUS) {
+        const amount=Math.min(ally.maxHp-ally.hp,Math.min(36,Math.max(12,Math.round(ally.maxHp*.12))));
+        ally.hp+=amount;healed++;
+        addEffect(ally.x,ally.y-ally.r,'number',{text:`+${amount}`,color:'#91e6a3'});
+      }
+      if(healed){addEffect(enemy.x,enemy.y,'heal-pulse',{radius:SUPPORT_RADIUS,duration:.45});playSound(560,.1,'sine',.025);}
+      enemy.healClock=2.4;
+    }
+  }
+  const direction=d>270?1:d<165?-1:0;
+  if(direction)moveActor(enemy,clamp(enemy.x+dx/d*movementSpeed*dt*direction,40,MAP.w-40),clamp(enemy.y+dy/d*movementSpeed*dt*direction,85,MAP.h-40),direction>0);
+}
+function updateBeamEnemy(enemy,dt,movementSpeed,d,dx,dy) {
+  if(enemy.windup>0) {
+    enemy.windup=Math.max(0,enemy.windup-dt);
+    if(enemy.windup===0) {
+      const angle=enemy.throwAngle;
+      enemyShot(enemy,{type:'beam',x:enemy.x,y:enemy.y,vx:Math.cos(angle)*650,vy:Math.sin(angle)*650,r:16,damage:23,life:1.8,angle,hitPlayer:false});
+      enemy.attackClock=3.6;playSound(180,.25,'sawtooth',.04);
+    }
+    return;
+  }
+  if(enemy.attackClock<=0&&d<650){enemy.windup=1.4;enemy.throwAngle=Math.atan2(dy,dx);return;}
+  const direction=d>390?1:d<210?-1:0;
+  if(direction)moveActor(enemy,clamp(enemy.x+dx/d*movementSpeed*dt*direction,40,MAP.w-40),clamp(enemy.y+dy/d*movementSpeed*dt*direction,85,MAP.h-40),direction>0);
+}
 function updateSpecialEnemy(enemy,dt,movementSpeed) {
   const teleporter=enemy.kind==='boxer';
   enemy.martialMove ||= teleporter?'teleport':'volley';
@@ -1640,7 +1811,7 @@ function updateSpecialEnemy(enemy,dt,movementSpeed) {
             moveActor(player,clamp(player.x+Math.cos(angle)*45,45,MAP.w-45),clamp(player.y+Math.sin(angle)*45,87,MAP.h-45));
           }
         } else {
-          for(const shot of summonedBallShots(enemy))enemyProjectiles.push({type:'summoned-ball',...shot,vx:Math.cos(shot.angle)*270,vy:Math.sin(shot.angle)*270,r:12,damage:14,life:3.8});
+          for(const shot of summonedBallShots(enemy))enemyShot(enemy,{type:'summoned-ball',...shot,vx:Math.cos(shot.angle)*270,vy:Math.sin(shot.angle)*270,r:12,damage:14,life:3.8});
           playSound(410,.12,'sine',.03);
         }
         enemy.martialRecovery=teleporter?.65:.8;enemy.attackClock=teleporter?2.8:3.2;
@@ -1667,6 +1838,8 @@ function updateEnemies(dt) {
   let summons = 0;
   const spidersToSpawn = [];
   const dogsToSpawn = [];
+  const commanders=enemies.filter(e=>e.kind==='commander'&&e.hp>0&&e.stunTime<=dt);
+  for(const enemy of enemies)enemy.rallyBoost=enemy.kind!=='practice'&&commanders.some(leader=>leader!==enemy&&distance(leader,enemy)<=SUPPORT_RADIUS);
   for (const enemy of enemies) {
     if (enemy.hp <= 0) continue;
     if (enemy.kind === "spider" || enemy.kind === "dog") {
@@ -1690,10 +1863,26 @@ function updateEnemies(dt) {
     const d = Math.hypot(dx, dy) || 1;
     const wasLunging=enemy.lungeTime>0;
     const rage=!!enemy.boss&&enemy.hp<=enemy.maxHp/2;
-    const movementSpeed = enemy.speed * (enemy.slowTime > 0 ? .55 : 1) * (rage?1.15:1);
-    enemy.attackClock -= dt;
-    if(enemy.kind!=='boxer'&&!enemy.windup&&enemy.lungeTime<=0&&tableHit(enemy,player)) {
+    const movementSpeed = enemy.speed * (enemy.slowTime > 0 ? .55 : 1) * (rage?1.15:1) * (enemy.rallyBoost?1.5:1) * (enemy.kind==='practice'?1:difficultySettings().enemySpeed);
+    enemy.attackClock -= dt*(enemy.rallyBoost?2:1);
+    if(enemy.kind==='medic'||enemy.kind==='commander'){updateSupportEnemy(enemy,dt,movementSpeed,d,dx,dy);continue;}
+    if(enemy.kind!=='boxer'&&enemy.kind!=='beam'&&!enemy.windup&&enemy.lungeTime<=0&&tableHit(enemy,player)) {
       moveActor(enemy,enemy.x+dx/d*movementSpeed*dt,enemy.y+dy/d*movementSpeed*dt,true);
+      continue;
+    }
+    if(enemy.kind==='beam'){updateBeamEnemy(enemy,dt,movementSpeed,d,dx,dy);continue;}
+    if(enemy.kind==='heavykick') {
+      if(enemy.windup>0) {
+        enemy.windup=Math.max(0,enemy.windup-dt);
+        if(enemy.windup===0) {
+          const direction=Math.atan2(dy,dx),difference=Math.atan2(Math.sin(direction-enemy.throwAngle),Math.cos(direction-enemy.throwAngle));
+          if(d<125+player.r&&Math.abs(difference)<.9)kickPlayerToWall(enemy);
+          enemy.attackClock=3;
+        }
+      } else {
+        if(d>92)moveActor(enemy,clamp(enemy.x+dx/d*movementSpeed*dt,40,MAP.w-40),clamp(enemy.y+dy/d*movementSpeed*dt,85,MAP.h-40),true);
+        if(d<150&&enemy.attackClock<=0){enemy.windup=.8;enemy.throwAngle=Math.atan2(dy,dx);}
+      }
       continue;
     }
     if(enemy.kind==="boxer"||enemy.kind==="striker") {updateSpecialEnemy(enemy,dt,movementSpeed);continue;}
@@ -1725,7 +1914,7 @@ function updateEnemies(dt) {
         enemy.windup-=dt;
         if(enemy.windup<=0) {
           if(enemy.trapAttack==="trap") {
-            if(effects.filter(e=>e.type==="enemy-trap").length<20) addEffect(enemy.targetX,enemy.targetY,"enemy-trap",{radius:22,duration:8});
+            if(effects.filter(e=>e.type==="enemy-trap").length<20) addEffect(enemy.targetX,enemy.targetY,"enemy-trap",{radius:22,duration:8,rallyBoost:enemy.rallyBoost});
             enemy.trapAttack="grenade";
           } else {throwEnemyGrenade(enemy);enemy.trapAttack="trap";}
           enemy.attackClock=2.8;
@@ -1962,8 +2151,15 @@ function update(dt) {
   player.stunTime=Math.max(0,player.stunTime-dt);
   const speed = player.speed * (player.slowTime>0?.5:1) * movementDt;
   const previousX=player.x,previousY=player.y;
-  moveActor(player,clamp(player.x + v.x * speed, 45, MAP.w - 45),clamp(player.y + v.y * speed, 87, MAP.h - 45));
-  player.moving = movementDt>0 && Math.hypot(v.x, v.y) > .05;
+  if(player.wallLaunch) {
+    const nextX=player.x+player.wallLaunch.vx*dt,nextY=player.y+player.wallLaunch.vy*dt;
+    player.x=clamp(nextX,45,MAP.w-45);player.y=clamp(nextY,87,MAP.h-45);
+    if(player.x!==nextX||player.y!==nextY) {
+      player.wallLaunch=null;player.stunTime=Math.max(player.stunTime,.4);
+      addEffect(player.x,player.y,'wall-impact',{radius:72,duration:.4});playSound(100,.18,'triangle',.05);
+    }
+  } else moveActor(player,clamp(player.x + v.x * speed, 45, MAP.w - 45),clamp(player.y + v.y * speed, 87, MAP.h - 45));
+  player.moving=!!player.wallLaunch||(movementDt>0&&Math.hypot(v.x,v.y)>.05);
   const actualMovement=Math.hypot(player.x-previousX,player.y-previousY);
   if (player.moving) {
     player.facing = Math.atan2(v.y, v.x);
@@ -1986,7 +2182,7 @@ function update(dt) {
       gameTime=Math.min(gameTime+dt,nextBossTime,GAME_LENGTH);
     }
     if (currentLesson() !== previousLesson) {
-      const firstAppearances={2:"水壺方塊人登場！",3:"橡皮筋方塊人登場！",4:"溼衛生紙方塊人登場！",5:"威龍登場！小心噴射衝刺與爆炸物！",6:"比特登場！小心機械蜘蛛！",7:"深藍登場！繞到盾牌側面或背後！",8:"訓犬員登場！小心追咬的狗！",9:"戳眼方塊人登場！別讓他靠近眼睛！",10:"牧羊人登場！避開陷阱與手雷！",11:"大聲公方塊人登場！音波命中會眩暈！",12:"飛踢方塊人登場！小心被踢飛的倒楣蛋！",13:"瞬移拳手登場！小心旁邊的瞬移落點！",14:"三球召喚者登場！側移閃避三顆球！"};
+      const firstAppearances={2:"水壺方塊人登場！",3:"橡皮筋方塊人登場！",4:"溼衛生紙方塊人登場！",5:"威龍登場！小心噴射衝刺與爆炸物！",6:"比特登場！小心機械蜘蛛！",7:"深藍登場！繞到盾牌側面或背後！",8:"訓犬員登場！小心追咬的狗！",9:"戳眼方塊人登場！別讓他靠近眼睛！",10:"牧羊人登場！避開陷阱與手雷！",11:"大聲公方塊人登場！音波命中會眩暈！",12:"飛踢方塊人登場！小心被踢飛的倒楣蛋！",13:"瞬移拳手登場！小心旁邊的瞬移落點！",14:"三球召喚者登場！側移閃避三顆球！",15:"保健股長登場！會幫周圍敵人回血！",16:"助威方塊人登場！會強化周圍敵人！",17:"氣功方塊人登場！蓄力光束會穿透課桌！",18:"重踢方塊人登場！蓄力後會把你踢到牆邊！"};
       const announcement = hasActiveBoss() ? "Boss 戰持續中！" : firstAppearances[currentLesson()] || "更多方塊人來了！";
       showToast(`第 ${currentLesson()} / 30 節課！${announcement}`);
       if (!hasActiveBoss()) spawnClock = 0;
@@ -2022,7 +2218,11 @@ function regularEnemyKind() {
   if(currentLesson()>=13) {
     if(roll<.07)return "boxer";
     if(currentLesson()>=14&&roll<.14)return "striker";
-    const reserved=currentLesson()>=14?.14:.07;
+    if(currentLesson()>=15&&roll<.20)return "medic";
+    if(currentLesson()>=16&&roll<.26)return "commander";
+    if(currentLesson()>=17&&roll<.32)return "beam";
+    if(currentLesson()>=18&&roll<.38)return "heavykick";
+    const reserved=currentLesson()>=18?.38:currentLesson()>=17?.32:currentLesson()>=16?.26:currentLesson()>=15?.20:currentLesson()>=14?.14:.07;
     roll=(roll-reserved)/(1-reserved);
   }
   if(currentLesson()>=5) {
@@ -2085,10 +2285,20 @@ function updateHud() {
   if (activeBoss) {
     const groupRage=enemies.some(e=>e.kind===activeBoss.kind&&e.hp>0&&e.hp<=e.maxHp/2);
     $("boss-name").textContent = activeBoss.boss.name+(groupRage?" · 暴走":"");
-    const hp = enemies.filter(e => e.kind === activeBoss.kind && e.hp > 0).reduce((total, e) => total + e.hp, 0);
-    const maxHp = activeBoss.maxHp * (activeBoss.boss.members || 1);
-    $("boss-hp").textContent = `${Math.ceil(hp)} / ${maxHp}`;
-    $("boss-fill").style.width = `${hp / maxHp * 100}%`;
+    const team=activeBoss.kind==='mini2';
+    $("boss-single-bar").hidden=team;$("boss-team-health").hidden=!team;
+    if(team) {
+      for(let i=0;i<2;i++) {
+        const rider=enemies.find(e=>e.kind==='mini2'&&e.memberIndex===i&&e.hp>0);
+        const hp=Math.max(0,Math.ceil(rider?.hp||0));
+        $(`boss-rider-${i}-hp`).textContent=`${hp} / ${activeBoss.maxHp}`;
+        $(`boss-rider-${i}-fill`).style.width=`${hp/activeBoss.maxHp*100}%`;
+      }
+      $("boss-hp").textContent=`${enemies.filter(e=>e.kind==='mini2'&&e.hp>0).length} / 2 人`;
+    } else {
+      $("boss-hp").textContent = `${Math.ceil(activeBoss.hp)} / ${activeBoss.maxHp}`;
+      $("boss-fill").style.width = `${Math.max(0,activeBoss.hp/activeBoss.maxHp)*100}%`;
+    }
   }
 }
 function renderLoadoutGuide() {
@@ -2111,8 +2321,9 @@ function renderLoadoutGuide() {
 }
 function renderTalentHud() {
   const equipped = CONTENT.talents.filter(t => player.talents[t.id]);
-  $("talent-label").textContent = `天賦 ${equipped.length} / ${MAX_EQUIPPED_TALENTS}`;
-  const signature = CONTENT.talents.map(t => `${Number(!!player.talents[t.id])}:${Number(isEvolved(t.toolId))}`).join(",");
+  const unlocked=equippedToolCount()===MAX_EQUIPPED_TOOLS;
+  $("talent-label").textContent = unlocked?`天賦 ${equipped.length} / ${MAX_EQUIPPED_TALENTS}`:`天賦未解鎖 · 道具 ${equippedToolCount()} / ${MAX_EQUIPPED_TOOLS}`;
+  const signature = `${unlocked}:`+CONTENT.talents.map(t => `${Number(!!player.talents[t.id])}:${Number(isEvolved(t.toolId))}`).join(",");
   if (signature === talentHudSignature) return;
   talentHudSignature = signature;
   $("talent-slots").replaceChildren();
@@ -2121,7 +2332,7 @@ function renderTalentHud() {
     const badge = document.createElement("span");
     if (!talent) {
       badge.className = "talent-slot"; badge.textContent = "○ 空位";
-      badge.setAttribute("title", "升級選擇天賦後，走過去撿起來裝備");
+      badge.setAttribute("title", unlocked?"升級選擇天賦後，走過去撿起來裝備":"先撿起六件不同道具，才會解鎖天賦");
       $("talent-slots").append(badge); continue;
     }
     const active = !!player.talents[talent.id];
@@ -2379,21 +2590,34 @@ function drawTalent(c, talent, x, y, size = 1) {
   c.restore();
 }
 function drawDesk(x, y) {
-  roundedRect(x - 53, y + 24, 106, 21, 5, "#9c7553", "#77563f", 2);
-  roundedRect(x - 65, y - 28, 130, 65, 8, "#987454", "#74563e", 3);
-  roundedRect(x - 61, y - 31, 122, 57, 7, "#d9ae72", "#ac7d4c", 3);
-  ctx.fillStyle = "#ecd09b"; ctx.fillRect(x - 48, y - 21, 95, 3);
-  roundedRect(x - 28, y - 9, 35, 22, 3, "#f5e9ce", "#cabd9d");
-  ctx.fillStyle = "#e5b66b"; ctx.fillRect(x + 23, y - 11, 27, 4);
+  ctx.fillStyle='#5b493d32';ctx.beginPath();ctx.ellipse(x+10,y+47,77,17,0,0,Math.PI*2);ctx.fill();
+  roundedRect(x-48,y+24,96,25,6,'#8f694c','#6b4b37',3);
+  roundedRect(x-39,y+30,78,13,3,'#a77d56','#6b4b37',2);
+  roundedRect(x-65,y-24,130,66,8,'#866244','#65472f',3);
+  roundedRect(x-65,y-33,130,65,8,'#d3a16b','#795437',4);
+  roundedRect(x-61,y-29,122,57,6,'#ddb27b','#f2d4a3',2);
+  ctx.strokeStyle='#b88857';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x-53,y-12);ctx.bezierCurveTo(x-7,y-16,x+8,y-9,x+52,y-14);ctx.moveTo(x-54,y+16);ctx.bezierCurveTo(x-10,y+11,x+17,y+19,x+51,y+14);ctx.stroke();
+  roundedRect(x-30,y-10,39,25,3,'#f8edcf','#baa883',1.5);
+  ctx.strokeStyle='#b4c6ba';ctx.lineWidth=1;for(let line=0;line<3;line++){ctx.beginPath();ctx.moveTo(x-26,y-4+line*6);ctx.lineTo(x+4,y-4+line*6);ctx.stroke();}
+  roundedRect(x+22,y-11,30,6,2,'#e7bf74','#9e7147',1);
+  ctx.fillStyle='#d26766';ctx.fillRect(x+22,y-12,5,8);
 }
 function drawClassroom() {
-  ctx.fillStyle = "#d8c9ac"; ctx.fillRect(0, 0, MAP.w, MAP.h);
-  ctx.strokeStyle = "#c8b994"; ctx.lineWidth = 2;
+  const floor=ctx.createLinearGradient(0,0,MAP.w,MAP.h);
+  floor.addColorStop(0,'#efe0bf');floor.addColorStop(.5,'#ddcdaa');floor.addColorStop(1,'#c8b797');
+  ctx.fillStyle=floor;ctx.fillRect(0,0,MAP.w,MAP.h);
+  ctx.fillStyle='#ffffff18';for(let row=0;row<MAP.h/160;row++)for(let col=0;col<MAP.w/160;col++)if((row+col)%3===0)ctx.fillRect(col*160+2,row*160+2,156,156);
+  ctx.strokeStyle = "#af9d7b66"; ctx.lineWidth = 2;
   for (let x = 0; x < MAP.w; x += 80) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP.h); ctx.stroke(); }
   for (let y = 0; y < MAP.h; y += 80) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP.w, y); ctx.stroke(); }
+  ctx.fillStyle='#fff5cf34';for(let beam=0;beam<4;beam++){const sy=275+beam*230;ctx.beginPath();ctx.moveTo(66,sy+8);ctx.lineTo(66,sy+104);ctx.lineTo(640,sy+348);ctx.lineTo(730,sy+313);ctx.closePath();ctx.fill();}
+  ctx.fillStyle='#795e4540';ctx.fillRect(18,22,22,MAP.h-44);ctx.fillRect(MAP.w-40,22,22,MAP.h-44);
   roundedRect(20, 20, MAP.w - 40, MAP.h - 40, 12, null, "#b89970", 22);
+  roundedRect(523,37,754,188,12,'#6a4e38','#f2dcae',3);
   roundedRect(535, 36, 730, 176, 7, "#8a6446", "#684c37", 8);
-  roundedRect(551, 52, 698, 143, 4, "#306d66", "#d4c6a2", 5);
+  const board=ctx.createLinearGradient(551,52,1249,195);board.addColorStop(0,'#397970');board.addColorStop(1,'#22564f');
+  roundedRect(551, 52, 698, 143, 4, board, "#d4c6a2", 5);
+  ctx.strokeStyle='#d6e1c333';ctx.lineWidth=2;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(600+i*130,62);ctx.lineTo(548+i*130,180);ctx.stroke();}
   ctx.fillStyle = "#e1edcf"; ctx.textAlign = "center"; ctx.font = "900 23px 'Noto Sans TC',sans-serif"; ctx.fillText("國中 102 班", 900, 91);
   ctx.font = "900 37px 'Noto Sans TC',sans-serif"; ctx.fillText("一起撐到放學！", 900, 142);
   ctx.font = "14px 'Noto Sans TC',sans-serif";ctx.fillText("值日生：班長、轉學生",900,174);
@@ -2406,10 +2630,13 @@ function drawClassroom() {
   for(const [x,label] of [[1410,"歡迎新同學"],[1547,"值日生輪值"]]){roundedRect(x,96,119,91,2,"#fff4da");ctx.fillStyle="#698278";ctx.font="12px 'Noto Sans TC',sans-serif";ctx.fillText(label,x+59,117);ctx.fillRect(x+14,130,88,3);ctx.fillRect(x+14,144,70,3);ctx.fillRect(x+14,158,80,3);}
   roundedRect(800, 250, 200, 78, 8, "#b98553", "#7f5b3e", 4);
   roundedRect(810, 321, 180, 16, 5, "#8a6345");
+  roundedRect(844,259,71,46,3,'#f0e3c6','#9b856d',2);roundedRect(910,269,20,25,2,'#7396a8','#466878',2);
   for (const desk of CLASSROOM_DESKS) drawDesk(desk.x,desk.y);
   for (let y = 275; y < 970; y += 230) {
+    ctx.fillStyle='#e5f8e023';ctx.beginPath();ctx.moveTo(65,y+8);ctx.lineTo(360,y+117);ctx.lineTo(341,y+144);ctx.lineTo(65,y+104);ctx.fill();
     roundedRect(31, y, 34, 130, 2, "#b6dce1", "#8aacae", 5);
     ctx.strokeStyle = "#8aacae"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(48, y); ctx.lineTo(48, y + 130); ctx.moveTo(31, y + 65); ctx.lineTo(65, y + 65); ctx.stroke();
+    ctx.strokeStyle='#f8ffffbb';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(37,y+8);ctx.lineTo(37,y+54);ctx.stroke();
   }
   roundedRect(MAP.w - 73, 423, 45, 145, 4, "#a57850", "#775339", 5);
   roundedRect(MAP.w-137,379,108,30,4,"#ecedcf","#668e7d",3);ctx.fillStyle="#35584f";ctx.font="900 18px 'Noto Sans TC',sans-serif";ctx.fillText("102 班",MAP.w-83,401);
@@ -2455,7 +2682,7 @@ function drawEnemy(enemy, time) {
   }
   const size = enemy.r / 21;
   const x = enemy.x, y = enemy.y + Math.sin(time * 5 + enemy.wobble) * 2;
-  const main = enemy.hitFlash ? "#fff6e5" : enemy.windup > 0 ? "#e69b76" : enemy.lungeTime > 0 ? "#db7868" : enemy.kind === "kicker" ? "#ba785e" : enemy.kind === "megaphone" ? "#ba955d" : enemy.kind === "weilong" ? "#637777" : enemy.kind === "bit" ? "#7373a4" : enemy.kind === "deepblue" ? "#486b99" : enemy.kind === "handler" ? "#a98459" : enemy.kind === "eye" ? "#b88486" : enemy.kind === "shepherd" ? "#788369" : enemy.kind === "rubber" ? "#af9869" : enemy.kind === "tissue" ? "#a1b6a0" : enemy.kind === "water" || (enemy.kind === "mini2" && enemy.memberIndex === 1) ? "#6d92ae" : enemy.boss ? enemy.boss.color : enemy.kind === "practice" ? "#7aabb4" : "#829b93";
+  const main = enemy.hitFlash ? "#fff6e5" : enemy.windup > 0 ? "#e69b76" : enemy.lungeTime > 0 ? "#db7868" : enemy.kind === "heavykick" ? "#aa7768" : enemy.kind === "medic" ? "#69a98b" : enemy.kind === "commander" ? "#cf9b56" : enemy.kind === "beam" ? "#668cb9" : enemy.kind === "kicker" ? "#ba785e" : enemy.kind === "megaphone" ? "#ba955d" : enemy.kind === "weilong" ? "#637777" : enemy.kind === "bit" ? "#7373a4" : enemy.kind === "deepblue" ? "#486b99" : enemy.kind === "handler" ? "#a98459" : enemy.kind === "eye" ? "#b88486" : enemy.kind === "shepherd" ? "#788369" : enemy.kind === "rubber" ? "#af9869" : enemy.kind === "tissue" ? "#a1b6a0" : enemy.kind === "water" || (enemy.kind === "mini2" && enemy.memberIndex === 1) ? "#6d92ae" : enemy.boss ? enemy.boss.color : enemy.kind === "practice" ? "#7aabb4" : "#829b93";
   const edge = "#4c6a68";
   ctx.save(); ctx.translate(x, y); ctx.scale(size, size);
   ctx.fillStyle = "#34505a44"; ctx.beginPath(); ctx.ellipse(0, 22, 22, 7, 0, 0, Math.PI * 2); ctx.fill();
@@ -2465,7 +2692,30 @@ function drawEnemy(enemy, time) {
   roundedRect(-17, -26, 34, 29, 2, main, edge, 3);
   ctx.fillStyle = "#253d46"; ctx.fillRect(-9, -13, 4, 5); ctx.fillRect(6, -13, 4, 5);
   ctx.strokeStyle = "#253d46"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-4, -5); ctx.lineTo(4, -5); ctx.stroke();
-  if(enemy.kind==="boxer"||enemy.kind==="striker") {
+  if(enemy.kind==='heavykick') {
+    roundedRect(-20,-31,40,9,3,'#e6b394','#7b554e',2);
+    roundedRect(-12,5,24,17,3,'#6e4a4c','#503d46',2);
+    ctx.fillStyle='#ffe2be';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('18',0,18);
+    ctx.save();ctx.rotate(enemy.throwAngle||0);
+    roundedRect(enemy.windup>0?8:11,18,30,12,3,'#3f454f','#e6b394',2);
+    ctx.restore();
+  } else if(enemy.kind==='medic') {
+    roundedRect(-20,-31,40,8,3,'#e9f3dc','#47806b',2);
+    roundedRect(-12,5,24,18,3,'#e9f3dc','#47806b',2);
+    ctx.fillStyle='#4ebd82';ctx.fillRect(-2,8,4,12);ctx.fillRect(-6,12,12,4);
+    roundedRect(18,4,14,18,3,'#f3f0d7','#47806b',2);
+  } else if(enemy.kind==='commander') {
+    roundedRect(-20,-31,40,9,3,'#ffe0a0','#8b6646',2);
+    roundedRect(-13,5,26,18,3,'#f3d29b','#8b6646',2);
+    ctx.fillStyle='#825b46';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('16',0,18);
+    roundedRect(18,-23,43,21,4,'#fff0be','#8b6646',2);
+    ctx.fillStyle='#a06b42';ctx.font='900 10px sans-serif';ctx.fillText('衝啊！',39,-8);
+  } else if(enemy.kind==='beam') {
+    roundedRect(-20,-31,40,8,3,'#a7e9f3','#356480',2);
+    roundedRect(-12,5,24,18,3,'#345e8d','#273f63',2);
+    ctx.fillStyle='#cffcff';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('17',0,18);
+    ctx.fillStyle='#8ef7ff';ctx.beginPath();ctx.arc(24,8,enemy.windup>0?9:5,0,Math.PI*2);ctx.fill();
+  } else if(enemy.kind==="boxer"||enemy.kind==="striker") {
     const boxer=enemy.kind==="boxer",trim=boxer?"#64d9d0":"#ca8cdb";
     roundedRect(-19,-29,38,7,2,trim,"#465568",2);
     ctx.fillStyle=trim;ctx.beginPath();ctx.moveTo(17,-26);ctx.lineTo(35,-20);ctx.lineTo(24,-15);ctx.closePath();ctx.fill();
@@ -2586,16 +2836,29 @@ function drawEnemy(enemy, time) {
     ctx.beginPath(); ctx.moveTo(-16, -28); ctx.lineTo(-18, -39); ctx.lineTo(-8, -34); ctx.lineTo(0, -43); ctx.lineTo(8, -34); ctx.lineTo(18, -39); ctx.lineTo(16, -28); ctx.closePath(); ctx.fill();
   }
   ctx.restore();
+  if(enemy.kind==='commander') {
+    ctx.strokeStyle='#f3bf69aa';ctx.lineWidth=2;ctx.setLineDash([8,8]);ctx.beginPath();ctx.arc(x,y,SUPPORT_RADIUS,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+  } else if(enemy.kind==='medic') {
+    ctx.strokeStyle='#7fe5a288';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,55+Math.sin(time*4)*3,0,Math.PI*2);ctx.stroke();
+  }
+  if(enemy.rallyBoost){ctx.strokeStyle='#f6d070';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,enemy.r+5,0,Math.PI*2);ctx.stroke();}
   if(enemy.kind==="kicker"&&enemy.windup>0) {
     drawUnlucky(ctx,x+Math.cos(enemy.throwAngle)*45,y+Math.sin(enemy.throwAngle)*45,0,.7);
   }
   if(enemy.stunTime>0){ctx.strokeStyle="#c6b7ff";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-enemy.r-12,16,5,time*3,0,Math.PI*2);ctx.stroke();}
   if(enemy.boss&&enemy.hp<=enemy.maxHp/2){ctx.strokeStyle="#ff9f6b99";ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y+15,enemy.r+8,enemy.r*.42,0,0,Math.PI*2);ctx.stroke();}
-  const name={weilong:"威龍",bit:"比特",deepblue:"深藍",handler:"訓犬員",eye:"戳眼方塊人",shepherd:"牧羊人",megaphone:"大聲公方塊人",kicker:"飛踢方塊人",boxer:"瞬移拳手",striker:"三球召喚者"}[enemy.kind];
+  const name={weilong:"威龍",bit:"比特",deepblue:"深藍",handler:"訓犬員",eye:"戳眼方塊人",shepherd:"牧羊人",megaphone:"大聲公方塊人",kicker:"飛踢方塊人",boxer:"瞬移拳手",striker:"三球召喚者",medic:"保健股長",commander:"助威方塊人",beam:"氣功方塊人",heavykick:"重踢方塊人"}[enemy.kind];
   if(name){const width=name.length*11+12;roundedRect(x-width/2,y-56,width,17,4,"#29464bde");ctx.fillStyle="#d9f5ec";ctx.font="900 11px sans-serif";ctx.textAlign="center";ctx.fillText(name,x,y-43);}
   if (enemy.windup > 0) {
     ctx.strokeStyle = `rgba(221,99,78,${.4 + Math.sin(time * 35) * .25})`;
     ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x, y, enemy.r + 8, 0, 7); ctx.stroke();
+    if(enemy.kind==='beam') {
+      ctx.strokeStyle='#8bf5facc';ctx.lineWidth=22*enemy.windup/1.4+3;ctx.setLineDash([15,12]);
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(enemy.throwAngle)*1100,y+Math.sin(enemy.throwAngle)*1100);ctx.stroke();ctx.setLineDash([]);
+    }
+    if(enemy.kind==='heavykick') {
+      ctx.strokeStyle='#ffcca5';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x,y);ctx.arc(x,y,130,enemy.throwAngle-.9,enemy.throwAngle+.9);ctx.closePath();ctx.stroke();
+    }
     if(enemy.kind==="boxer"||enemy.kind==="striker") {
       ctx.strokeStyle=enemy.kind==="boxer"?"#99eee4cc":"#f2b9ffcc";ctx.lineWidth=3;
       ctx.beginPath();
@@ -2636,6 +2899,8 @@ function drawEnemy(enemy, time) {
 }
 function drawPlayer(time) {
   const x = player.x, y = player.y + (player.moving ? Math.sin(time * 17) * 2 : Math.sin(time * 3) * 1.5);
+  if(player.wallLaunch){ctx.strokeStyle='#ffe1afaa';ctx.lineWidth=12;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x-player.wallLaunch.vx*.06,y-player.wallLaunch.vy*.06);ctx.lineTo(x,y);ctx.stroke();}
+  ctx.save();ctx.strokeStyle=player.hp<player.maxHp*.25?'#f2a56acc':'#80dfd4aa';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y+25,30,11,0,0,Math.PI*2);ctx.stroke();ctx.restore();
   ctx.save(); ctx.translate(x, y);
   if (player.invulnerable > 0 && Math.floor(time * 16) % 2) ctx.globalAlpha = .5;
   ctx.fillStyle = "#334f5744"; ctx.beginPath(); ctx.ellipse(0, 25, 24, 8, 0, 0, Math.PI * 2); ctx.fill();
@@ -2733,6 +2998,11 @@ function drawSummonedBall(c,x,y,r,angle=0) {
   c.fillStyle='#fff2ff';c.beginPath();c.arc(-r*.25,-r*.3,r*.22,0,Math.PI*2);c.fill();c.restore();
 }
 function drawEnemyProjectile(cap) {
+  if(cap.type==='beam') {
+    ctx.save();ctx.strokeStyle='#61d7f0aa';ctx.lineWidth=30;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cap.x-cap.vx*.11,cap.y-cap.vy*.11);ctx.lineTo(cap.x,cap.y);ctx.stroke();
+    ctx.strokeStyle='#ecffff';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(cap.x-cap.vx*.11,cap.y-cap.vy*.11);ctx.lineTo(cap.x,cap.y);ctx.stroke();
+    ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(cap.x,cap.y,10,0,Math.PI*2);ctx.fill();ctx.restore();return;
+  }
   if(cap.type==='summoned-ball') {
     ctx.strokeStyle='#ddafff88';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(cap.x-cap.vx*.07,cap.y-cap.vy*.07);ctx.lineTo(cap.x,cap.y);ctx.stroke();
     drawSummonedBall(ctx,cap.x,cap.y,cap.r,cap.angle);return;
@@ -2798,7 +3068,13 @@ function drawUnlucky(c,x,y,angle,size=1) {
 }
 function drawEffect(effect) {
   const t = effect.age / effect.duration;
-  if(effect.type==="martial-teleport") {
+  if(effect.type==='heavy-kick'||effect.type==='wall-impact') {
+    ctx.save();ctx.globalAlpha=1-t;ctx.strokeStyle=effect.type==='wall-impact'?'#fff0bb':'#ffb98d';ctx.lineWidth=8*(1-t)+2;
+    ctx.beginPath();ctx.arc(effect.x,effect.y,effect.radius*(.3+t*.7),0,Math.PI*2);ctx.stroke();ctx.restore();
+  } else if(effect.type==='heal-pulse') {
+    ctx.save();ctx.globalAlpha=1-t;ctx.strokeStyle='#79e6a5';ctx.lineWidth=5*(1-t)+1;
+    ctx.beginPath();ctx.arc(effect.x,effect.y,effect.radius*t,0,Math.PI*2);ctx.stroke();ctx.restore();
+  } else if(effect.type==="martial-teleport") {
     ctx.save();ctx.globalAlpha=1-t;ctx.strokeStyle='#9ff8eb';ctx.lineWidth=4;
     ctx.beginPath();ctx.ellipse(effect.x,effect.y,effect.radius*(.5+t),effect.radius*.45,0,0,Math.PI*2);ctx.stroke();
     ctx.beginPath();ctx.moveTo(effect.x-15,effect.y-35-t*15);ctx.lineTo(effect.x-15,effect.y+10);ctx.moveTo(effect.x+15,effect.y-35-t*15);ctx.lineTo(effect.x+15,effect.y+10);ctx.stroke();ctx.restore();
@@ -2936,7 +3212,7 @@ function frame(now) {
   render(now / 1000);
   if(mode==="story") drawStoryFrame($("story-canvas").getContext("2d"),storyIndex,storyAnimationTime,storyReducedMotion);
   else if(mode==="ended") drawStoryFrame($("ending-canvas").getContext("2d"),endingWon?6:7,storyAnimationTime,storyReducedMotion);
-  if(activeDialogue)drawDialoguePortrait();
+  if(activeDialogue){drawDialoguePortrait();drawDialogueStoryFrame($('dialogue-story-canvas').getContext('2d'),activeDialogue,portraitTime,storyReducedMotion);}
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
