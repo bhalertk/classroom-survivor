@@ -473,14 +473,14 @@ evalGame("startGame(); player.weapons.ruler=5; player.talents.geometry=true; pla
 assert.equal(evalGame("rulerPositions().length"), 5);
 assert.equal(evalGame("enemies.every(e=>e.hp<e.maxHp)"), true, "Super ruler damages enemies at all five orbit positions");
 evalGame("startGame(); player.weapons.bow=5; player.talents.trajectory=true; player.pencilCooldown=10; enemies=[makeEnemy(player.x+200,player.y),makeEnemy(player.x+300,player.y),makeEnemy(player.x+400,player.y)]; for(const e of enemies)e.hp=1000; weaponAttacks(.001); projectiles=[projectiles[2]]; projectiles[0].x=enemies[0].x; updateProjectiles(.001)");
-assert.equal(evalGame("enemies[0].hp"), 912);
+assert.equal(evalGame("enemies[0].hp"), 1000-evalGame("toolStats('bow',5).damage"));
 evalGame("projectiles[0].x=enemies[1].x; updateProjectiles(.001)");
-assert.equal(evalGame("enemies[1].hp"), 824, "Super arrow doubles its second hit");
+assert.equal(evalGame("enemies[1].hp"), 1000-evalGame("toolStats('bow',5).damage*toolStats('bow',5).pierceMultiplier"), "Super arrow increases its second hit");
 assert.equal(evalGame("projectiles.length"), 0, "Super arrow still stops at two distinct enemies");
 assert.equal(evalGame("enemies[2].hp"), 1000);
 evalGame("startGame(); player.weapons.pistol=5; player.talents.focus=true; player.pencilCooldown=10; enemies=[makeEnemy(player.x+220,player.y)]; weaponAttacks(.001)");
 assert.equal(evalGame("projectiles.length"), 1, "Super Gatling fires one bullet per trigger");
-evalGame("weaponAttacks(.11)");
+evalGame("weaponAttacks(.161)");
 assert.equal(evalGame("projectiles.length"), 2, "Super Gatling increases firing frequency");
 
 // Cards describe next-level mechanics, numeric changes, and matching evolution conditions.
@@ -567,7 +567,7 @@ evalGame("startGame(); player.weapons.book=5; player.pencilCooldown=10; enemies=
 assert.equal(evalGame("enemies[0].hp"),900);
 assert.equal(evalGame("enemies[1].hp"),1000,"Textbook hits the forward cone, not enemies behind the player");
 evalGame("startGame(); player.weapons.bell=5; player.pencilCooldown=10; enemies=[makeEnemy(player.x+100,player.y),makeEnemy(player.x-100,player.y)]; for(const e of enemies)e.hp=1000; weaponAttacks(.001)");
-assert.equal(evalGame("enemies.every(e=>e.hp===975)"),true,"Bell wave covers enemies on both sides");
+assert.equal(evalGame("enemies.every(e=>e.hp===1000-toolStats('bell',5).damage)"),true,"Bell wave covers enemies on both sides");
 assert.equal(evalGame("enemies.every(e=>distance(e,player)>180)"),true,"Bell wave pushes enemies away");
 
 // Enemy 3 fires rubber bands; enemy 4's misses become three-second ground hazards.
@@ -1324,4 +1324,25 @@ click('resume-btn');
 evalGame("damageEnemy(enemies.find(enemy=>enemy.kind==='final'),999999,'unity',enemies.find(enemy=>enemy.kind==='final'));gameTime=CORE_GAME_LENGTH;updateNarrative(0);offerBonusLessons()");
 assert.equal(evalGame('mode'),'reward','Cheat skip can still complete lesson thirty');
 assert(require('node:fs').readFileSync('polish.css','utf8').includes('top: calc(50% + 12vh)'),'Touch joystick sits below screen center');
+assert.equal(evalGame('BESTIARY.length'),23);
+assert.equal(evalGame('BESTIARY.every(entry=>entry.art||MOVE_ART_SCENES[entry.kind])'),true,'Every enemy and boss has a move diagram');
+evalGame('unlockedEnemies=new Set(BESTIARY.map(entry=>entry.kind));renderBestiary()');
+const moveArtSources=elements['bestiary-list'].children.map(card=>card.children[3].children[0].src);
+assert.equal(moveArtSources.length,23,'Every unlocked entry renders its move art');
+assert.equal(moveArtSources.filter(src=>src.startsWith('data:image/svg+xml')).length,21);
+assert.equal(new Set(moveArtSources).size,23,'Each entry has its own diagram');
+assert(decodeURIComponent(moveArtSources[0].split(',')[1]).includes('突刺後可能召喚同伴'));
+assert(decodeURIComponent(moveArtSources[22].split(',')[1]).includes('程式碼與錯誤碼彈幕'));
+assert.equal(evalGame('CONTENT.talents.every(t=>Object.keys(t.bonus).every(key=>key in TOOL_LEVELS[t.toolId][4]))'),true,'Every talent modifies an existing stat');
+assert.equal(evalGame('CONTENT.talents.some(t=>t.id===\'geometry\'&&t.bonus.hitCooldown<1)'),true,'Ruler talent improves actual hit rate');
+const offense=evalGame("['blueberry','pistol','bow','eraser'].map(id=>{const s=SUPER_TOOLS[id];return s.damage*(s.count||1)*(id==='eraser'?1+s.returnMultiplier:1)/s.cooldown})");
+assert(Math.max(...offense)/Math.min(...offense)<1.3,'Offensive super tools have comparable single-target potential');
+evalGame("startGame();enemies=[];for(let i=0;i<5;i++)spawnEnemy('medic');for(let i=0;i<5;i++)spawnEnemy('commander')");
+assert.equal(evalGame("enemies.filter(e=>e.kind==='medic').length"),3,'Medic count is capped');
+assert.equal(evalGame("enemies.filter(e=>e.kind==='commander').length"),3,'Commander count is capped');
+assert.equal(evalGame("enemies.filter(e=>e.kind==='basic').length"),4,'Excess support spawns become regular enemies');
+evalGame("startGame();enemyProjectiles=[];const rider=makeEnemy(player.x+300,player.y,'mini2');rider.throwAngle=0;throwTire(rider)");
+assert.equal(evalGame('enemyProjectiles[0].damage'),28,'Thrown tires are less damaging than a direct bicycle hit');
+evalGame("enemyProjectiles=[];rider.hp=rider.maxHp/2;throwTire(rider)");
+assert.equal(evalGame('enemyProjectiles[0].damage'),32,'Enraged tire damage is still readable and dodgeable');
 console.log("PASS: gameplay, rewards, bonus lessons, enemy bestiary, move art, Boss stories, difficulty, solid desks, tutorial and standalone build");

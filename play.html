@@ -311,7 +311,7 @@ button.touch-pressed { filter: brightness(1.12); }
         <div class="modal-kicker">102 班 · 敵人記錄</div>
         <h2 id="bestiary-title">敵人圖鑑</h2>
         <p id="bestiary-progress" role="status">已解鎖 0 / 23</p>
-        <p>擊敗對應敵人至少 1 隻，就能查看招式與應對方式。進度會保存在這台裝置。</p>
+        <p>擊敗對應敵人至少 1 隻，就能查看專屬招式圖與應對方式。進度會保存在這台裝置。</p>
         <div id="bestiary-list" class="bestiary-list"></div>
         <button id="bestiary-close-btn" class="primary-btn">返回 <span>→</span></button>
       </div>
@@ -455,6 +455,73 @@ const BESTIARY = [
   {kind:'mini2',name:'小 Boss · 雙人單車隊',move:'一人衝撞，一人丟輪胎。',tip:'兩人血量獨立，兩人都倒下才結束。'},
   {kind:'final',name:'最終 Boss · 程式老師',move:'先預告再發射程式碼；衝刺後散出錯誤碼彈幕，半血時擴大範圍。',tip:'側移避開程式碼射線，利用桌子擋下子彈；衝刺後留意周圍彈幕。'}
 ];
+// The diagrams use the same classroom silhouettes and attack language as the game.
+// Enemy 19 and 20 keep their dedicated SVG illustrations.
+const MOVE_ART_SCENES = {
+  basic:['突刺方向會先亮起','突刺後可能召喚同伴','dash','#f6c67b'],
+  water:['水壺瞄準玩家','揮擊時飛出三顆水珠','water','#8ad8ef'],
+  rubber:['橡皮筋拉開蓄力','直線射出橡皮筋','rubber','#f8d682'],
+  tissue:['溼紙球拋向地面','殘留三秒的減速區','tissue','#9ddbd7'],
+  weilong:['背包噴口亮起','噴射衝刺並投擲爆炸物','jet','#ffad78'],
+  bit:['機械蜘蛛準備出動','蜘蛛追近後自爆','spiders','#a8d9c5'],
+  deepblue:['盾牌朝向玩家','正面阻擋並揮盾','shield','#9bd6e9'],
+  handler:['訓犬員呼叫小狗','小狗沿走道追咬','dogs','#f4c68a'],
+  eye:['近身戳眼蓄力','半邊視野遮蔽三秒','eye','#d7b9f3'],
+  shepherd:['地面出現陷阱警示','陷阱與手雷交替','trap','#f3c58c'],
+  megaphone:['大聲公對準方向','音波命中眩暈一秒','sound','#b3e8f8'],
+  kicker:['倒楣蛋被叫到前方','飛踢變成遠程攻擊','unlucky','#ffc08d'],
+  boxer:['身旁出現瞬移落點','現身後近距出拳','teleport','#c8b6ff'],
+  striker:['三顆球開始蓄力','三球同時射出','balls','#f0c480'],
+  medic:['保健股長停下準備','附近同伴恢復體力','heal','#9ee1ab'],
+  commander:['助威範圍亮起','附近敵人加速強攻','rally','#f6d77a'],
+  beam:['光束方向先預告','氣功穿過課桌','beam','#89e5e9'],
+  heavykick:['前方扇形蓄力','命中踢向牆壁','wallkick','#ffb28f'],
+  mini1:['瓶蓋扇形蓄力','瓶蓋碰牆與桌會反彈','caps','#f6d395'],
+  mini2:['衝撞與輪胎分工','單車衝鋒、輪胎齊飛','cycling','#ffc18d'],
+  final:['程式射線先畫出','程式碼與錯誤碼彈幕','code','#91eee4']
+};
+function moveArtAttack(shape,color) {
+  const line=(path,width=6,dash='')=>`<path d="${path}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" ${dash?`stroke-dasharray="${dash}"`:''} marker-end="url(#arrow)"/>`;
+  const orb=(x,y,r,fill=color)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#fff3d3" stroke-width="3"/>`;
+  switch(shape) {
+    case 'dash':return line('M540 176 H690',12)+`<path d="M555 135 L600 135 M545 151 L588 151" stroke="${color}" stroke-width="5"/>`;
+    case 'water':return line('M542 175 Q620 110 690 148',5)+[-1,0,1].map(i=>line(`M570 ${171+i*14} Q630 ${135+i*15} 696 ${142+i*24}`,3)).join('');
+    case 'rubber':return line('M540 174 H692',4)+`<path d="M553 144 Q590 173 553 201" fill="none" stroke="${color}" stroke-width="5"/>`;
+    case 'tissue':return line('M540 155 Q610 80 679 183',4)+`<ellipse cx="676" cy="200" rx="54" ry="14" fill="${color}" opacity=".45"/>`;
+    case 'jet':return line('M540 175 H667',10)+`<path d="M665 185 l17 -31 17 31 -17 19z" fill="${color}" opacity=".75"/>${orb(681,175,11,'#ffdb82')}`;
+    case 'spiders':return [590,637,684].map((x,i)=>`<rect x="${x-11}" y="${176+i%2*15}" width="22" height="18" rx="4" fill="${color}"/><path d="M${x-18} ${183+i%2*15}h7m22 0h7" stroke="${color}" stroke-width="3"/>`).join('');
+    case 'shield':return `<path d="M597 115 Q652 173 597 225" fill="none" stroke="${color}" stroke-width="15"/>${line('M610 177 Q653 131 692 158',6)}`;
+    case 'dogs':return [602,659].map((x,i)=>`<rect x="${x-17}" y="${164+i*12}" width="30" height="22" rx="5" fill="${color}"/><path d="M${x-14} ${164+i*12}l-8 -10m29 10l8 -10" stroke="${color}" stroke-width="5"/>`).join('')+line('M542 188 H696',3,'8 8');
+    case 'eye':return `<path d="M571 175 Q632 107 698 175 Q632 243 571 175Z" fill="${color}" opacity=".35" stroke="${color}" stroke-width="5"/>${orb(635,175,20,'#50446c')}`;
+    case 'trap':return `<circle cx="617" cy="193" r="31" fill="none" stroke="${color}" stroke-width="5" stroke-dasharray="8 6"/>${orb(617,193,9,'#e5846b')}${line('M550 155 Q615 87 693 157',4)}`;
+    case 'sound':return [35,60,85].map(r=>`<path d="M555 ${175-r} A${r} ${r} 0 0 1 555 ${175+r}" fill="none" stroke="${color}" stroke-width="6"/>`).join('');
+    case 'unlucky':return line('M542 180 Q613 106 689 172',5)+`<g transform="translate(639 132) rotate(25)"><rect x="-17" y="-17" width="34" height="34" rx="5" fill="${color}"/><path d="M-8 -4h4m8 0h4M-8 8q8 -8 16 0" stroke="#385061" stroke-width="3" fill="none"/></g>`;
+    case 'teleport':return `<rect x="643" y="132" width="53" height="62" rx="8" fill="${color}" opacity=".55" stroke="#fff" stroke-width="3" stroke-dasharray="6 5"/>${line('M545 175 Q595 112 654 151',4,'9 7')}`;
+    case 'balls':return [[613,144],[647,177],[614,211]].map(([x,y])=>orb(x,y,13)).join('')+line('M662 176 H699',4);
+    case 'heal':return [600,650,690].map((x,i)=>`<circle cx="${x}" cy="${171+i%2*22}" r="20" fill="${color}" opacity=".35"/><path d="M${x-9} ${171+i%2*22}h18m-9 -9v18" stroke="${color}" stroke-width="5"/>`).join('');
+    case 'rally':return [590,630,670].map((x,i)=>line(`M${x} ${205-i%2*8} V${119+i%2*12}`,5)).join('')+`<ellipse cx="631" cy="176" rx="88" ry="49" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="9 7"/>`;
+    case 'beam':return `<rect x="615" y="188" width="48" height="18" rx="3" fill="#ad8e67"/>${line('M539 172 H699',17)}`;
+    case 'wallkick':return line('M543 176 H686',9)+`<rect x="695" y="111" width="13" height="111" fill="#e9d3a7"/><path d="M683 165l-20 -25m20 45l-20 25" stroke="${color}" stroke-width="5"/>`;
+    case 'caps':return line('M543 162 L608 118 L650 212 L698 169',5)+[[607,118],[650,212],[694,169]].map(([x,y])=>orb(x,y,8,'#f4dfbd')).join('');
+    case 'cycling':return [572,634].map(x=>`<circle cx="${x}" cy="203" r="20" fill="none" stroke="${color}" stroke-width="5"/>`).join('')+line('M585 178 H695',6)+orb(674,142,18,'#354c5c');
+    case 'code':return [-1,0,1].map(i=>line(`M541 ${175+i*15} L696 ${175+i*21}`,4,'8 7')).join('')+`<text x="609" y="130" fill="${color}" font-family="monospace" font-size="31" font-weight="900">{ }</text>`;
+  }
+  return '';
+}
+function moveArtActor(kind,x,y,color) {
+  if(kind==='player')return `<g transform="translate(${x} ${y})"><circle cy="-23" r="18" fill="#f4c9a5"/><path d="M-18 -29q18 -22 36 0" fill="#394c67"/><rect x="-18" y="-7" width="36" height="38" rx="7" fill="#6797b7"/><path d="M-8 -24h3m10 0h3" stroke="#344651" stroke-width="3"/></g>`;
+  return `<g transform="translate(${x} ${y})"><rect x="-22" y="-48" width="44" height="38" rx="5" fill="${color}" stroke="#173946" stroke-width="4"/><rect x="-17" y="-43" width="34" height="8" rx="3" fill="#f8edc5"/><rect x="-19" y="-8" width="38" height="36" rx="5" fill="#4a7981" stroke="#183946" stroke-width="4"/><path d="M-12 -24h5m14 0h5" stroke="#203d4a" stroke-width="4"/><path d="M-13 29v14m26 -14v14" stroke="#2c4854" stroke-width="9"/></g>`;
+}
+function moveArtDataUri(entry) {
+  const [cue,attack,shape,color]=MOVE_ART_SCENES[entry.kind];
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" role="img" aria-label="${entry.name}招式示意：${cue}，${attack}"><defs><linearGradient id="bg" x2="0" y2="1"><stop stop-color="#244d56"/><stop offset="1" stop-color="#152f3c"/></linearGradient><marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10" fill="${color}"/></marker><g id="enemy"><rect x="-22" y="-48" width="44" height="38" rx="5" fill="${color}" stroke="#173946" stroke-width="4"/><rect x="-17" y="-43" width="34" height="8" rx="3" fill="#f8edc5"/><rect x="-19" y="-8" width="38" height="36" rx="5" fill="#4a7981" stroke="#183946" stroke-width="4"/><path d="M-12 -24h5m14 0h5" stroke="#203d4a" stroke-width="4"/><path d="M-13 29v14m26 -14v14" stroke="#2c4854" stroke-width="9"/></g><g id="player"><circle cy="-23" r="18" fill="#f4c9a5"/><path d="M-18 -29q18 -22 36 0" fill="#394c67"/><rect x="-18" y="-7" width="36" height="38" rx="7" fill="#6797b7"/><path d="M-8 -24h3m10 0h3" stroke="#344651" stroke-width="3"/></g></defs><rect width="800" height="280" rx="18" fill="url(#bg)"/><path d="M400 16v248" stroke="#638c86" stroke-width="2" stroke-dasharray="7 8"/><text x="26" y="39" fill="#f1fff0" font-family="sans-serif" font-size="22" font-weight="900">${entry.name}</text><text x="28" y="76" fill="#d4eee5" font-family="sans-serif" font-size="17" font-weight="800">01 預告 · ${cue}</text><text x="429" y="76" fill="#d4eee5" font-family="sans-serif" font-size="17" font-weight="800">02 招式 · ${attack}</text><ellipse cx="145" cy="220" rx="52" ry="10" fill="#112c37"/><use href="#enemy" x="145" y="175"/><use href="#player" x="324" y="175"/><path d="M185 170 H294" fill="none" stroke="${color}" stroke-width="5" stroke-dasharray="10 8" marker-end="url(#arrow)"/><circle cx="325" cy="176" r="37" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="8 7"/><ellipse cx="526" cy="220" rx="52" ry="10" fill="#112c37"/><use href="#enemy" x="526" y="175"/><use href="#player" x="725" y="175"/>${moveArtAttack(shape,color)}<rect x="26" y="238" width="748" height="32" rx="7" fill="#11363d"/><text x="400" y="260" text-anchor="middle" fill="#fff1c4" font-family="sans-serif" font-size="17" font-weight="800">避法：${entry.tip}</text></svg>`;
+  const illustrated=svg.replaceAll('<use href="#enemy" x="145" y="175"/>',moveArtActor('enemy',145,175,color))
+    .replaceAll('<use href="#enemy" x="526" y="175"/>',moveArtActor('enemy',526,175,color))
+    .replaceAll('<use href="#player" x="324" y="175"/>',moveArtActor('player',324,175,color))
+    .replaceAll('<use href="#player" x="725" y="175"/>',moveArtActor('player',725,175,color))
+    .replaceAll('font-family="sans-serif"','font-family="Microsoft JhengHei,Noto Sans TC,sans-serif"');
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(illustrated)}`;
+}
 const EMOTION_LABELS={calm:'平靜',surprised:'驚訝',nervous:'緊張',relieved:'鬆一口氣',happy:'開心',tired:'疲憊',determined:'堅定'};
 
 const $ = id => document.getElementById(id);
@@ -493,7 +560,7 @@ CONTENT.talents = [
   {id: "blast", toolId: "firecracker", name: "爆破專家", icon: "✹", description: "甩炮與核彈爆炸範圍增加 12%", bonus: {blastRadius: 1.12}},
   {id: "trajectory", toolId: "bow", name: "穿雲之眼", icon: "➶", description: "弓箭傷害增加 10%", bonus: {damage: 1.1}},
   {id: "return", toolId: "eraser", name: "回旋巧手", icon: "↻", description: "橡皮擦回程速度增加 15%", bonus: {returnSpeed: 1.15}},
-  {id: "geometry", toolId: "ruler", name: "幾何大師", icon: "△", description: "三角尺環繞距離增加 10%", bonus: {orbitRadius: 1.1}}
+  {id: "geometry", toolId: "ruler", name: "幾何大師", icon: "△", description: "三角尺命中間隔縮短 10%", bonus: {hitCooldown: .9}}
 ];
 CONTENT.talents.push(
   {id:"athlete", toolId:"football", name:"體育健將", icon:"⚽", description:"足球傷害增加 10%", bonus:{damage:1.1}},
@@ -504,20 +571,20 @@ CONTENT.talents.push(
   {id:"rhythm", toolId:"bell", name:"音樂節奏", icon:"♬", description:"校鈴攻擊間隔縮短 10%", bonus:{cooldown:.9}}
 );
 const SUPER_TOOLS = {
-  blueberry: {name: "星耀西瓜雨", damage: 85, count: 5, cooldown: 1.2, splashRadius: 92, knockback: 110, upgrade: "五顆西瓜齊砸，震波與擊退大幅增強"},
-  pistol: {name: "星耀加特林", damage: 65, cooldown: .1, range: 850, speed: 1200, upgrade: "每秒 10 次自動單發，傷害與射程提升"},
+  blueberry: {name: "星耀西瓜雨", damage: 62, count: 5, cooldown: 1.2, splashRadius: 92, knockback: 110, upgrade: "五顆西瓜齊砸，震波與擊退大幅增強"},
+  pistol: {name: "星耀加特林", damage: 45, cooldown: .16, range: 850, speed: 1200, upgrade: "高速自動單發，傷害與射程提升"},
   firecracker: {name: "超新星核彈", damage: 210, blastRadius: 230, aftershock: 90, cooldown: 2.5, upgrade: "超大範圍爆炸，追加強力衝擊波"},
-  bow: {name: "流星穿雲弓", damage: 80, count: 5, pierceMultiplier: 2, speed: 1100, range: 900, cooldown: 1.1, upgrade: "五箭齊射，第二次命中造成雙倍傷害；每箭最多命中兩人"},
-  eraser: {name: "星環回旋組", damage: 60, count: 4, returnMultiplier: 2, returnSpeed: 850, speed: 650, cooldown: 1.6, outwardDuration: .85, upgrade: "四顆回旋夾擊，回程造成雙倍傷害"},
+  bow: {name: "流星穿雲弓", damage: 65, count: 5, pierceMultiplier: 1.8, speed: 1100, range: 900, cooldown: 1.1, upgrade: "五箭齊射，第二次命中傷害增加；每箭最多命中兩人"},
+  eraser: {name: "星環回旋組", damage: 54, count: 4, returnMultiplier: 1.5, returnSpeed: 850, speed: 650, cooldown: 1.8, outwardDuration: .85, upgrade: "四顆回旋夾擊，回程傷害增加"},
   ruler: {name: "星耀三角結界", damage: 45, count: 5, rotation: 5.3, orbitRadius: 125, hitCooldown: .35, upgrade: "五把三角尺形成高速環繞結界"}
 };
 Object.assign(SUPER_TOOLS, {
-  football:{name:"冠軍流星球", damage:70, count:2, maxHits:9, speed:650, cooldown:1.6, upgrade:"雙足球連環彈跳，每顆最多撞擊九個敵人"},
+  football:{name:"冠軍流星球", damage:95, count:2, maxHits:9, speed:650, cooldown:1.45, upgrade:"雙足球連環彈跳，每顆最多撞擊九個敵人"},
   plane:{name:"星翼飛行隊", damage:60, count:4, maxHits:4, speed:600, cooldown:1.4, upgrade:"四架追蹤飛機，每架連續追擊四個敵人"},
   chalk:{name:"星塵粉筆雲", damage:35, zoneDamage:40, zoneRadius:145, zoneDuration:4, cooldown:2.3, upgrade:"大範圍粉筆雲持續傷害，敵人移動減速"},
   stapler:{name:"星鎖裝訂機", damage:62, count:3, spread:.16, stunDuration:1.2, cooldown:.75, upgrade:"三枚書針齊射，長時間定住敵人"},
   book:{name:"星耀百科全書", damage:165, range:310, attackRadius:310, stunDuration:.8, cooldown:2, upgrade:"超大扇形重拍，高傷害並暈眩敵群"},
-  bell:{name:"放學交響鐘", damage:45, range:270, pulseRadius:270, knockback:145, cooldown:2, upgrade:"大範圍聲波清場，強力推開周圍敵人"}
+  bell:{name:"放學交響鐘", damage:75, range:270, pulseRadius:270, knockback:145, cooldown:1.7, upgrade:"大範圍聲波清場，強力推開周圍敵人"}
 });
 const BOSS_SCHEDULE = [
   { id: "mini1", name: "瓶蓋收藏家", lesson: 10, hp: 5000, r: 34, damage: 24, color: "#688c94" },
@@ -622,11 +689,11 @@ Object.assign(TOOL_LEVELS, {
     {damage:100,range:235,attackRadius:235,cooldown:2.4,count:1,stunDuration:.35,upgrade:"金色百科全書：強力扇形重拍"}
   ],
   bell:[
-    {damage:8,range:110,pulseRadius:110,cooldown:3.4,count:1,knockback:45,upgrade:"環形聲波傷害並推開周圍敵人"},
-    {damage:12,range:125,pulseRadius:125,cooldown:3.2,count:1,knockback:55,upgrade:"銅校鈴：提升聲波擊退"},
-    {damage:16,range:145,pulseRadius:145,cooldown:3,count:1,knockback:65,upgrade:"大校鈴：擴大聲波範圍"},
-    {damage:20,range:160,pulseRadius:160,cooldown:2.8,count:1,knockback:78,upgrade:"雙環校鈴：更快發出聲波"},
-    {damage:25,range:180,pulseRadius:180,cooldown:2.6,count:1,knockback:90,upgrade:"金色校鈴：強力環形擊退"}
+    {damage:12,range:110,pulseRadius:110,cooldown:3.4,count:1,knockback:45,upgrade:"環形聲波傷害並推開周圍敵人"},
+    {damage:18,range:125,pulseRadius:125,cooldown:3.2,count:1,knockback:55,upgrade:"銅校鈴：提升聲波擊退"},
+    {damage:24,range:145,pulseRadius:145,cooldown:3,count:1,knockback:65,upgrade:"大校鈴：擴大聲波範圍"},
+    {damage:30,range:160,pulseRadius:160,cooldown:2.8,count:1,knockback:78,upgrade:"雙環校鈴：更快發出聲波"},
+    {damage:38,range:180,pulseRadius:180,cooldown:2.6,count:1,knockback:90,upgrade:"金色校鈴：強力環形擊退"}
   ]
 });
 Object.assign(TOOL_ROLES,{football:"彈跳連擊",plane:"追蹤飛行",chalk:"持續減速",stapler:"遠距定身",book:"扇形重拍",bell:"聲波擊退"});
@@ -862,13 +929,14 @@ function renderBestiary() {
   $('bestiary-progress').textContent=`已解鎖 ${unlockedEnemies.size} / ${BESTIARY.length}`;
   for(const [index,entry] of BESTIARY.entries()) {
     const unlocked=unlockedEnemies.has(entry.kind);
-    const card=document.createElement('article');card.className=`bestiary-entry${unlocked?' unlocked':' locked'}${unlocked&&entry.art?' illustrated':''}`;
+    const card=document.createElement('article');card.className=`bestiary-entry${unlocked?' unlocked illustrated':' locked'}`;
     const heading=document.createElement('h3');heading.textContent=unlocked?entry.name:`${String(index+1).padStart(2,'0')} · 尚未解鎖`;
     card.append(heading);
     const body=document.createElement('p');body.textContent=unlocked?`招式：${entry.move}`:'擊敗對應敵人至少 1 隻後，解鎖招式與應對提示。';card.append(body);
     if(unlocked) {
       const tip=document.createElement('p');tip.textContent=`應對：${entry.tip}`;card.append(tip);
-      if(entry.art){const wrap=document.createElement('div');wrap.className='move-art-scroll';const image=document.createElement('img');image.src=entry.art;image.alt=`${entry.name}的招式圖。${entry.move}${entry.tip}`;image.loading='lazy';wrap.append(image);card.append(wrap);}
+      const wrap=document.createElement('div'),image=document.createElement('img');wrap.className='move-art-scroll';
+      image.src=entry.art||moveArtDataUri(entry);image.alt=`${entry.name}的招式圖。${entry.move}${entry.tip}`;image.loading='lazy';wrap.append(image);card.append(wrap);
     }
     list.append(card);
   }
@@ -1456,6 +1524,7 @@ function makeEnemy(x, y, kind = "basic") {
   return freePosition({ x, y, kind, boss, hp: scaledHealth, maxHp: scaledHealth, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "deepblue" ? 65 : kind === "mini2" ? 110 : boss ? 77 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), healClock:2.4, windup: 0, codeCooldown:kind==='final'?2.8:0, codeWindup:0, codeAngle:0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) });
 }
 function spawnEnemy(kind) {
+  if((kind==='medic'||kind==='commander')&&enemies.filter(enemy=>enemy.kind===kind&&enemy.hp>0).length>=3)kind='basic';
   const viewW = cw / scale;
   const viewH = ch / scale;
   const angle = random(0, Math.PI * 2);
@@ -2152,7 +2221,7 @@ function throwTire(enemy) {
   const rage=enemy.hp<=enemy.maxHp/2,count=rage?4:2,speed=rage?400:340;
   for(let i=0;i<count;i++) {
     const angle = enemy.throwAngle+(i-(count-1)/2)*.22;
-    enemyShot(enemy,{ type: "tire", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 17, damage: enemy.damage, life: 4.5, angle });
+    enemyShot(enemy,{ type: "tire", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 17, damage: rage?32:28, life: 4.5, angle });
   }
   playSound(230, .12, "triangle", .04);
 }
