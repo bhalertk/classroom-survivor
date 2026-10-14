@@ -187,10 +187,13 @@
       <div class="modal-card skin-modal">
         <div class="modal-kicker">CLASS 102 COLLECTION</div>
         <h2 id="skin-title">道具皮膚收藏室</h2>
-        <p id="skin-balance" role="status">皮膚券 0 張 · 已收藏 0 / 12</p>
-        <p>每次使用 1 張皮膚券，隨機抽到一款尚未擁有的皮膚；抽到後會自動套用在對應道具上，攻擊能力不變。</p>
+        <p id="skin-balance" role="status">皮膚券 0 張 · 已收藏 0 / 60</p>
+        <p>每個道具各有 5 款皮膚。每次使用 1 張皮膚券，隨機抽到一款尚未擁有的皮膚；抽到後自動套用，也能在下方切換已收藏外觀。皮膚不影響攻擊能力。</p>
+        <p class="skin-odds">抽取機率：普通 55% · 稀有 28% · 史詩 12% · 傳說 4% · 神話 1%。某稀有度抽齊後，機率會在其他尚有皮膚的稀有度中重新分配。</p>
+        <div id="skin-draw-stage" class="skin-draw-stage" aria-live="polite"><div class="skin-draw-orbit" aria-hidden="true">✦　✧　✦</div><canvas id="skin-reveal-canvas" width="130" height="110" aria-label="抽取結果預覽"></canvas><strong id="skin-reveal-title">等待抽取</strong><small id="skin-reveal-rarity">每張券抽一款新外觀</small></div>
         <button id="skin-draw-btn" type="button" class="primary-btn">🎟️ 抽一款皮膚</button>
         <p id="skin-result" class="skin-result" role="status">完成課節就能獲得皮膚券。</p>
+        <div id="skin-tool-tabs" class="skin-tool-tabs" role="tablist" aria-label="選擇道具查看皮膚"></div>
         <div id="skin-list" class="skin-list"></div>
         <button id="skin-close-btn" class="secondary-btn">返回遊戲</button>
       </div>

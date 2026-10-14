@@ -136,12 +136,39 @@ button.touch-pressed { filter: brightness(1.12); }
 .skin-modal > p { line-height: 1.55; }
 .skin-modal .primary-btn:disabled { opacity: .55; cursor: default; box-shadow: none; }
 .skin-result, .end-skin-tickets { padding: 9px 12px; border-radius: 9px; background: #e8f2e2; color: #325b54; font-weight: 900; }
-.skin-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 15px 0; text-align: left; }
-.skin-entry { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 7px; border: 2px solid #c0cec6; border-radius: 11px; background: #f0f2e9; }
-.skin-entry.owned { border-color: #7fb7a2; background: #e7f5e8; }
+.skin-odds { padding: 8px 10px; border-radius: 9px; background: #f0ead9; color: #63584e; font-size: 12px; }
+.skin-draw-stage { position: relative; display: grid; justify-items: center; gap: 3px; min-height: 173px; margin: 10px auto; padding: 8px; border: 3px solid #b7cfc2; border-radius: 16px; background: radial-gradient(circle, #fbfff1, #dcece5); overflow: hidden; }
+.skin-draw-stage canvas { width: 130px; height: 110px; }
+.skin-draw-stage strong { color: #294e52; font-size: 18px; }
+.skin-draw-stage small { color: #648278; font-weight: 900; }
+.skin-draw-orbit { position: absolute; margin-top: 34px; color: #efca73; font-size: 25px; pointer-events: none; }
+.skin-draw-stage.drawing { animation: skin-stage-pulse 1.4s ease-in-out both; }
+.skin-draw-stage.drawing .skin-draw-orbit { animation: skin-orbit 1.4s linear both; }
+.skin-draw-stage.drawing canvas { animation: skin-card-flip 1.4s ease-in-out both; }
+.skin-draw-stage.drawing strong, .skin-draw-stage.drawing small { visibility: hidden; }
+.skin-draw-stage.revealed { border-color: #8cbeb0; box-shadow: 0 0 18px #9fdac278; }
+.skin-draw-stage.revealed.rarity-epic { border-color: #ad90df; box-shadow: 0 0 24px #b592e099; }
+.skin-draw-stage.revealed.rarity-legendary { border-color: #e0b96b; box-shadow: 0 0 30px #f4d17bac; }
+.skin-draw-stage.revealed.rarity-mythic { border-color: #e790b7; box-shadow: 0 0 34px #eea4c7c4; }
+@keyframes skin-stage-pulse { 0%,100% { background: #e7f3e6; } 35%,72% { background: #e9dcf8; } }
+@keyframes skin-orbit { from { transform: rotate(0deg) scale(.8); } to { transform: rotate(720deg) scale(1.3); } }
+@keyframes skin-card-flip { 0%,45% { opacity: 0; transform: rotateY(90deg) scale(.45); } 70% { opacity: 1; transform: rotateY(360deg) scale(1.25); } 100% { opacity: 1; transform: rotateY(360deg) scale(1); } }
+.skin-tool-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 7px 2px; scrollbar-width: thin; }
+.skin-tool-tab { flex: 0 0 auto; padding: 7px 10px; border: 2px solid #b6cbc3; border-radius: 9px; background: #f3f1e5; color: #325957; font-weight: 900; }
+.skin-tool-tab.selected { border-color: #448f83; background: #d6ede2; }
+.skin-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 10px 0 15px; text-align: left; }
+.skin-entry { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 7px; border: 2px solid #c0cec6; border-radius: 11px; background: #f0f2e9; text-align: left; }
+.skin-entry.owned { background: #e7f5e8; cursor: pointer; }
+.skin-entry.locked { cursor: default; }
+.skin-entry.equipped { outline: 3px solid #6fb8a0; }
+.skin-entry.rarity-rare { border-color: #89c5e5; }
+.skin-entry.rarity-epic { border-color: #b99bdc; }
+.skin-entry.rarity-legendary { border-color: #e1bf76; }
+.skin-entry.rarity-mythic { border-color: #e9a6bf; }
 .skin-entry canvas { flex: 0 0 70px; width: 70px; height: 62px; }
 .skin-entry strong, .skin-entry small { display: block; }
 .skin-entry strong { color: #274d52; font-size: 13px; }
 .skin-entry small { color: #698079; font-size: 11px; }
-@media (max-width: 650px) { .skin-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 410px) { .skin-list { grid-template-columns: 1fr; } }
+.skin-entry .skin-rarity { color: #8b639b; font-weight: 900; }
+@media (max-width: 650px) { .skin-list { grid-template-columns: 1fr; } .skin-draw-stage { min-height: 160px; } }
+@media (prefers-reduced-motion: reduce) { .skin-draw-stage.drawing, .skin-draw-stage.drawing .skin-draw-orbit, .skin-draw-stage.drawing canvas { animation: none; } }

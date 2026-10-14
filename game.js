@@ -256,7 +256,7 @@ CONTENT.talents.push(
   {id:"reading", toolId:"book", name:"閱讀專注", icon:"▤", description:"課本重拍傷害增加 10%", passive:"受傷後無敵時間 +0.1 秒", bonus:{damage:1.1}},
   {id:"rhythm", toolId:"bell", name:"音樂節奏", icon:"♬", description:"校鈴攻擊間隔縮短 10%", passive:"鉛筆攻擊間隔縮短 10%", bonus:{cooldown:.9}}
 );
-const TOOL_SKINS=[
+const LEGACY_TOOL_SKINS=[
   {toolId:'blueberry',name:'星雲莓果',hue:115,color:'#a0b8ff'},
   {toolId:'pistol',name:'極光手槍',hue:80,color:'#9df8e9'},
   {toolId:'firecracker',name:'彩虹甩炮',hue:205,color:'#d3a1ff'},
@@ -270,7 +270,21 @@ const TOOL_SKINS=[
   {toolId:'book',name:'祕密日記',hue:195,color:'#d2b7ff'},
   {toolId:'bell',name:'星光校鈴',hue:130,color:'#9aebf6'}
 ];
-const TOOL_SKIN_BY_ID=Object.fromEntries(TOOL_SKINS.map(skin=>[skin.toolId,skin]));
+const SKIN_RARITIES=[
+  {id:'common',label:'普通',weight:55,prefix:'校園',hueShift:-35,color:'#c5e8d4',glow:3},
+  {id:'rare',label:'稀有',weight:28,prefix:'',hueShift:0,color:'#84cafa',glow:7},
+  {id:'epic',label:'史詩',weight:12,prefix:'霓虹',hueShift:75,color:'#c6a8ff',glow:11},
+  {id:'legendary',label:'傳說',weight:4,prefix:'流光',hueShift:160,color:'#ffe294',glow:16},
+  {id:'mythic',label:'神話',weight:1,prefix:'宇宙',hueShift:235,color:'#ffafcd',glow:22}
+];
+const TOOL_SKINS=LEGACY_TOOL_SKINS.flatMap(base=>SKIN_RARITIES.map((rarity,index)=>({
+  id:`${base.toolId}:${rarity.id}`,toolId:base.toolId,
+  name:rarity.id==='rare'?base.name:`${rarity.prefix}${CONTENT.weapons.find(tool=>tool.id===base.toolId).name}`,
+  rarity:rarity.id,rarityLabel:rarity.label,rarityIndex:index,
+  hue:(base.hue+rarity.hueShift+360)%360,
+  color:rarity.id==='rare'?base.color:rarity.color,glow:rarity.glow
+})));
+const TOOL_SKIN_BY_ID=Object.fromEntries(TOOL_SKINS.map(skin=>[skin.id,skin]));
 const SUPER_TOOLS = {
   blueberry: {name: "星耀西瓜雨", damage: 62, count: 5, cooldown: 1.2, splashRadius: 92, knockback: 110, upgrade: "五顆西瓜齊砸，震波與擊退大幅增強"},
   pistol: {name: "星耀加特林", damage: 45, cooldown: .16, range: 850, speed: 1200, upgrade: "高速自動單發，傷害與射程提升"},
@@ -482,7 +496,17 @@ let gameTime = 0;
 let skinTickets=(()=>{try{const saved=Number(window.localStorage?.getItem('classroom-survivor-skin-tickets'));return Number.isSafeInteger(saved)&&saved>=0?saved:0;}catch(_){return 0;}})();
 let runSkinTickets=0;
 let rewardedLessons=new Set();
-let ownedSkins=(()=>{try{const saved=JSON.parse(window.localStorage?.getItem('classroom-survivor-tool-skins')||'[]');return new Set(Array.isArray(saved)?saved.filter(id=>TOOL_SKIN_BY_ID[id]):[]);}catch(_){return new Set();}})();
+let ownedSkins=(()=>{try{const saved=JSON.parse(window.localStorage?.getItem('classroom-survivor-tool-skins')||'[]');return new Set(Array.isArray(saved)?saved.map(id=>TOOL_SKIN_BY_ID[id]?id:TOOL_SKIN_BY_ID[`${id}:rare`]?`${id}:rare`:null).filter(Boolean):[]);}catch(_){return new Set();}})();
+let equippedSkins=(()=>{try{
+  const saved=JSON.parse(window.localStorage?.getItem('classroom-survivor-equipped-skins')||'{}');
+  return Object.fromEntries(LEGACY_TOOL_SKINS.map(base=>{
+    const equipped=saved?.[base.toolId],legacy=`${base.toolId}:rare`;
+    return [base.toolId,ownedSkins.has(equipped)&&TOOL_SKIN_BY_ID[equipped]?.toolId===base.toolId?equipped:ownedSkins.has(legacy)?legacy:null];
+  }).filter(([,id])=>id));
+}catch(_){return {};}})();
+let selectedSkinTool=CONTENT.weapons[0].id;
+let skinDrawing=false;
+let skinAnimationTimer=null;
 let skinsReturnMode='menu';
 let bonusAccepted = false;
 let drinkEarned = false;
@@ -700,47 +724,105 @@ function closeBestiary() {
 function renderSkinCollection() {
   $('skin-balance').textContent=`皮膚券 ${skinTickets} 張 · 已收藏 ${ownedSkins.size} / ${TOOL_SKINS.length}`;
   const available=TOOL_SKINS.length-ownedSkins.size;
-  $('skin-draw-btn').disabled=skinTickets<1||available===0;
-  $('skin-draw-btn').textContent=available===0?'全部皮膚已收藏':skinTickets<1?'皮膚券不足':'🎟️ 花 1 張抽一款皮膚';
+  $('skin-draw-btn').disabled=skinDrawing||skinTickets<1||available===0;
+  $('skin-close-btn').disabled=skinDrawing;
+  $('skin-draw-btn').textContent=skinDrawing?'抽取中…':available===0?'全部皮膚已收藏':skinTickets<1?'皮膚券不足':'🎟️ 花 1 張抽一款皮膚';
+  const tabs=$('skin-tool-tabs');tabs.replaceChildren();
+  for(const tool of CONTENT.weapons){
+    const button=document.createElement('button');button.type='button';button.className=`skin-tool-tab${selectedSkinTool===tool.id?' selected':''}`;
+    button.textContent=`${tool.icon} ${tool.name}`;
+    button.setAttribute('role','tab');button.setAttribute('aria-selected',String(selectedSkinTool===tool.id));
+    button.disabled=skinDrawing;
+    bindButtonAction(button,()=>{if(skinDrawing)return;selectedSkinTool=tool.id;renderSkinCollection();});
+    tabs.append(button);
+  }
   const list=$('skin-list');list.replaceChildren();
-  for(const skin of TOOL_SKINS){
-    const tool=CONTENT.weapons.find(weapon=>weapon.id===skin.toolId);
-    const owned=ownedSkins.has(skin.toolId);
-    const card=document.createElement('article');card.className=`skin-entry${owned?' owned':' locked'}`;
+  for(const skin of TOOL_SKINS.filter(entry=>entry.toolId===selectedSkinTool)){
+    const owned=ownedSkins.has(skin.id),equipped=equippedSkins[skin.toolId]===skin.id;
+    const card=document.createElement('button');card.type='button';
+    card.className=`skin-entry rarity-${skin.rarity}${owned?' owned':' locked'}${equipped?' equipped':''}`;
+    card.disabled=!owned||skinDrawing;
     const preview=document.createElement('canvas');preview.width=90;preview.height=80;
     preview.setAttribute('aria-label',`${skin.name}外觀預覽`);
-    drawTool(preview.getContext('2d'),skin.toolId,3,45,40,1,0,false,true);
+    drawTool(preview.getContext('2d'),skin.toolId,3,45,40,1,0,false,skin.id);
     const label=document.createElement('div');
     const heading=document.createElement('strong');heading.textContent=skin.name;
-    const detail=document.createElement('small');detail.textContent=`${tool.name} · ${owned?'已套用':'尚未抽到'}`;
-    label.append(heading);label.append(detail);card.append(preview);card.append(label);list.append(card);
+    const rarity=document.createElement('small');rarity.className='skin-rarity';rarity.textContent=skin.rarityLabel;
+    const detail=document.createElement('small');detail.textContent=equipped?'使用中':owned?'點擊套用':'尚未抽到';
+    label.append(heading);label.append(rarity);label.append(detail);card.append(preview);card.append(label);
+    bindButtonAction(card,()=>equipToolSkin(skin.id));list.append(card);
   }
 }
 function openSkinCollection() {
   if(mode==='skins'||!['menu','paused','reward','ended'].includes(mode))return;
   skinsReturnMode=mode;mode='skins';
   $('skin-result').textContent='抽到的皮膚會自動套用，能力維持不變。';
+  $('skin-draw-stage').classList.remove('revealed');
+  $('skin-reveal-canvas').getContext('2d').clearRect(0,0,130,110);
+  $('skin-reveal-title').textContent='等待抽取';
+  $('skin-reveal-rarity').textContent='每張券抽一款新外觀';
   renderSkinCollection();showScreen('skin-screen');
 }
 function closeSkinCollection() {
-  if(mode!=='skins')return;
+  if(mode!=='skins'||skinDrawing)return;
   mode=skinsReturnMode;
   showScreen({menu:'start-screen',paused:'pause-screen',reward:'reward-screen',ended:'end-screen'}[mode]);
 }
-function drawRandomToolSkin() {
-  if(mode!=='skins'||skinTickets<1)return;
-  const available=TOOL_SKINS.filter(skin=>!ownedSkins.has(skin.toolId));
-  if(!available.length)return;
-  const skin=available[Math.floor(Math.random()*available.length)];
-  skinTickets--;
-  ownedSkins.add(skin.toolId);
+function saveSkinCollection() {
   try{
     window.localStorage?.setItem('classroom-survivor-skin-tickets',String(skinTickets));
     window.localStorage?.setItem('classroom-survivor-tool-skins',JSON.stringify([...ownedSkins]));
+    window.localStorage?.setItem('classroom-survivor-equipped-skins',JSON.stringify(equippedSkins));
   }catch(_){}
-  $('skin-result').textContent=`抽到了「${skin.name}」！${CONTENT.weapons.find(tool=>tool.id===skin.toolId).name}已換上新外觀。`;
+}
+function equipToolSkin(id) {
+  const skin=TOOL_SKIN_BY_ID[id];
+  if(mode!=='skins'||skinDrawing||!skin||!ownedSkins.has(id))return;
+  equippedSkins[skin.toolId]=id;
+  $('skin-result').textContent=`已套用「${skin.name}」；遊戲數值不變。`;
+  saveSkinCollection();renderSkinCollection();
+}
+function pickRandomToolSkin() {
+  const groups=SKIN_RARITIES.map(rarity=>({rarity,skins:TOOL_SKINS.filter(skin=>skin.rarity===rarity.id&&!ownedSkins.has(skin.id))})).filter(group=>group.skins.length);
+  const total=groups.reduce((sum,group)=>sum+group.rarity.weight,0);
+  if(!total)return null;
+  let roll=Math.random()*total;
+  for(const group of groups){
+    if(roll<group.rarity.weight)return group.skins[Math.floor(Math.random()*group.skins.length)];
+    roll-=group.rarity.weight;
+  }
+  return groups.at(-1).skins.at(-1);
+}
+function finishSkinReveal(skin) {
+  skinDrawing=false;skinAnimationTimer=null;
+  $('skin-draw-stage').classList.remove('drawing');
+  $('skin-draw-stage').classList.add('revealed',`rarity-${skin.rarity}`);
+  $('skin-reveal-title').textContent=skin.name;
+  $('skin-reveal-rarity').textContent=`${skin.rarityLabel} · ${CONTENT.weapons.find(tool=>tool.id===skin.toolId).name}`;
+  $('skin-result').textContent=`抽到了「${skin.name}」！已自動套用，也可在收藏室切換。`;
+  renderSkinCollection();
+}
+function drawRandomToolSkin() {
+  if(mode!=='skins'||skinDrawing||skinTickets<1)return;
+  const skin=pickRandomToolSkin();
+  if(!skin)return;
+  skinTickets--;
+  ownedSkins.add(skin.id);
+  equippedSkins[skin.toolId]=skin.id;
+  selectedSkinTool=skin.toolId;
+  saveSkinCollection();
+  skinDrawing=true;
+  const stage=$('skin-draw-stage');
+  stage.className='skin-draw-stage drawing';
+  const preview=$('skin-reveal-canvas').getContext('2d');preview.clearRect(0,0,130,110);
+  drawTool(preview,skin.toolId,5,65,55,1.4,0,false,skin.id);
+  $('skin-reveal-title').textContent='翻開皮膚卡片…';
+  $('skin-reveal-rarity').textContent='稀有度揭曉中';
+  $('skin-result').textContent='抽取中，皮膚卡片即將揭曉！';
   playSound(880,.22,'triangle',.04);
   renderSkinCollection();updateHud();
+  if(storyReducedMotion)finishSkinReveal(skin);
+  else skinAnimationTimer=setTimeout(()=>finishSkinReveal(skin),1400);
 }
 function bindButtonAction(button, action) {
   let touch=null,suppressClickUntil=0;
@@ -2951,14 +3033,14 @@ function roundedRect(x, y, w, h, radius, fill, stroke, lineWidth = 1) {
   if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineWidth; ctx.stroke(); }
 }
-function drawTool(c, id, level, x, y, size = 1, angle = 0, evolved = false, previewSkin = false) {
+function drawTool(c, id, level, x, y, size = 1, angle = 0, evolved = false, skinPreviewId = null) {
   level = clamp(level, 1, 5);
   const gold = level === 5;
-  const skin=(previewSkin||ownedSkins.has(id))&&TOOL_SKIN_BY_ID[id];
+  const skin=TOOL_SKIN_BY_ID[skinPreviewId||equippedSkins[id]];
   const accents = {blueberry: "#a1df7c", pistol: "#b8d7f8", firecracker: "#ffb995", bow: "#ddbb83", eraser: "#f7c6e0", ruler: "#93e8dc",football:"#c4ead7",plane:"#a5d9f4",chalk:"#e2bfdc",stapler:"#edaf93",book:"#91c6ab",bell:"#efd494"};
   const accent = gold ? "#ffda73" : accents[id];
   c.save(); c.translate(x, y); c.rotate(angle); c.scale(size, size);
-  if(skin){c.filter=`hue-rotate(${skin.hue}deg) saturate(1.3)`;c.shadowColor=skin.color;c.shadowBlur=9;}
+  if(skin){c.filter=`hue-rotate(${skin.hue}deg) saturate(${1.1+skin.rarityIndex*.12})`;c.shadowColor=skin.color;c.shadowBlur=skin.glow;}
   if (evolved) {
     c.fillStyle = "#a27bf036"; c.strokeStyle = "#d7bdff"; c.lineWidth = 2;
     c.beginPath();
@@ -3155,9 +3237,13 @@ function drawTool(c, id, level, x, y, size = 1, angle = 0, evolved = false, prev
   }
   if(skin){
     c.filter='none';c.shadowBlur=0;c.strokeStyle=skin.color;c.lineWidth=2;
-    for(const [sx,sy] of [[-27,-22],[26,-24],[28,23]]){
+    const count=skin.rarityIndex+2;
+    for(let i=0;i<count;i++){
+      const a=i*Math.PI*2/count-.8,sx=Math.cos(a)*34,sy=Math.sin(a)*34;
       c.beginPath();c.moveTo(sx-4,sy);c.lineTo(sx+4,sy);c.moveTo(sx,sy-4);c.lineTo(sx,sy+4);c.stroke();
     }
+    if(skin.rarityIndex>=3){c.globalAlpha=.55;c.beginPath();c.arc(0,0,39,0,Math.PI*2);c.stroke();c.globalAlpha=1;}
+    if(skin.rarityIndex===4){c.beginPath();c.arc(0,0,44,-1.3,1.3);c.stroke();}
   }
   c.restore();
 }
