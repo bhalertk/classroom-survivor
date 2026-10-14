@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" role="img" aria-labelledby="title desc">
+  <title id="title">敵人 19 閃身拳手招式圖</title>
+  <desc id="desc">左側示範側向閃身的預告路線；右側示範落點後的昇龍拳扇形。先避開落點，再離開拳擊範圍。</desc>
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#244d56"/><stop offset="1" stop-color="#152f3c"/></linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10" fill="#9cf0d7"/></marker>
+    <g id="fighter" stroke="#234d56" stroke-width="4" stroke-linejoin="round">
+      <rect x="-19" y="-47" width="38" height="31" rx="4" fill="#67b6a9"/>
+      <rect x="-15" y="-50" width="30" height="8" rx="3" fill="#b1f6df"/>
+      <rect x="-17" y="-15" width="34" height="35" rx="4" fill="#2f7777"/>
+      <rect x="-30" y="-8" width="13" height="19" rx="3" fill="#78d8c7"/>
+      <rect x="17" y="-8" width="13" height="19" rx="3" fill="#78d8c7"/>
+      <rect x="-15" y="18" width="11" height="15" rx="2" fill="#354f60"/>
+      <rect x="4" y="18" width="11" height="15" rx="2" fill="#354f60"/>
+      <path d="M-9 -31h4m10 0h4" stroke="#223c46" stroke-width="5"/>
+    </g>
+  </defs>
+  <rect width="800" height="280" rx="18" fill="url(#bg)"/>
+  <path d="M400 16v248" stroke="#5c8887" stroke-width="2" stroke-dasharray="7 8"/>
+  <text x="24" y="36" fill="#e4fff3" font-size="22" font-weight="900" font-family="sans-serif">ENEMY 19 | SIDESTEP BOXER</text>
+  <text x="28" y="74" fill="#b9e8dc" font-size="18" font-weight="800" font-family="sans-serif">01 SIDESTEP | 0.55s</text>
+  <ellipse cx="133" cy="195" rx="43" ry="11" fill="#132933"/>
+  <use href="#fighter" xlink:href="#fighter" xmlns:xlink="http://www.w3.org/1999/xlink" x="133" y="174"/>
+  <path d="M180 177 Q235 104 300 168" fill="none" stroke="#9cf0d7" stroke-width="7" stroke-dasharray="10 8" marker-end="url(#arrow)"/>
+  <circle cx="322" cy="178" r="30" fill="none" stroke="#c3ffdf" stroke-width="4" stroke-dasharray="8 7"/>
+  <text x="255" y="236" fill="#fff0bd" font-size="17" font-weight="700" font-family="sans-serif">DODGE LANDING</text>
+  <text x="431" y="74" fill="#b9e8dc" font-size="18" font-weight="800" font-family="sans-serif">02 UPPERCUT | 0.48s</text>
+  <ellipse cx="552" cy="202" rx="43" ry="11" fill="#132933"/>
+  <use href="#fighter" xlink:href="#fighter" xmlns:xlink="http://www.w3.org/1999/xlink" x="552" y="178"/>
+  <path d="M561 165 Q610 87 665 109 L697 146 Q633 132 609 203 Z" fill="#9cf0d7" fill-opacity=".25" stroke="#a9f7dd" stroke-width="4" stroke-dasharray="9 6"/>
+  <path d="M579 183 Q620 152 646 119" fill="none" stroke="#fff0bd" stroke-width="6" marker-end="url(#arrow)"/>
+  <text x="610" y="239" fill="#fff0bd" font-size="17" font-weight="700" font-family="sans-serif">EXIT FRONT ARC</text>
+</svg>

@@ -35,6 +35,8 @@ button.touch-pressed { filter: brightness(1.12); }
 .dialogue-portrait[hidden] { display: none; }
 .chapter-dialogue button { clear: both; position: sticky; bottom: 0; }
 .difficulty-picker { display: flex; gap: 8px; margin: 12px 0 8px; }
+.difficulty-options { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.difficulty-options button { min-width: 0; padding: 8px 3px; white-space: nowrap; }
 .difficulty-picker button { flex: 1; min-height: 44px; padding: 8px; border: 2px solid #c0cbb7; border-radius: 9px; background: #edf0df; color: #4c6766; font-weight: 900; }
 .difficulty-picker button.selected { border-color: #297b77; background: #377f79; color: #fff8dc; box-shadow: inset 0 0 0 2px #ffffff40; }
 .difficulty-description { margin-bottom: 18px; font-size: 14px; color: #526d70; line-height: 1.6; }
@@ -47,6 +49,14 @@ button.touch-pressed { filter: brightness(1.12); }
 .lesson-progress { height: 6px; background: #d6d2be; }
 .lesson-progress > div { background: linear-gradient(90deg, #50a891, #b7d884); }
 .status-panel { border-left: 5px solid #84d4c1; }
+.secret-tool { margin: 7px 0; padding: 5px 7px; border: 1px solid #f5dd91; border-radius: 7px; background: #866132; color: #fff5cc; font-size: 11px; font-weight: 900; }
+.secret-tool[hidden] { display: none; }
+.cheat-panel { margin: 12px 0 8px; padding: 12px; border: 2px dashed #c7aa72; border-radius: 12px; background: #f8edd3; text-align: left; }
+.cheat-panel label { display: block; margin-bottom: 6px; color: #4c655b; font-size: 13px; font-weight: 900; }
+.cheat-controls { display: flex; gap: 7px; }
+.cheat-controls input { min-width: 0; flex: 1; padding: 9px 10px; border: 2px solid #b7c8b7; border-radius: 8px; background: #fffdf5; color: #274850; font: inherit; font-size: 14px; }
+.cheat-controls button { padding: 8px 12px; border: 0; border-radius: 8px; background: #568b79; color: #fff; font: inherit; font-weight: 900; }
+.cheat-panel small { display: block; margin-top: 6px; color: #6c7a72; font-size: 11px; }
 .hp-bar { height: 13px; }
 .hp-bar > div { background: linear-gradient(90deg, #f06462, #ffb27c); }
 .xp-bar > div { background: linear-gradient(90deg, #58c9ca, #b4e8b6); }
@@ -62,7 +72,7 @@ button.touch-pressed { filter: brightness(1.12); }
 @media (pointer: coarse) {
   .icon-btn, .speed-btn { min-width: 44px; min-height: 44px; }
   .secondary-btn, .text-btn, .chapter-dialogue button, .tutorial-panel button { min-height: 44px; }
-  .joystick { left: max(20px, env(safe-area-inset-left)); bottom: max(24px, env(safe-area-inset-bottom)); }
+  .joystick { left: 50%; top: calc(50% + 12vh); bottom: auto; transform: translate(-50%, -50%); }
 }
 @media (max-width: 650px) {
   .dialogue-story-canvas { max-height: 78px; }
@@ -95,3 +105,17 @@ button.touch-pressed { filter: brightness(1.12); }
   .chapter-dialogue { max-height: 140px; }
   #loadout-guide { max-height: 130px; }
 }
+.reward-prizes { display: grid; gap: 9px; margin: 18px 0; text-align: left; }
+.reward-prizes span { display: block; padding: 12px 14px; border: 2px solid #c8d8c3; border-radius: 10px; background: #ecf1df; color: #345e5c; font-weight: 900; }
+.reward-modal > button { width: 100%; margin-top: 9px; }
+.bestiary-modal { width: min(880px, 96vw); max-height: min(90dvh, 850px); overflow-y: auto; }
+.bestiary-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 14px 0 20px; text-align: left; }
+.bestiary-entry { padding: 13px; border: 2px solid #b8c9c0; border-radius: 12px; background: #eff3e8; }
+.bestiary-entry.unlocked { border-color: #69a49a; background: #e9f4eb; }
+.bestiary-entry.locked { background: #e0e5df; color: #64716e; }
+.bestiary-entry h3 { margin: 0 0 7px; color: #274d52; font-size: 17px; }
+.bestiary-entry p { margin: 4px 0; font-size: 14px; line-height: 1.55; }
+.bestiary-entry.illustrated { grid-column: 1 / -1; }
+.move-art-scroll { max-width: 100%; overflow-x: auto; margin-top: 10px; }
+.move-art-scroll img { display: block; width: 800px; max-width: none; height: 280px; border-radius: 8px; }
+@media (max-width: 650px) { .bestiary-list { grid-template-columns: 1fr; } .bestiary-modal { max-height: 94dvh; } }

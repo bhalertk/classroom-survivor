@@ -18,14 +18,15 @@
       <div class="brand"><span class="brand-icon">✎</span><span>下課生存戰</span><small>國中 102 班</small></div>
       <div class="hud-center">
         <div class="timer-box"><span id="lesson-label" class="hud-label">第 1 / 30 節</span><strong id="timer">00:30</strong><div class="lesson-progress" aria-hidden="true"><div id="lesson-fill"></div></div></div>
-        <div class="wave-box"><span class="hud-label">距離放學</span><strong id="wave">15:00</strong></div>
+        <div class="wave-box"><span id="wave-label" class="hud-label">距離領飲料</span><strong id="wave">15:00</strong></div>
       </div>
-      <div class="hud-right"><span id="kill-count">擊退 0</span><button id="speed-btn" class="icon-btn speed-btn" aria-label="遊戲速度 1 倍，點擊切換" title="切換 1×、2×、3×（F）">1×</button><button id="sound-btn" class="icon-btn" aria-label="開啟音效" title="音效">♪</button><button id="pause-btn" class="icon-btn" aria-label="暫停遊戲" title="暫停">Ⅱ</button><button id="hud-toggle" class="icon-btn" aria-label="隱藏選單與生命欄" aria-expanded="true" title="隱藏遊戲介面（H）">隱藏</button></div>
+      <div class="hud-right"><span id="kill-count">擊退 0</span><button id="bestiary-btn" class="icon-btn" aria-label="開啟敵人圖鑑" title="敵人圖鑑">圖鑑</button><button id="speed-btn" class="icon-btn speed-btn" aria-label="遊戲速度 1 倍，點擊切換" title="切換 1×、2×、3×（F）">1×</button><button id="sound-btn" class="icon-btn" aria-label="開啟音效" title="音效">♪</button><button id="pause-btn" class="icon-btn" aria-label="暫停遊戲" title="暫停">Ⅱ</button><button id="hud-toggle" class="icon-btn" aria-label="隱藏選單與生命欄" aria-expanded="true" title="隱藏遊戲介面（H）">隱藏</button></div>
     </div>
 
     <div class="status-panel">
       <div id="difficulty-indicator" class="difficulty-indicator">難度：困難</div>
       <div class="loadout"><span id="loadout-label">✎ 鉛筆揮砍 · 道具 0 / 6</span><strong id="weapon-levels">🫐 0/5　⌖ 0/5　✹ 0/5<br>🏹 0/5　▰ 0/5　△ 0/5</strong></div>
+      <div id="secret-tool" class="secret-tool" hidden>🤝 隱藏道具：大家的團結</div>
       <div class="talent-loadout"><span id="talent-label">天賦 0 / 6</span><div id="talent-slots" class="talent-slots"></div></div>
       <small id="slow-label" class="slow-label" hidden>減速 3.0 秒</small>
       <small id="stun-label" class="stun-label" hidden>眩暈 1.0 秒</small>
@@ -69,10 +70,11 @@
         <li>第 13 節起，瞬移拳手會瞬移到身旁再出拳，現身後離開扇形或繞背閃避；第 14 節起，三球召喚者會召喚 3 顆球，看到方向線就側移閃避。</li>
         <li>第 15 節起，保健股長每隔一段時間幫附近敵人回血；第 16 節起，助威方塊人讓周圍敵人移動 1.5 倍速、攻擊間隔減半、傷害增加 25%。</li>
         <li>第 17 節起，氣功方塊人會蓄力發射穿透課桌的光束；第 18 節起，重踢方塊人會先蓄力，再把命中的玩家踢飛到教室邊界。</li>
+        <li>第 19 節起，閃身拳手先側向閃身再出昇龍拳；第 20 節起，飛踢重擊手交替使用衝刺飛踢與近身重擊。兩種攻擊都有預告，第 20 節的 Boss 戰期間小怪暫停出現。</li>
         <li>第 10 節：瓶蓋收藏家丟出的瓶蓋會從課桌和牆壁反彈，5 秒後消失。</li>
         <li>第 20 節：雙人單車隊，一人衝撞、一人丟輪胎；一人倒下就觸發劇情，兩人都倒下才結束 Boss 戰。</li>
         <li>課桌和講桌是實體障礙，會擋住你、敵人和敵方攻擊；沿著走道移動，也能利用桌子掩護。</li>
-        <li>第 30 節：擊敗最終 Boss，撐到放學鐘響才能通關。</li>
+        <li>第 30 節：最終 Boss 是程式老師。看準程式碼預告線避開射擊與錯誤碼彈幕；打敗老師、撐到鐘響可領飲料，之後可加碼 10 節挑戰茶葉蛋兌換券。</li>
         <li>Boss 登場時場上小怪與敵方投射物、陷阱消失；Boss 戰暫停課節計時與小怪生成。整組 Boss 擊敗後恢復倒數。</li>
         <li>Boss 半血後會暴走，加快攻擊；看到蓄力方向先閃避，再找空檔反擊。</li>
         <li>先撿起並裝備 6 個不同道具，天賦才會出現在升級選項；天賦最多 6 個。鉛筆另外保留，每種工具最多 5 級。</li>
@@ -85,19 +87,20 @@
         <div class="hero-badge">SURVIVE THE SCHOOL DAY</div>
         <div class="hero-doodles"><span>✎</span><span>✦</span><span>▤</span></div>
         <h1 id="start-title">下課<span>生存戰</span></h1>
-        <p class="hero-subtitle">轉學第一天，你走進國中 102 班。下課鐘不再響起，班長交給你一本神祕筆記。搭配工具與天賦、解除三道封印，帶大家一起撐到放學。</p>
+        <p class="hero-subtitle">轉學第一天，老師和同學給你一個驚喜：與同學們的方塊戰鬥造型交手，最後挑戰會寫程式的老師。撐過 30 節領飲料，再加碼 10 節可贏茶葉蛋兌換券！</p>
         <div class="how-to">
           <div><span class="how-icon">⌘</span><strong>移動閃避</strong><small>WASD、方向鍵或觸控搖桿</small></div>
           <div><span class="how-icon">◎</span><strong>自動攻擊</strong><small>靠近目標就會自動瞄準</small></div>
           <div><span class="how-icon">✦</span><strong>收集成長</strong><small>收集光點並選擇能力</small></div>
         </div>
         <div class="difficulty-picker" role="group" aria-label="選擇主角"><button id="character-boy" type="button" class="selected" aria-pressed="true">男生 · 短髮</button><button id="character-girl" type="button" aria-pressed="false">女生 · 馬尾</button></div>
-        <div class="difficulty-picker" role="group" aria-label="選擇遊戲難度"><button id="difficulty-easy" type="button" aria-pressed="false">簡單</button><button id="difficulty-normal" type="button" aria-pressed="false">普通</button><button id="difficulty-hard" type="button" class="selected" aria-pressed="true">困難</button></div>
+        <div class="difficulty-picker difficulty-options" role="group" aria-label="選擇遊戲難度"><button id="difficulty-easy" type="button" aria-pressed="false">簡單</button><button id="difficulty-normal" type="button" aria-pressed="false">普通</button><button id="difficulty-hard" type="button" class="selected" aria-pressed="true">困難</button><button id="difficulty-very-hard" type="button" aria-pressed="false">很難</button><button id="difficulty-ultra-hard" type="button" aria-pressed="false">超難</button></div>
         <p id="difficulty-description" class="difficulty-description" aria-live="polite"></p>
         <button id="start-btn" class="primary-btn">開始故事 <span>→</span></button>
         <button id="practice-btn" class="secondary-btn">直接練習新手教學</button>
+        <button id="start-bestiary-btn" class="secondary-btn">敵人圖鑑 · 擊敗後解鎖</button>
         <button id="quick-start-btn" class="secondary-btn">已熟悉操作，直接挑戰</button>
-        <p class="microcopy">30 節課 · 每節 30 秒 · 支援 1× / 2× / 3× 加速</p>
+        <p class="microcopy">30 節領飲料 · 可加碼 10 節 · 每節 30 秒 · 支援倍速</p>
       </div>
     </section>
 
@@ -115,7 +118,7 @@
       <div class="modal-card end-modal">
         <div class="modal-kicker">READY!</div>
         <h2 id="tutorial-done-title">教學完成</h2>
-        <p>你已完成移動、裝備、超級進化與閃避練習！正式挑戰從鉛筆開局，重新收集工具與天賦，撐過 30 節課並擊敗三組 Boss。</p>
+        <p>你已完成移動、裝備、超級進化與閃避練習！正式挑戰從鉛筆開局，迎戰同學們，最後打敗會用程式攻擊的老師；撐過 30 節可領飲料，還能加碼 10 節挑戰茶葉蛋兌換券。</p>
         <div class="tutorial-recap"><span>✓ 移動與自動攻擊</span><span>✓ 三選一與拾取裝備</span><span>✓ 天賦配對與超級進化</span><span>✓ 閃避、減速與敵人提示</span><span>✓ 回血、暫停與倍速</span><span>✓ 裝備上限與 Boss 規則</span></div>
         <button id="tutorial-done-btn" class="primary-btn">進入教室 <span>→</span></button>
         <button id="tutorial-replay-btn" class="secondary-btn">再練習一次</button>
@@ -142,9 +145,33 @@
         <p>準備好再回教室。</p>
         <details class="loadout-guide-panel" open><summary>我的裝備與進化條件</summary><div id="loadout-guide"></div></details>
         <details class="story-journal"><summary>102 班劇情回顧</summary><div id="pause-story-log"></div></details>
+        <div class="cheat-panel"><label for="cheat-input">密技</label><div class="cheat-controls"><input id="cheat-input" type="text" autocomplete="off" spellcheck="false" placeholder="輸入密技"><button id="cheat-submit" type="button">啟動</button></div><small id="cheat-status" role="status">輸入後按「啟動」；每個密技每局可用一次。</small></div>
+        <button id="pause-bestiary-btn" class="secondary-btn">查看敵人圖鑑</button>
         <button id="resume-btn" class="primary-btn">繼續遊戲 <span>→</span></button>
         <button id="pause-restart-btn" class="secondary-btn">重新開始</button>
         <button id="pause-menu-btn" class="secondary-btn">結束本局，回主選單</button>
+      </div>
+    </section>
+
+    <section id="reward-screen" class="overlay" aria-labelledby="reward-title">
+      <div class="modal-card end-modal reward-modal">
+        <div class="modal-kicker">30 節課達成！</div>
+        <h2 id="reward-title">老師的飲料到手了！</h2>
+        <p>老師把一杯飲料遞給你，同學們齊聲歡呼。班長拿出另一張獎券：「新同學，還想再撐 10 節課嗎？」</p>
+        <div class="reward-prizes"><span>🥤 飲料：已獲得</span><span>🥚 茶葉蛋兌換券：再撐 10 節</span></div>
+        <button id="claim-drink-btn" class="primary-btn">領飲料，今天放學 <span>→</span></button>
+        <button id="accept-bonus-btn" class="secondary-btn">加碼 10 節，挑戰茶葉蛋兌換券</button>
+      </div>
+    </section>
+
+    <section id="bestiary-screen" class="overlay" aria-labelledby="bestiary-title">
+      <div class="modal-card bestiary-modal">
+        <div class="modal-kicker">102 班 · 敵人記錄</div>
+        <h2 id="bestiary-title">敵人圖鑑</h2>
+        <p id="bestiary-progress" role="status">已解鎖 0 / 23</p>
+        <p>擊敗對應敵人至少 1 隻，就能查看招式與應對方式。進度會保存在這台裝置。</p>
+        <div id="bestiary-list" class="bestiary-list"></div>
+        <button id="bestiary-close-btn" class="primary-btn">返回 <span>→</span></button>
       </div>
     </section>
 

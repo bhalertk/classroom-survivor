@@ -23,34 +23,67 @@ CONTENT.weapons.push(
 );
 
 const STORY = [
-  { title: "國中 102 班的新同學", scene:1, text: "轉學第一天，你抱著書包站在國中 102 班門口。班長朝你招手：「你的座位在中間。老師還沒來，先把名字寫在黑板上吧。」" },
-  { title: "少了一聲下課鐘", scene:2, text: "你才拿起粉筆，廣播就傳來刺耳的雜音。班長的笑容消失了：「不對，這節課早就該結束了。」牆上的時鐘停住，門鎖喀的一聲扣上。" },
-  { title: "黑板上的規則", scene:3, text: "黑板上的名字自己擦掉，換成「完成三十節課，才能離開」。幾名同學變成方塊人，從桌椅間朝你靠近。這場考驗，竟把你當成了主角。" },
-  { title: "班長留下的筆記", scene:2, text: "班長躲到講台後，遞來一本皺皺的筆記：「每十節課會出現守門人。打敗他們，時鐘才肯繼續走。別被包圍，我會幫你看著教室。」" },
+  { title: "102 班的驚喜", scene:1, text: "轉學第一天，你走進國中 102 班。老師和同學突然從課桌後站起來，齊聲喊：「歡迎新同學！」班長笑著替你拉開座位。" },
+  { title: "老師的特別獎勵", scene:2, text: "老師拿出一杯飲料，宣布：「新同學，只要撐過 30 節課，這杯飲料就是你的！」同學們又舉起一張券：「如果再撐 10 節，還有茶葉蛋兌換券！」" },
+  { title: "同學們的迎新戰", scene:3, text: "老師在講桌的電腦按下執行鍵，黑板寫出「撐過三十節課」。同學們變成方塊戰鬥造型，從桌椅間朝你衝來！班長留在講台旁，負責記錄這場迎新挑戰。" },
+  { title: "班長留下的筆記", scene:2, text: "班長遞來一本筆記：「每十節有一道關卡；最後一關是老師本人。老師會寫程式改變戰場，看到程式碼的預告就快閃！」" },
   { title: "課桌裡的希望", scene:1, text: "筆記裡畫著十二種工具與天賦的配對。班長說：「強化到五級，再找到對應天賦，普通用品也能超級進化。」你看向書包，裡面還有一支鉛筆。" },
-  { title: "一起撐到放學", scene:3, text: "你握緊鉛筆：「我才剛轉來，可不想第一天就缺席。」班長點頭：「那就從移動和閃避開始。等鐘響了，我帶你認識真正的 102 班。」" }
+  { title: "飲料，還有茶葉蛋", scene:3, text: "你握緊鉛筆：「既然是同學們的挑戰，那我就接下了！先闖過三十節打敗老師，領我的飲料；到時再決定要不要加碼十節！」" }
 ];
-const STORY_BEATS = [
-  {id:"lesson-1",lesson:1,speaker:"班長",title:"第一堂：先活下來",text:"先沿著桌椅間的空隙走！我在講台後替你記課節。等方塊人倒下，記得撿起它們留下的經驗光點。"},
-  {id:"lesson-3",lesson:3,speaker:"轉學生",title:"不只是普通同學",text:"水壺、橡皮筋……連文具都變成攻擊了。但課桌裡的用品也能保護我。我得趁空檔把工具找齊。"},
-  {id:"lesson-5",lesson:5,speaker:"班長",title:"陌生的身影",text:"威龍也出現在教室了！這場怪事把陌生的身影都拉進 102 班。看到噴射背包蓄力，就往側邊閃開！"},
-  {id:"lesson-8",lesson:8,speaker:"班長",title:"守門人快到了",text:"筆記說，第十節會有收集瓶蓋的守門人。比特的蜘蛛、深藍的盾和追咬的狗都在擋路，先把眼前的危險處理掉。"},
-  {id:"lesson-11",lesson:11,speaker:"班長",title:"門縫透進光",text:"第一道封印鬆開了！牧羊人的陷阱和大聲公還在阻止我們。避開地上的警示，也別正面接下音波。"},
-  {id:"lesson-15",lesson:15,speaker:"轉學生",title:"半程的約定",text:"已經走完一半了。我開始記得每排桌椅的位置。班長，你答應過要帶我認識這個班，可別先離開。"},
-  {id:"lesson-21",lesson:21,speaker:"班長",title:"最後一頁筆記",text:"兩個單車手都倒下，第二道封印也解開了。筆記最後一頁只寫著：最後的守門人，就在黑板下等你。"},
-  {id:"lesson-25",lesson:25,speaker:"轉學生",title:"從新同學到同伴",text:"剛進門時，我還怕不知道怎麼跟大家打招呼。現在只剩一件事：把這扇門打開，讓 102 班一起回家。"},
-  {id:"lesson-29",lesson:29,speaker:"班長",title:"鐘聲之前",text:"下一節就是最後一關！把工具和天賦配好。擊敗最後的守門人，再完成第三十節的倒數，我們就能聽到真正的下課鐘。"}
+const LESSON_CHATS = [
+  ["1 號同學","第一節：迎新開跑","嗨，新同學！老師說這是迎新活動，放心，我們的方塊裝備只會把你打得想喝飲料！"],
+  ["2 號同學","第二節：水壺出場","我的水壺裝的是白開水，不是祕密藥水！小心它會飛，還會灑出三顆水珠。"],
+  ["3 號同學","第三節：橡皮筋樂隊","我負責彈橡皮筋，你負責閃！要是我彈到黑板，老師又要叫我擦乾淨了。"],
+  ["4 號同學","第四節：紙球大作戰","衛生紙球是溼的，黏在地上也會讓你慢三秒。這招是我打掃時間想出來的！"],
+  ["5 號同學","第五節：走廊太小","威龍把噴射背包帶進教室了！他衝過來時快側身，我可不想再扶正桌子。"],
+  ["6 號同學","第六節：蜘蛛點名","比特的機械蜘蛛又沒寫作業，現在滿地亂跑。先找比特，牠們就不會一直來！"],
+  ["8 號同學","第七節：盾牌練習","深藍說他的盾牌正面無敵。可是他忘了教室有走道，你繞到旁邊就好啦！"],
+  ["9 號同學","第八節：小狗也參加","訓犬員把狗帶來迎新了！別被追著跑，沿著桌邊轉個彎，牠會先跟桌腳打招呼。"],
+  ["10 號同學","第九節：看得見嗎","戳眼那招太壞了，我已經跟他說要輕一點！被碰到會有三秒看不清半邊。"],
+  ["11 號同學","第十節：瓶蓋收藏展","瓶蓋收藏家要來展示藏品了！會反彈的瓶蓋很好看，前提是你別站在它的路上。"],
+  ["12 號同學","第十一節：音量測試","我的大聲公調到迎新音量！看到音波就躲到桌後面，眩暈一秒可不好玩。"],
+  ["13 號同學","第十二節：倒楣蛋飛行","有人把倒楣蛋當球踢過來了！這絕對不是體育課標準動作，快往旁邊閃。"],
+  ["14 號同學","第十三節：突然出現","我會瞬移到你旁邊出拳！別緊張，看到我現身就快轉身，當作在練反應。"],
+  ["15 號同學","第十四節：三球連發","三顆球排隊出發！我本來想拿來打躲避球，結果老師說今天是生存課。"],
+  ["16 號同學","第十五節：半場休息嗎","保健股長在幫大家回血。你也累了吧？可惜這場迎新活動還不能喊暫停！"],
+  ["班長","第十六節：班長報時","已經過半了！我把進度寫在黑板上。加油，我可是特地幫你預留了飲料吸管。"],
+  ["21 號同學","第十七節：粉筆光束","那道氣功光束連課桌都擋不住！我畫了預告線，快移開，別讓筆記變成烤紙。"],
+  ["22 號同學","第十八節：重踢警報","重踢手想把你送到牆邊。這種送貨方式太粗魯了，你從蓄力扇形溜出去！"],
+  ["23 號同學","第十九節：舞步練習","閃身拳手把昇龍拳當舞步了！先躲他側移的落點，再離開拳頭前面。"],
+  ["24 號同學","第二十節：雙人單車","兩個人把腳踏車騎進教室？一個衝撞、一個丟輪胎。我宣布他們要負責整理桌椅！"],
+  ["25 號同學","第二十一節：單車停車場","單車隊的表演結束了！別忘了撿經驗光點，老師的程式關卡還在後面等你。"],
+  ["26 號同學","第二十二節：課桌迷宮","你已經比我們熟悉走道了！桌子會擋住敵人的攻擊，拿它當掩護很聰明。"],
+  ["27 號同學","第二十三節：道具展示","你那六件工具越變越帥！我的鉛筆盒看完都想報名超級進化。"],
+  ["28 號同學","第二十四節：加油團上線","別看大家穿著方塊裝備，我們都在替你加油。只是鼓掌的手還在發射攻擊。"],
+  ["29 號同學","第二十五節：飲料倒數","再五節就有飲料！老師問要不要加冰，我說等你打贏再決定。"],
+  ["30 號同學","第二十六節：轉學生之名","你都快成 102 班的傳說了！明天的座位表，我想坐在你旁邊學走位。"],
+  ["31 號同學","第二十七節：老師備課中","我剛偷看老師的螢幕，滿滿都是 RUN 和括號。看到程式碼的方向線就快躲！"],
+  ["32 號同學","第二十八節：最後兩節","大家把獎品放在講桌上了。老師說她會親自上場，我已經替你把吸管插好了！"],
+  ["33 號同學","第二十九節：全班倒數","三、二、一……等等，還有一節！老師準備用程式碼射擊，衝刺後也會放錯誤碼。"],
+  ["老師","第三十節：程式老師登場","同學們聊得很開心吧？現在換我測試你的走位！避開程式碼，飲料就是你的。"]
 ];
+const STORY_BEATS = LESSON_CHATS.map(([speaker,title,text],index)=>({id:`lesson-${index+1}`,lesson:index+1,speaker,title,text,emotion:index===29?'determined':index===15?'happy':undefined})).concat([
+  {id:"lesson-31",lesson:31,speaker:"老師",title:"加碼挑戰開始",text:"飲料已經是你的了！接下來十節是自選挑戰。撐到第四十節下課，茶葉蛋兌換券也給你！"},
+  {id:"lesson-32",lesson:32,speaker:"1 號同學",title:"加碼也有觀眾",text:"我已經把你的走位畫成戰術圖了！雖然畫得像一碗麵，但真的很厲害。"},
+  {id:"lesson-33",lesson:33,speaker:"21 號同學",title:"茶葉蛋情報",text:"茶葉蛋兌換券就在班長手裡。別擔心，她不會把它拿去換掉……應該啦！"},
+  {id:"lesson-34",lesson:34,speaker:"8 號同學",title:"課桌掩護隊",text:"你繞桌的速度比值日生還快。下次打掃我可以邀你加入嗎？"},
+  {id:"lesson-35",lesson:35,speaker:"班長",title:"加碼的中途",text:"已經多撐了五節！飲料先放在講桌上，我替你看著。你只要繼續躲開同學們的熱情！"},
+  {id:"lesson-36",lesson:36,speaker:"22 號同學",title:"牆壁請假中",text:"重踢手說今天不再把人踢到牆上。牆壁表示：謝謝體諒。"},
+  {id:"lesson-37",lesson:37,speaker:"12 號同學",title:"小聲加油",text:"我把大聲公關掉了，改用正常音量說：新同學，加油！"},
+  {id:"lesson-38",lesson:38,speaker:"27 號同學",title:"裝備畢業典禮",text:"你的工具都快能自己去上課了！再撐兩節，就可以帶著獎品放學。"},
+  {id:"lesson-39",lesson:39,speaker:"33 號同學",title:"兌換券就在眼前",text:"再一節就完成了！我已經幫你問好福利社，茶葉蛋還有喔。"},
+  {id:"lesson-40",lesson:40,speaker:"老師",title:"最後一聲鐘響",text:"好，最後一節也撐住了！今天的迎新挑戰圓滿結束，飲料和茶葉蛋券都歸你。"}
+]);
 const BOSS_DIALOGUE = {
-  mini1:{arrival:{speaker:"瓶蓋收藏家",title:"第一道封印",text:"每個瓶蓋都是一節沒下課的時間。想讓鐘繼續走？先從我的收藏裡闖過去！"},defeat:{speaker:"班長",title:"第一位守門人倒下",text:"瓶蓋散開了，時鐘又開始走了！這頁筆記果然是真的。我們還有兩道封印要解開。"}},
-  mini2:{arrival:{speaker:"雙人單車隊",title:"第二道封印",text:"一人封住去路，一人用輪胎攔截。轉學生，這條走廊可沒那麼容易通過！"},defeat:{speaker:"轉學生",title:"兩人都倒下了",text:"一個衝撞、一個丟輪胎……現在終於都停下了。班長，把最後一頁給我。我們去找最後的守門人。"}},
-  final:{arrival:{speaker:"班長",title:"最後一道封印",text:"黑板前的影子站起來了。它就是最後的守門人！時鐘再次停住，只有打敗它，第三十節才會繼續。"},defeat:{speaker:"轉學生",title:"等真正的下課鐘",text:"最後的守門人倒下了！黑板上的字正在消失。再撐過這一節剩下的時間，我們就能一起走出 102 班。"}}
+  mini1:{arrival:{speaker:"瓶蓋收藏家",title:"第一道關卡",text:"我收集的瓶蓋都派上用場了！新同學，躲得開這一輪才算過關！"},defeat:{speaker:"班長",title:"第一關通過",text:"瓶蓋散開了，時鐘又開始走了！你通過第一關，還有兩道關卡。"}},
+  mini2:{arrival:{speaker:"雙人單車隊",title:"第二道關卡",text:"一人封住走道，一人用輪胎攔截。轉學生，這間教室可沒那麼容易通過！"},defeat:{speaker:"轉學生",title:"兩人都倒下了",text:"一個衝撞、一個丟輪胎……現在終於都停下了。班長，把最後一頁給我。下一關是老師吧？"}},
+  final:{arrival:{speaker:"老師",title:"最終關卡：程式老師",emotion:'determined',text:"同學們的迎新戰打得不錯！接下來換我。看好黑板上的程式碼，能躲開我的指令，飲料才算贏到手。"},defeat:{speaker:"老師",title:"程式執行完畢",emotion:'relieved',text:"你把我的程式招式都破解了！最後一關通過。撐完第三十節剩下的時間，我就把飲料交給你。"}}
 };
 const BOSS_VICTORY_STORIES = {
   mini1:[
     {...BOSS_DIALOGUE.mini1.defeat,emotion:'surprised'},
     {speaker:'轉學生',title:'散落的收藏',emotion:'relieved',text:'剛剛那些瓶蓋差點把我的筆袋打穿……還好，我們真的做到了！'},
-    {speaker:'班長',title:'第一道光',emotion:'happy',text:'你看，門縫透進光了！把工具撿好，我陪你走完剩下兩道封印。'}
+    {speaker:'班長',title:'第一關的掌聲',emotion:'happy',text:'同學們在替你拍手！把工具撿好，我陪你走完剩下兩道關卡。'}
   ],
   mini2:[
     {speaker:'轉學生',title:'單車隊少了一人',emotion:'surprised',text:'其中一人倒下了！原來他們的配合也有破綻！'},
@@ -59,16 +92,41 @@ const BOSS_VICTORY_STORIES = {
   ],
   final:[
     {...BOSS_DIALOGUE.final.defeat,emotion:'surprised'},
-    {speaker:'班長',title:'名字回來了',emotion:'relieved',text:'黑板上變回我們的名字了！那道影子消失了，這次真的快要放學了。'},
-    {speaker:'轉學生',title:'102 班的新同學',emotion:'happy',text:'等鐘響後，帶我認識大家吧。明天，我還想坐在這個位子。'}
+    {speaker:'班長',title:'同學們收起裝備',emotion:'relieved',text:'老師的程式停止了，同學們也收起方塊戰鬥裝備。這場迎新戰真的快結束了！'},
+    {speaker:'轉學生',title:'102 班的新同學',emotion:'happy',text:'原來這就是你們的歡迎方式！等鐘響後，飲料可別忘了給我。'}
   ]
 };
+const BESTIARY = [
+  {kind:'basic',name:'敵人 1 · 方塊人',move:'突刺；命中時有 1% 機率召喚 100 隻方塊人。',tip:'看到蓄力就向側面移動。'},
+  {kind:'water',name:'敵人 2 · 水壺方塊人',move:'投擲水壺，或揮擊並射出 3 顆水珠。',tip:'利用課桌掩護，注意近距離的扇形水珠。'},
+  {kind:'rubber',name:'敵人 3 · 橡皮筋方塊人',move:'用橡皮筋遠距射擊。',tip:'保持移動，別停在射線上。'},
+  {kind:'tissue',name:'敵人 4 · 溼衛生紙方塊人',move:'投出溼衛生紙球，命中或踩到殘留物會減速 3 秒。',tip:'避開地上的溼球。'},
+  {kind:'weilong',name:'敵人 5 · 威龍',move:'噴射衝刺與投擲爆炸物。',tip:'離開衝刺路線和爆炸警示圈。'},
+  {kind:'bit',name:'敵人 6 · 比特',move:'召喚機械蜘蛛追擊。',tip:'優先擊敗召喚者與接近的蜘蛛。'},
+  {kind:'deepblue',name:'敵人 7 · 深藍',move:'正面舉盾阻擋，靠近後盾牌揮擊。',tip:'繞到側面或背後攻擊。'},
+  {kind:'handler',name:'敵人 8 · 訓犬員',move:'放出狗追咬。',tip:'先處理訓犬員，沿桌邊拉開距離。'},
+  {kind:'eye',name:'敵人 9 · 戳眼方塊人',move:'近身戳眼，讓半邊視野消失 3 秒。',tip:'在他靠近前擊退。'},
+  {kind:'shepherd',name:'敵人 10 · 牧羊人',move:'設置陷阱與投擲手雷。',tip:'避開地面警示。'},
+  {kind:'megaphone',name:'敵人 11 · 大聲公方塊人',move:'發射音波，命中後眩暈 1 秒。',tip:'靠課桌遮擋音波。'},
+  {kind:'kicker',name:'敵人 12 · 飛踢方塊人',move:'召喚倒楣蛋，再踢飛當作遠程武器。',tip:'看準準備動作側移。'},
+  {kind:'boxer',name:'敵人 13 · 瞬移拳手',move:'瞬移到玩家旁邊，再出拳。',tip:'離開落點與拳擊扇形。'},
+  {kind:'striker',name:'敵人 14 · 三球召喚者',move:'召喚 3 顆球一同射擊。',tip:'看方向線後側移。'},
+  {kind:'medic',name:'敵人 15 · 保健股長',move:'定期治療周圍敵人。',tip:'優先擊倒，防止敵群回血。'},
+  {kind:'commander',name:'敵人 16 · 助威方塊人',move:'強化附近敵人的速度、攻速與傷害。',tip:'先處理助威者。'},
+  {kind:'beam',name:'敵人 17 · 氣功方塊人',move:'蓄力發射能穿透課桌的光束。',tip:'沿射線側移，課桌不能擋光束。'},
+  {kind:'heavykick',name:'敵人 18 · 重踢方塊人',move:'踢飛玩家直到撞上教室邊界。',tip:'離開蓄力扇形。'},
+  {kind:'stepboxer',name:'敵人 19 · 閃身拳手',move:'蓄力 0.55 秒側向閃身，接著蓄力 0.48 秒使出昇龍拳。',tip:'先避開閃身落點，再離開昇龍拳扇形。',art:'enemy19-moves.svg'},
+  {kind:'flyfighter',name:'敵人 20 · 飛踢重擊手',move:'交替施展直線飛踢和前方扇形重擊。',tip:'飛踢向側面閃；重擊離開前方扇形。',art:'enemy20-moves.svg'},
+  {kind:'mini1',name:'小 Boss · 瓶蓋收藏家',move:'投擲會反彈的瓶蓋，5 秒後消失。',tip:'利用掩護，但留意反彈路線。'},
+  {kind:'mini2',name:'小 Boss · 雙人單車隊',move:'一人衝撞，一人丟輪胎。',tip:'兩人血量獨立，兩人都倒下才結束。'},
+  {kind:'final',name:'最終 Boss · 程式老師',move:'先預告再發射程式碼；衝刺後散出錯誤碼彈幕，半血時擴大範圍。',tip:'側移避開程式碼射線，利用桌子擋下子彈；衝刺後留意周圍彈幕。'}
+];
 const EMOTION_LABELS={calm:'平靜',surprised:'驚訝',nervous:'緊張',relieved:'鬆一口氣',happy:'開心',tired:'疲憊',determined:'堅定'};
 
 const $ = id => document.getElementById(id);
 const canvas = $("game");
 const ctx = canvas.getContext("2d");
-const screens = ["start-screen", "story-screen", "tutorial-done-screen", "upgrade-screen", "pause-screen", "end-screen"];
+const screens = ["start-screen", "story-screen", "tutorial-done-screen", "upgrade-screen", "pause-screen", "reward-screen", "bestiary-screen", "end-screen"];
 const keys = new Set();
 const pointer = { active: false, id: null, x: 0, y: 0 };
 const MAP = { w: 1800, h: 1200 };
@@ -76,18 +134,23 @@ const SUPPORT_RADIUS=280;
 const CLASSROOM_DESKS=Array.from({length:15},(_,i)=>({x:290+i%5*300,y:415+Math.floor(i/5)*230,left:225+i%5*300,top:384+Math.floor(i/5)*230,right:355+i%5*300,bottom:460+Math.floor(i/5)*230}));
 const SOLID_TABLES=[...CLASSROOM_DESKS,{left:800,top:250,right:1000,bottom:337}];
 const navigationFields=new Map();
-const TOTAL_LESSONS = 30;
+const CORE_LESSONS = 30;
+const BONUS_LESSONS = 10;
+const TOTAL_LESSONS = CORE_LESSONS + BONUS_LESSONS;
 const LESSON_LENGTH = 30;
+const CORE_GAME_LENGTH = CORE_LESSONS * LESSON_LENGTH;
 const GAME_LENGTH = TOTAL_LESSONS * LESSON_LENGTH;
 const MAX_TOOL_LEVEL = 5;
 const MAX_EQUIPPED_TOOLS = 6;
 const MAX_EQUIPPED_TALENTS = 6;
-const MELEE_ENEMY_KINDS = new Set(['basic','water','weilong','deepblue','eye','boxer','dog','spider','heavykick']);
+const MELEE_ENEMY_KINDS = new Set(['basic','water','weilong','deepblue','eye','boxer','dog','spider','heavykick','stepboxer','flyfighter']);
 const PLAYER_MAX_HP = 200;
 const DIFFICULTIES = {
   easy:{name:'簡單',hp:280,regen:3,enemyHealth:.65,enemyDamage:.6,enemySpeed:1,spawnCount:.6,spawnInterval:1.35,spawnCap:.65,description:'280 體力、每秒回復 3 點；敵人血量 65%、傷害 60%，出怪較少。'},
   normal:{name:'普通',hp:240,regen:2.5,enemyHealth:.82,enemyDamage:.8,enemySpeed:1,spawnCount:.8,spawnInterval:1.15,spawnCap:.85,description:'240 體力、每秒回復 2.5 點；敵人血量 82%、傷害 80%，出怪適中。'},
-  hard:{name:'困難',hp:PLAYER_MAX_HP,regen:2,enemyHealth:1,enemyDamage:1,enemySpeed:1.08,spawnCount:1.5,spawnInterval:.9,spawnCap:1,description:'200 體力、每秒回復 2 點；敵人追擊更快，每批敵人更多、出怪更頻繁。'}
+  hard:{name:'困難',hp:PLAYER_MAX_HP,regen:2,enemyHealth:1,enemyDamage:1,enemySpeed:1.08,spawnCount:1.5,spawnInterval:.9,spawnCap:1,description:'200 體力、每秒回復 2 點；敵人追擊更快，每批敵人更多、出怪更頻繁。'},
+  'very-hard':{name:'很難',hp:180,regen:1.5,enemyHealth:1.15,enemyDamage:1.2,enemySpeed:1.14,spawnCount:1.75,spawnInterval:.85,spawnCap:1.05,description:'180 體力、每秒回復 1.5 點；敵人血量 115%、傷害 120%，追擊和出怪更快。'},
+  'ultra-hard':{name:'超難',hp:160,regen:1,enemyHealth:1.3,enemyDamage:1.4,enemySpeed:1.2,spawnCount:2,spawnInterval:.75,spawnCap:1.1,description:'160 體力、每秒回復 1 點；敵人血量 130%、傷害 140%，敵群更密集。'}
 };
 const PRACTICE_DIFFICULTY={hp:PLAYER_MAX_HP,regen:2,enemyHealth:1,enemyDamage:1,enemySpeed:1,spawnCount:1,spawnInterval:1,spawnCap:1};
 CONTENT.talents = [
@@ -123,9 +186,9 @@ Object.assign(SUPER_TOOLS, {
   bell:{name:"放學交響鐘", damage:45, range:270, pulseRadius:270, knockback:145, cooldown:2, upgrade:"大範圍聲波清場，強力推開周圍敵人"}
 });
 const BOSS_SCHEDULE = [
-  { id: "mini1", name: "瓶蓋收藏家", lesson: 10, hp: 2100, r: 34, damage: 24, color: "#688c94" },
-  { id: "mini2", name: "雙人單車隊", lesson: 20, hp: 1900, members: 2, r: 32, damage: 32, color: "#be8363" },
-  { id: "final", name: "最終 Boss", lesson: 30, hp: 9000, r: 48, damage: 40, color: "#b57884" }
+  { id: "mini1", name: "瓶蓋收藏家", lesson: 10, hp: 5000, r: 34, damage: 24, color: "#688c94" },
+  { id: "mini2", name: "雙人單車隊", lesson: 20, hp: 7000, members: 2, r: 32, damage: 40, color: "#be8363" },
+  { id: "final", name: "程式老師", lesson: 30, hp: 20000, r: 48, damage: 40, color: "#597895" }
 ];
 const TOOL_APPEARANCES = {
   blueberry: ["單顆藍莓", "巨型藍莓", "小西瓜", "雙顆西瓜組", "金色西瓜組"],
@@ -267,6 +330,9 @@ let narrativeQueue=[];
 let activeDialogue=null;
 let dialogueTime=0;
 let portraitTime=0;
+let unityTool=false;
+let unityCooldown=0;
+let usedCheats=new Set();
 let tutorialStep = 0;
 let tutorialDistance = 0;
 let tutorialToolId = null;
@@ -293,7 +359,7 @@ const TUTORIAL_STEPS = [
   {title:"體驗溼衛生紙減速",text:"敵人 4 丟的溼衛生紙直接命中會減速 3 秒；沒命中的球留地 3 秒，碰到也會減速。",goal:"碰一下標記的溼衛生紙，再等減速結束。"},
   {title:"體力會自動回復",text:"遊玩時每秒回復 2 點體力，最高 200 點。暫停與選擇升級時會停止回血。",goal:"觀察體力條，等它從 85 回復到 95。"},
   {title:"練習暫停與加速",text:"按 P、Esc 或右上角 Ⅱ 暫停，再繼續遊戲。按 F 或倍速按鈕切換 1×、2×、3×；此步可以試用加速。",goal:"暫停並繼續一次，切到 2× 或 3× 後移動。"},
-  {title:"準備迎接 30 節課",text:"每節課 30 秒，共 30 節。Boss 出場後暫停課節計時與生成小怪，整組 Boss 倒下後恢復。",goal:"閱讀首領與裝備規則，準備好後完成教學。"}
+  {title:"準備迎接 30 節課",text:"每節課 30 秒。撐過 30 節可領飲料，再選擇是否加碼 10 節挑戰茶葉蛋兌換券。Boss 出場時會暫停課節計時與生成小怪。",goal:"閱讀首領、裝備與獎勵規則，準備好後完成教學。"}
 ];
 let player;
 let enemies = [];
@@ -306,6 +372,10 @@ let upgradeRerolls = 0;
 let spawnedBosses = new Set();
 let defeatedBosses = new Set();
 let gameTime = 0;
+let bonusAccepted = false;
+let drinkEarned = false;
+let bestiaryReturnMode = 'menu';
+let unlockedEnemies = (()=>{try {const saved=JSON.parse(window.localStorage?.getItem('classroom-survivor-bestiary')||'[]');return new Set(Array.isArray(saved)?saved.filter(kind=>BESTIARY.some(entry=>entry.kind===kind)):[]);}catch(_){return new Set();}})();
 let gameSpeed = 1;
 let hudHidden = false;
 let talentHudSignature = "";
@@ -403,7 +473,9 @@ function moveActor(entity,x,y,route=false) {
   }
 }
 function random(min, max) { return min + Math.random() * (max - min); }
-function currentLesson() { return Math.min(TOTAL_LESSONS, Math.floor(gameTime / LESSON_LENGTH) + 1); }
+function activeLessons() { return bonusAccepted ? TOTAL_LESSONS : CORE_LESSONS; }
+function activeGameLength() { return bonusAccepted ? GAME_LENGTH : CORE_GAME_LENGTH; }
+function currentLesson() { return Math.min(activeLessons(), Math.floor(gameTime / LESSON_LENGTH) + 1); }
 function spawnSettings() {
   const lesson = currentLesson();
   const settings=difficultySettings();
@@ -445,6 +517,39 @@ function resetInput() {
 function showScreen(id) {
   if(id)resetInput();
   for (const name of screens) $(name).classList.toggle("visible", name === id);
+}
+function recordEnemyDiscovery(kind) {
+  if(!BESTIARY.some(entry=>entry.kind===kind)||unlockedEnemies.has(kind))return;
+  unlockedEnemies.add(kind);
+  try {window.localStorage?.setItem('classroom-survivor-bestiary',JSON.stringify([...unlockedEnemies]));}catch(_){}
+}
+function renderBestiary() {
+  const list=$('bestiary-list');list.replaceChildren();
+  $('bestiary-progress').textContent=`已解鎖 ${unlockedEnemies.size} / ${BESTIARY.length}`;
+  for(const [index,entry] of BESTIARY.entries()) {
+    const unlocked=unlockedEnemies.has(entry.kind);
+    const card=document.createElement('article');card.className=`bestiary-entry${unlocked?' unlocked':' locked'}${unlocked&&entry.art?' illustrated':''}`;
+    const heading=document.createElement('h3');heading.textContent=unlocked?entry.name:`${String(index+1).padStart(2,'0')} · 尚未解鎖`;
+    card.append(heading);
+    const body=document.createElement('p');body.textContent=unlocked?`招式：${entry.move}`:'擊敗對應敵人至少 1 隻後，解鎖招式與應對提示。';card.append(body);
+    if(unlocked) {
+      const tip=document.createElement('p');tip.textContent=`應對：${entry.tip}`;card.append(tip);
+      if(entry.art){const wrap=document.createElement('div');wrap.className='move-art-scroll';const image=document.createElement('img');image.src=entry.art;image.alt=`${entry.name}的招式圖。${entry.move}${entry.tip}`;image.loading='lazy';wrap.append(image);card.append(wrap);}
+    }
+    list.append(card);
+  }
+}
+function openBestiary() {
+  if(mode==='bestiary')return;
+  bestiaryReturnMode=mode;
+  mode='bestiary';
+  renderBestiary();
+  showScreen('bestiary-screen');
+}
+function closeBestiary() {
+  if(mode!=='bestiary')return;
+  mode=bestiaryReturnMode;
+  showScreen(mode==='menu'?'start-screen':mode==='paused'?'pause-screen':mode==='ended'?'end-screen':null);
 }
 function bindButtonAction(button, action) {
   let touch=null,suppressClickUntil=0;
@@ -514,6 +619,8 @@ function makePlayer() {
 
 function resetWorld() {
   player = makePlayer();
+  unityTool=false;unityCooldown=0;usedCheats=new Set();
+  $('cheat-input').value='';$('cheat-status').textContent='輸入後按「啟動」；每個密技每局可用一次。';
   mini2FirstFallen=null;
   narrativeSeen=new Set();narrativeHistory=[];narrativeQueue=[];activeDialogue=null;dialogueTime=0;
   dialogueEntrance?.cancel();dialogueEntrance=null;
@@ -530,6 +637,8 @@ function resetWorld() {
   spawnedBosses = new Set();
   defeatedBosses = new Set();
   gameTime = 0;
+  bonusAccepted = false;
+  drinkEarned = false;
   gameSpeed = 1;
   updateSpeedButton();
   spawnClock = 0;
@@ -581,9 +690,9 @@ function drawStudentSkirt(c,top,bottom) {
   c.fillStyle='#574668';c.beginPath();c.moveTo(-18,top);c.lineTo(18,top);c.lineTo(23,bottom);c.lineTo(-23,bottom);c.closePath();c.fill();
   c.strokeStyle='#9f82a2';c.lineWidth=1.5;c.beginPath();c.moveTo(-9,top+3);c.lineTo(-11,bottom);c.moveTo(0,top+3);c.lineTo(0,bottom);c.moveTo(9,top+3);c.lineTo(11,bottom);c.stroke();
 }
-function storyStudent(c,x,y,time,walking,leader=false,emotion='calm') {
+function storyStudent(c,x,y,time,walking,leader=false,emotion='calm',gender=null) {
   c.save();c.translate(x,y+(walking?Math.sin(time*10)*2:0));
-  const girl=!leader&&player?.gender==='girl';
+  const girl=leader||gender==='girl'||(gender===null&&player?.gender==='girl');
   if(girl)drawStudentHairBack(c,-25);
   c.fillStyle="#43595933";c.beginPath();c.ellipse(0,29,25,6,0,0,Math.PI*2);c.fill();
   if(!leader)storyBox(c,12,-12,15,30,"#cf9b5f","#876b4d");
@@ -597,6 +706,26 @@ function storyStudent(c,x,y,time,walking,leader=false,emotion='calm') {
   c.fillStyle=girl?"#fff1cf":"#f0cf78";c.fillRect(-17,0,34,4);
   if(girl)drawStudentSkirt(c,18,31);
   if(leader){c.strokeStyle="#334e54";c.lineWidth=2;c.strokeRect(-11,-28,10,9);c.strokeRect(2,-28,10,9);c.beginPath();c.moveTo(-1,-24);c.lineTo(2,-24);c.stroke();}
+  c.restore();
+}
+function storyTeacher(c,x,y,time,emotion='happy') {
+  c.save();c.translate(x,y+Math.sin(time*2)*1.5);
+  c.fillStyle='#425a5b33';c.beginPath();c.ellipse(0,29,24,6,0,0,Math.PI*2);c.fill();
+  c.fillStyle='#d7d2bc';c.beginPath();c.ellipse(25,-23,9,20,-.25,0,Math.PI*2);c.fill();
+  c.fillStyle='#e9bd72';c.beginPath();c.arc(19,-34,5,0,Math.PI*2);c.fill();
+  storyBox(c,-14,19,11,13,'#4b535f','#374450');storyBox(c,3,19,11,13,'#4b535f','#374450');
+  storyBox(c,-19,-7,38,30,'#70a091','#4f6b6b',6);
+  c.fillStyle='#537c78';c.beginPath();c.moveTo(-17,17);c.lineTo(17,17);c.lineTo(23,31);c.lineTo(-23,31);c.closePath();c.fill();
+  storyBox(c,-25,-4,7,23,'#edc6a5','#ad836b');storyBox(c,18,-4,7,23,'#edc6a5','#ad836b');
+  c.fillStyle='#edc6a5';c.beginPath();c.arc(0,-25,18,0,Math.PI*2);c.fill();
+  c.fillStyle='#d7d2bc';c.beginPath();c.arc(0,-32,19,Math.PI,Math.PI*2);c.lineTo(18,-23);c.lineTo(-18,-22);c.fill();
+  c.strokeStyle='#435258';c.lineWidth=2;c.strokeRect(-13,-29,10,9);c.strokeRect(3,-29,10,9);c.beginPath();c.moveTo(-3,-25);c.lineTo(3,-25);c.stroke();
+  c.fillStyle='#354858';for(const eye of [-8,8]){c.beginPath();c.arc(eye,-24,1.7,0,Math.PI*2);c.fill();}
+  c.strokeStyle='#965d50';c.lineWidth=1.8;c.beginPath();
+  if(emotion==='surprised')c.ellipse(0,-13,3,4,0,0,Math.PI*2);
+  else if(emotion==='determined'){c.moveTo(-4,-12);c.lineTo(4,-12);}
+  else {c.moveTo(-5,-14);c.quadraticCurveTo(0,-7,5,-14);}c.stroke();
+  storyBox(c,22,-12,19,25,'#f8e0a5','#937a58',3);
   c.restore();
 }
 function drawStoryFace(c,emotion,time) {
@@ -620,12 +749,19 @@ function drawStoryFace(c,emotion,time) {
   if(emotion==='nervous'||emotion==='tired') {c.fillStyle='#86cde3';c.beginPath();c.ellipse(14,-17,2.5,4,-.3,0,Math.PI*2);c.fill();}
   if(emotion==='happy') {c.fillStyle='#de9b8899';c.fillRect(-13,-16,5,3);c.fillRect(8,-16,5,3);}
 }
+function classmateGender(speaker) {
+  const number=Number(/^([0-9]+) 號同學$/.exec(speaker)?.[1]);
+  if(number>=1&&number<=6||number>=8&&number<=16)return 'boy';
+  if(number>=21&&number<=33)return 'girl';
+  return null;
+}
 function drawDialoguePortrait() {
-  if(!activeDialogue||!['班長','轉學生'].includes(activeDialogue.speaker))return;
+  if(!activeDialogue||!['班長','轉學生','老師'].includes(activeDialogue.speaker)&&!classmateGender(activeDialogue.speaker))return;
   const c=$('dialogue-portrait').getContext('2d');
   c.clearRect(0,0,144,144);storyBox(c,0,0,144,144,'#e8e4c9',null,12);
   c.save();c.translate(72,111);c.scale(2.5,2.5);
-  storyStudent(c,0,0,portraitTime,false,activeDialogue.speaker==='班長',activeDialogue.emotion||'calm');c.restore();
+  if(activeDialogue.speaker==='老師')storyTeacher(c,0,0,portraitTime,activeDialogue.emotion||'happy');
+  else storyStudent(c,0,0,portraitTime,false,activeDialogue.speaker==='班長',activeDialogue.emotion||'calm',classmateGender(activeDialogue.speaker));c.restore();
 }
 function drawStoryCyclist(c,x,y,time,index,fallen=false) {
   c.save();c.translate(x,y);if(fallen)c.rotate(.9);
@@ -649,7 +785,7 @@ function drawBossStoryFrame(c,dialogue,time,reduced=false) {
   c.fillStyle='#e8dac0';c.fillRect(0,0,440,120);
   c.fillStyle='#b5ccb7';c.fillRect(0,0,440,25);c.fillStyle='#b18d69';c.fillRect(0,91,440,29);
   c.strokeStyle='#c6ae86';c.lineWidth=2;for(let x=0;x<440;x+=55){c.beginPath();c.moveTo(x,91);c.lineTo(x,120);c.stroke();}
-  storyBox(c,182,7,76,18,'#315f5c','#d2be97',3);c.fillStyle='#e9f0d0';c.textAlign='center';c.font="900 11px 'Noto Sans TC',sans-serif";c.fillText('第二道封印',220,20);
+  storyBox(c,182,7,76,18,'#315f5c','#d2be97',3);c.fillStyle='#e9f0d0';c.textAlign='center';c.font="900 11px 'Noto Sans TC',sans-serif";c.fillText('第二道關卡',220,20);
   if(stage==='arrival') {
     drawStoryCyclist(c,62+progress*92,75,t,0);drawStoryCyclist(c,378-progress*92,75,-t,1);
     c.fillStyle='#344f58';c.font="900 12px 'Noto Sans TC',sans-serif";c.fillText('衝撞',80,38);c.fillText('輪胎',360,38);
@@ -665,7 +801,7 @@ function drawBossStoryFrame(c,dialogue,time,reduced=false) {
     drawStoryCyclist(c,145,76,0,0,true);drawStoryCyclist(c,295,76,0,1,true);
     c.strokeStyle='#ffe19a';c.lineWidth=3;c.beginPath();c.arc(220,58,13+progress*24,0,Math.PI*2);c.stroke();
     storyBox(c,182,47,76,18,'#fff4d5','#a9885b',3);
-    c.fillStyle='#345955';c.font="900 12px 'Noto Sans TC',sans-serif";c.fillText('封印解除',220,60);
+    c.fillStyle='#345955';c.font="900 12px 'Noto Sans TC',sans-serif";c.fillText('關卡通過',220,60);
   }
   c.restore();
 }
@@ -688,13 +824,15 @@ function drawDialogueStoryFrame(c,dialogue,time,reduced=false) {
     for(let i=0;i<4;i++){const capX=victory?345-i*47-progress*120:300-i*49-progress*85,capY=67-Math.abs(Math.sin(t*3+i))*18;c.fillStyle='#f8e8c8';c.strokeStyle='#8c8069';c.lineWidth=2;c.beginPath();c.arc(capX,capY,6,0,Math.PI*2);c.fill();c.stroke();}
     storyStudent(c,85+progress*28,79,t,!reduced,false,victory?'relieved':'nervous');
   } else if(lastBoss) {
-    const shade=victory?1-progress:1;
-    c.save();c.globalAlpha=shade;c.translate(335,88);c.fillStyle='#344b4e';c.beginPath();c.moveTo(-34,2);c.lineTo(-19,-60);c.lineTo(0,-82);c.lineTo(20,-60);c.lineTo(38,2);c.closePath();c.fill();c.fillStyle='#f3b96b';c.fillRect(-12,-47,6,4);c.fillRect(7,-47,6,4);c.restore();
-    c.strokeStyle='#f7d68c';c.lineWidth=3;c.beginPath();c.arc(225,61,15+progress*(victory?38:12),0,Math.PI*2);c.stroke();
+    storyTeacher(c,335-(victory?progress*25:progress*80),79,t,victory?'surprised':'determined');
+    c.fillStyle='#5adad1';c.font="900 17px monospace";c.fillText('{ }',282-(victory?progress*15:progress*60),47);
+    c.fillText('01',380-(victory?progress*15:progress*60),60);
+    c.strokeStyle='#7ee7db';c.lineWidth=3;c.setLineDash([5,5]);c.beginPath();c.arc(225,61,15+progress*(victory?38:12),0,Math.PI*2);c.stroke();c.setLineDash([]);
     storyStudent(c,90+progress*45,79,t,!reduced,false,victory?'happy':'determined');
   } else {
     storyStudent(c,82+progress*34,78,t,!reduced,false,dialogue.speaker==='轉學生'?'determined':'nervous');
-    storyStudent(c,355-progress*30,78,t,!reduced,true,dialogue.speaker==='班長'?'determined':'calm');
+    if(dialogue.speaker==='老師')storyTeacher(c,355-progress*30,78,t,dialogue.emotion||'happy');
+    else storyStudent(c,355-progress*30,78,t,!reduced,dialogue.speaker==='班長',dialogue.emotion||'happy',classmateGender(dialogue.speaker));
     c.save();c.translate(220,66);c.fillStyle='#fff3d8';c.strokeStyle='#9a7858';c.lineWidth=3;c.beginPath();c.arc(0,0,22,0,Math.PI*2);c.fill();c.stroke();c.rotate(reduced?0:t*.8);c.strokeStyle='#345955';c.beginPath();c.moveTo(0,0);c.lineTo(0,-15);c.stroke();c.restore();
   }
   c.restore();
@@ -730,21 +868,24 @@ function drawStoryFrame(c,page,elapsed,reduced=false) {
   if(page===7)heroY=215;
   sceneStudent(c,heroX,heroY,t,(page===0||page===6)&&progress<1);
   sceneStudent(c,leaderX,205,t,page===6&&progress<1,true);
+  if(page===0||page===1||page===2||page===6)storyTeacher(c,780,203,t);
   if(page===0) {
-    c.fillStyle="#edf1d5";c.font="900 26px 'Noto Sans TC',sans-serif";c.fillText("歡迎新同學",458,112);
+    c.fillStyle="#edf1d5";c.font="900 26px 'Noto Sans TC',sans-serif";c.fillText("驚喜！歡迎新同學",458,112);
     c.strokeStyle="#f2e1a4";c.lineWidth=3;c.beginPath();c.moveTo(leaderX-23,198);c.lineTo(leaderX-39,186+(reduced?0:Math.sin(t*5)*6));c.stroke();
   } else if(page===1) {
-    c.fillStyle="#ecf0d3";c.font="900 26px 'Noto Sans TC',sans-serif";c.fillText(t<1.2?"下課鐘……":"鐘聲停住了",458,111);
-    if(!reduced&&t<3.5){c.strokeStyle="#e0b979";c.lineWidth=3;for(let i=0;i<3;i++){c.beginPath();c.arc(702,33,32+i*12+Math.sin(t*9)*3,.2,Math.PI-.2);c.stroke();}}
-    c.fillStyle="#244238";c.globalAlpha=.08;c.fillRect(0,0,900,300);c.globalAlpha=1;
+    c.fillStyle="#ecf0d3";c.font="900 25px 'Noto Sans TC',sans-serif";c.fillText("30 節＝飲料　加碼 10 節＝茶葉蛋券",458,111);
+    storyBox(c,405,139,35,52,'#f8e0a5','#bb845a',5);storyBox(c,410,126,25,12,'#fff3d0','#bb845a',4);
+    c.strokeStyle='#f8e0a5';c.lineWidth=4;c.beginPath();c.moveTo(423,130);c.lineTo(435,116);c.stroke();
+    storyBox(c,464,147,60,36,'#f7eac6','#b18f59',3);c.fillStyle='#946e46';c.font="900 14px 'Noto Sans TC',sans-serif";c.fillText('兌換券',494,170);
   } else if(page===2) {
-    const words="完成三十節課，才能離開";
+    const words="先完成三十節課！";
     c.fillStyle="#f4f0c8";c.font="900 23px 'Noto Sans TC',sans-serif";c.fillText(words.slice(0,Math.min(words.length,Math.floor(t*7))),458,111);
+    storyBox(c,704,180,49,27,'#3e6170','#85bcc0',3);c.fillStyle='#bbfcdf';c.font="900 13px monospace";c.fillText('RUN',728,199);
     for(let i=0;i<3;i++){const reveal=clamp((t-.8-i*.2)/.5,0,1);c.save();c.globalAlpha=reveal;c.translate(380+i*66,198);storyBox(c,-12,-17,24,30,"#829b93","#4c6a68");storyBox(c,-14,-40,28,25,"#829b93","#4c6a68");c.fillStyle="#253d46";c.fillRect(-8,-30,4,5);c.fillRect(5,-30,4,5);c.restore();}
   } else if(page===3) {
     const bookX=628-365*ease,bookY=179-Math.sin(progress*Math.PI)*26;
     c.save();c.translate(bookX,bookY);c.rotate((1-ease)*-.3);storyBox(c,-27,-31,54,62,"#d6b578","#826447");storyBox(c,-19,-25,40,50,"#f6ecd4","#b8a482");c.fillStyle="#596d60";c.font="900 15px 'Noto Sans TC',sans-serif";c.fillText("筆記",1,-2);c.restore();
-    c.fillStyle="#e4edce";c.font="900 21px 'Noto Sans TC',sans-serif";c.fillText("每十節課 · 一道封印",458,108);
+    c.fillStyle="#e4edce";c.font="900 21px 'Noto Sans TC',sans-serif";c.fillText("每十節課 · 一道關卡",458,108);
     c.strokeStyle="#8a5b49";c.lineWidth=5;c.beginPath();c.moveTo(70,155);c.lineTo(70+75*ease,155);c.stroke();
   } else if(page===4) {
     c.fillStyle="#ecf2d1";c.font="900 18px 'Noto Sans TC',sans-serif";c.fillText("Lv.5 ＋ 對應天賦 → 超級進化",458,84);
@@ -760,12 +901,15 @@ function drawStoryFrame(c,page,elapsed,reduced=false) {
   } else if(page===6) {
     c.fillStyle="#f6ecc9";c.font="900 29px 'Noto Sans TC',sans-serif";c.fillText("歡迎加入 102 班",458,113);
     c.fillStyle="#dceecd55";c.fillRect(48,39,105,191);
+    storyBox(c,402,146,35,51,'#f8dc9d','#ac7955',5);storyBox(c,406,137,27,11,'#fff0cc','#ac7955',4);
+    c.strokeStyle='#fff0cc';c.lineWidth=3;c.beginPath();c.moveTo(419,137);c.lineTo(430,126);c.stroke();
+    if(bonusAccepted){storyBox(c,465,148,71,42,'#fff0ca','#b18f59',3);c.fillStyle='#9b744d';c.font="900 14px 'Noto Sans TC',sans-serif";c.fillText('茶葉蛋券',500,174);}
     for(let i=0;i<18;i++){const fall=reduced?i*13:((t*45+i*27)%260);c.save();c.translate(185+i*32,fall);c.rotate(reduced?0:t+i);c.fillStyle=["#e6bd64","#83bb9f","#e99478"][i%3];c.fillRect(-3,-3,6,9);c.restore();}
   } else {
     c.fillStyle="#e5edce";c.font="900 24px 'Noto Sans TC',sans-serif";c.fillText("筆記還沒合上，再試一次",458,112);
     storyBox(c,355,199+motion*2,49,37,"#e9d4a8","#967653");c.strokeStyle="#fbdf97";c.lineWidth=2;c.beginPath();c.arc(380,216,35+motion*2,0,Math.PI*2);c.stroke();
   }
-  const captions=["轉學生走進教室","廣播響起，時鐘停住","黑板自己寫出規則","班長交出神祕筆記","工具與天賦的進化線索","握緊鉛筆，準備迎戰","下課鐘響，教室重獲平靜","休息一下，下一次再出發"];
+  const captions=["老師和同學給轉學生驚喜","飲料與茶葉蛋兌換券的約定","黑板自己寫出挑戰","班長交出神祕筆記","工具與天賦的進化線索","握緊鉛筆，準備迎戰","下課鐘響，教室重獲平靜","休息一下，下一次再出發"];
   storyBox(c,160,253,580,43,"#173b3bed",null,8);c.fillStyle="#fff7e5";c.font="900 30px 'Noto Sans TC',sans-serif";c.fillText(captions[page],450,284);
   c.restore();
 }
@@ -789,7 +933,7 @@ function nextDialogue() {
   if(activeDialogue) {
     const bossEntrance=activeDialogue.id?.startsWith("boss-arrival-");
     $("chapter-dialogue").classList.toggle("story-boss-cue",!!bossEntrance);
-    const hasPortrait=['班長','轉學生'].includes(activeDialogue.speaker);
+    const hasPortrait=['班長','轉學生','老師'].includes(activeDialogue.speaker)||!!classmateGender(activeDialogue.speaker);
     $("dialogue-portrait").hidden=!hasPortrait;
     $("dialogue-story-canvas").hidden=false;
     $("dialogue-speaker").textContent=activeDialogue.speaker+(activeDialogue.emotion?` · ${EMOTION_LABELS[activeDialogue.emotion]}`:'');
@@ -965,7 +1109,7 @@ function startGame() {
   $("tutorial-panel").hidden = true;
   $("pause-btn").classList.remove('tutorial-focus');$("speed-btn").classList.remove('tutorial-focus');
   showScreen(null);
-  showToast("撐過 30 節課，等到放學！");
+  showToast("撐過 30 節領飲料，還可加碼 10 節！");
   updateNarrative(0);
 }
 
@@ -973,9 +1117,9 @@ function makeEnemy(x, y, kind = "basic") {
   const practice = kind === "practice";
   const boss = BOSS_SCHEDULE.find(b => b.id === kind);
   const baseHealth = 37 + (currentLesson() - 1) * 5;
-  const health = boss ? boss.hp : practice ? 20 : kind === "deepblue" ? Math.round(baseHealth * 1.8) : kind === "spider" || kind === "dog" ? Math.round(baseHealth * .45) : ["weilong","bit","handler","shepherd","boxer","striker","medic","commander","beam","heavykick"].includes(kind) ? Math.round(baseHealth * 1.6) : kind === "water" ? Math.round(baseHealth * 1.25) : baseHealth;
+  const health = boss ? boss.hp : practice ? 20 : kind === "deepblue" ? Math.round(baseHealth * 1.8) : kind === "spider" || kind === "dog" ? Math.round(baseHealth * .45) : ["weilong","bit","handler","shepherd","boxer","striker","medic","commander","beam","heavykick","stepboxer","flyfighter"].includes(kind) ? Math.round(baseHealth * 1.6) : kind === "water" ? Math.round(baseHealth * 1.25) : baseHealth;
   const scaledHealth=practice?health:Math.max(1,Math.round(health*(MELEE_ENEMY_KINDS.has(kind)?2:1)*difficultySettings().enemyHealth));
-  return freePosition({ x, y, kind, boss, hp: scaledHealth, maxHp: scaledHealth, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "deepblue" ? 65 : kind === "mini2" ? 110 : boss ? 77 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), healClock:2.4, windup: 0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) });
+  return freePosition({ x, y, kind, boss, hp: scaledHealth, maxHp: scaledHealth, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "deepblue" ? 65 : kind === "mini2" ? 110 : boss ? 77 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), healClock:2.4, windup: 0, codeCooldown:kind==='final'?2.8:0, codeWindup:0, codeAngle:0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) });
 }
 function spawnEnemy(kind) {
   const viewW = cw / scale;
@@ -998,7 +1142,7 @@ function spawnScheduledBosses() {
       for(const enemy of enemies) if(!enemy.boss) enemy.hp=0;
       enemies=enemies.filter(enemy=>enemy.boss&&enemy.hp>0);
       enemyProjectiles=[];
-      effects=effects.filter(effect=>!["enemy-trap","wet-tissue","water-swing","enemy-explosion","eye-poke","shield-swing","shield-block","martial-teleport","martial-uppercut"].includes(effect.type));
+      effects=effects.filter(effect=>!["enemy-trap","wet-tissue","water-swing","enemy-explosion","eye-poke","shield-swing","shield-block","martial-teleport","martial-uppercut","sidestep","heavy-strike"].includes(effect.type));
       spawnedBosses.add(boss.id);
       for (let i = 0; i < (boss.members || 1); i++) spawnEnemy(boss.id).memberIndex = i;
       showToast(`第 ${boss.lesson} 節：${boss.name} 登場！`);
@@ -1095,6 +1239,7 @@ function damageEnemy(enemy, amount, source, origin = player) {
       return true;
     }
     kills++;
+    recordEnemyDiscovery(enemy.kind);
     if (enemy.boss) {
       if(enemy.kind==='mini2'&&mini2FirstFallen===null){mini2FirstFallen=enemy.memberIndex??0;queueBossVictory('mini2');}
       if (!enemies.some(e => e !== enemy && e.kind === enemy.kind && e.hp > 0)) {
@@ -1107,6 +1252,53 @@ function damageEnemy(enemy, amount, source, origin = player) {
     pickups.push({ x: enemy.x, y: enemy.y, r: 8, value: enemy.boss ? 20 : 1, type: "xp", age: 0 });
     addEffect(enemy.x, enemy.y, "burst", { color: "#9dcac3" });
   }
+  return true;
+}
+function updateUnityTool(dt) {
+  if(!unityTool||mode!=='playing')return;
+  unityCooldown-=dt;
+  if(unityCooldown>0)return;
+  unityCooldown=2.5;
+  if(!enemies.some(enemy=>enemy.hp>0))return;
+  addEffect(player.x,player.y,'unity-wave',{radius:2200,duration:.65});
+  for(const enemy of [...enemies])if(enemy.hp>0)damageEnemy(enemy,999999,'unity',enemy);
+  playSound(840,.23,'triangle',.055);
+}
+function applyCheat(rawCode) {
+  if(mode!=='paused'||pauseReturnMode!=='playing')return false;
+  const code=String(rawCode||'').trim().replace(/\s+/g,'');
+  const status=$('cheat-status');
+  if(!['two突飛猛竟','我是外掛'].includes(code)){status.textContent='沒有找到這組密技，再檢查一下字。';return false;}
+  if(usedCheats.has(code)){status.textContent='這組密技本局已經用過了。';return false;}
+  usedCheats.add(code);
+  if(code==='two突飛猛竟') {
+    unityTool=true;unityCooldown=0;
+    status.textContent='獲得隱藏道具「大家的團結」！每 2.5 秒攻擊全圖敵人，造成 999999 傷害。';
+  } else {
+    const choices=CONTENT.weapons.slice();
+    for(let i=choices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[choices[i],choices[j]]=[choices[j],choices[i]];}
+    player.weapons=Object.fromEntries(CONTENT.weapons.map(weapon=>[weapon.id,0]));
+    player.talents=Object.fromEntries(CONTENT.talents.map(talent=>[talent.id,false]));
+    player.evolvedTools=new Set();
+    for(const weapon of choices.slice(0,6)){
+      player.weapons[weapon.id]=5;
+      player.talents[matchingTalent(weapon.id).id]=true;
+    }
+    pickups=pickups.filter(p=>p.type==='xp');
+    if(currentLesson()<30){
+      enemies=[];projectiles=[];enemyProjectiles=[];effects=[];
+      gameTime=(CORE_LESSONS-1)*LESSON_LENGTH;
+      for(const boss of BOSS_SCHEDULE.filter(b=>b.lesson<30)){spawnedBosses.add(boss.id);defeatedBosses.add(boss.id);}
+      narrativeQueue=[];activeDialogue=null;nextDialogue();
+      for(const beat of STORY_BEATS.filter(b=>b.lesson<30))narrativeSeen.add(beat.id);
+      updateNarrative(0);
+      spawnScheduledBosses();
+    }
+    checkEvolutions();
+    status.textContent=`六件隨機工具已達 5 級並超級進化！現在是第 ${currentLesson()} 節。`;
+  }
+  $('cheat-input').value='';
+  renderLoadoutGuide();updateHud();
   return true;
 }
 function pencilAttack() {
@@ -1623,7 +1815,7 @@ function throwBottleCaps(enemy) {
   playSound(310, .08, "triangle", .04);
 }
 function throwTire(enemy) {
-  const rage=enemy.hp<=enemy.maxHp/2,count=rage?3:1,speed=rage?335:280;
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?4:2,speed=rage?400:340;
   for(let i=0;i<count;i++) {
     const angle = enemy.throwAngle+(i-(count-1)/2)*.22;
     enemyShot(enemy,{ type: "tire", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 17, damage: enemy.damage, life: 4.5, angle });
@@ -1638,8 +1830,18 @@ function bossShockwave(enemy) {
     enemyShot(enemy,{type:"boss-wave",x:enemy.x,y:enemy.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
       r:12,damage:26,life:2.6,angle});
   }
-  addEffect(enemy.x,enemy.y,"boss-enrage",{radius:100,duration:.45});
+  addEffect(enemy.x,enemy.y,"boss-enrage",{radius:100,duration:.45,color:'#7ce9ed'});
   playSound(150,.18,"triangle",.04);
+}
+function castTeacherCode(enemy) {
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?5:3;
+  for(let i=0;i<count;i++) {
+    const angle=enemy.codeAngle+(i-(count-1)/2)*.19;
+    enemyShot(enemy,{type:'code-glyph',x:enemy.x+Math.cos(angle)*enemy.r*.65,y:enemy.y+Math.sin(angle)*enemy.r*.65,
+      vx:Math.cos(angle)*(rage?410:350),vy:Math.sin(angle)*(rage?410:350),r:12,damage:20,life:3.2,angle});
+  }
+  addEffect(enemy.x,enemy.y,'burst',{color:'#83f0e8',duration:.4});
+  playSound(640,.18,'square',.035);
 }
 function waterBottleAttack(enemy) {
   const angle = enemy.throwAngle;
@@ -1834,6 +2036,61 @@ function updateSpecialEnemy(enemy,dt,movementSpeed) {
     moveActor(enemy,clamp(enemy.x+dx/d*movementSpeed*dt*direction,40,MAP.w-40),clamp(enemy.y+dy/d*movementSpeed*dt*direction,85,MAP.h-40),!enemy.lungeTime && !enemy.windup);
   }
 }
+function updateLateMartialEnemy(enemy,dt,movementSpeed) {
+  const stepboxer=enemy.kind==='stepboxer';
+  enemy.martialPhase ||= 'approach';
+  if(enemy.martialRecovery>0){enemy.martialRecovery=Math.max(0,enemy.martialRecovery-dt);return;}
+  if(enemy.martialPhase==='step-dash'||enemy.martialPhase==='kick-flight') {
+    enemy.dashTime=Math.max(0,enemy.dashTime-dt);
+    moveActor(enemy,enemy.x+enemy.dashVX*dt,enemy.y+enemy.dashVY*dt,false);
+    if(enemy.martialPhase==='kick-flight'&&!enemy.hitPlayer&&distance(enemy,player)<enemy.r+player.r+7&&damagePlayer(18,enemy)) {
+      enemy.hitPlayer=true;
+      moveActor(player,player.x+Math.cos(enemy.throwAngle)*35,player.y+Math.sin(enemy.throwAngle)*35);
+    }
+    if(enemy.dashTime===0) {
+      if(stepboxer){enemy.martialPhase='uppercut-windup';enemy.windup=.48;enemy.throwAngle=Math.atan2(player.y-enemy.y,player.x-enemy.x);}
+      else {enemy.martialPhase='approach';enemy.martialRecovery=.55;enemy.attackClock=2.3;enemy.attackCycle='strike';}
+    }
+    return;
+  }
+  if(enemy.windup>0) {
+    enemy.windup=Math.max(0,enemy.windup-dt);
+    if(enemy.windup>0)return;
+    if(enemy.martialPhase==='step-windup') {
+      const angle=enemy.throwAngle,side=enemy.stepSide;
+      enemy.dashVX=Math.cos(angle)*500-Math.sin(angle)*480*side;
+      enemy.dashVY=Math.sin(angle)*500+Math.cos(angle)*480*side;
+      enemy.dashTime=.24;enemy.martialPhase='step-dash';
+      addEffect(enemy.x,enemy.y,'sidestep',{angle:angle+side*Math.PI/2,radius:55,duration:.3});
+    } else if(enemy.martialPhase==='uppercut-windup') {
+      const angle=Math.atan2(player.y-enemy.y,player.x-enemy.x);
+      const difference=Math.atan2(Math.sin(angle-enemy.throwAngle),Math.cos(angle-enemy.throwAngle));
+      addEffect(enemy.x,enemy.y,'martial-uppercut',{angle:enemy.throwAngle,radius:110,duration:.4});
+      if(distance(enemy,player)<110+player.r&&Math.abs(difference)<.85&&damagePlayer(20,enemy))
+        moveActor(player,player.x+Math.cos(enemy.throwAngle)*55,player.y+Math.sin(enemy.throwAngle)*55);
+      enemy.martialPhase='approach';enemy.martialRecovery=.6;enemy.attackClock=2.6;
+    } else if(enemy.martialPhase==='kick-windup') {
+      enemy.dashVX=Math.cos(enemy.throwAngle)*720;enemy.dashVY=Math.sin(enemy.throwAngle)*720;
+      enemy.dashTime=.52;enemy.hitPlayer=false;enemy.martialPhase='kick-flight';
+    } else if(enemy.martialPhase==='strike-windup') {
+      const angle=Math.atan2(player.y-enemy.y,player.x-enemy.x);
+      const difference=Math.atan2(Math.sin(angle-enemy.throwAngle),Math.cos(angle-enemy.throwAngle));
+      addEffect(enemy.x,enemy.y,'heavy-strike',{angle:enemy.throwAngle,radius:125,duration:.42});
+      if(distance(enemy,player)<125+player.r&&Math.abs(difference)<.85&&damagePlayer(24,enemy))
+        moveActor(player,player.x+Math.cos(enemy.throwAngle)*65,player.y+Math.sin(enemy.throwAngle)*65);
+      enemy.martialPhase='approach';enemy.martialRecovery=.65;enemy.attackClock=2.6;enemy.attackCycle='kick';
+    }
+    return;
+  }
+  const dx=player.x-enemy.x,dy=player.y-enemy.y,d=Math.hypot(dx,dy)||1;
+  const strike=enemy.attackCycle==='strike',range=stepboxer?210:strike?145:380;
+  if(enemy.attackClock<=0&&d<range) {
+    enemy.throwAngle=Math.atan2(dy,dx);
+    if(stepboxer){enemy.stepSide=enemy.stepSide===1?-1:1;enemy.martialPhase='step-windup';enemy.windup=.55;}
+    else {enemy.martialPhase=strike?'strike-windup':'kick-windup';enemy.windup=strike?.75:.65;}
+  } else if(d>(stepboxer?140:strike?105:210))
+    moveActor(enemy,enemy.x+dx/d*movementSpeed*dt,enemy.y+dy/d*movementSpeed*dt,true);
+}
 function updateEnemies(dt) {
   let summons = 0;
   const spidersToSpawn = [];
@@ -1865,12 +2122,27 @@ function updateEnemies(dt) {
     const rage=!!enemy.boss&&enemy.hp<=enemy.maxHp/2;
     const movementSpeed = enemy.speed * (enemy.slowTime > 0 ? .55 : 1) * (rage?1.15:1) * (enemy.rallyBoost?1.5:1) * (enemy.kind==='practice'?1:difficultySettings().enemySpeed);
     enemy.attackClock -= dt*(enemy.rallyBoost?2:1);
+    if(enemy.kind==='final') {
+      if(enemy.codeWindup>0) {
+        enemy.codeWindup=Math.max(0,enemy.codeWindup-dt);
+        if(enemy.codeWindup===0)castTeacherCode(enemy);
+        continue;
+      }
+      enemy.codeCooldown=Math.max(0,enemy.codeCooldown-dt);
+      if(enemy.codeCooldown===0&&enemy.windup<=0&&enemy.lungeTime<=0&&d<650) {
+        enemy.codeAngle=Math.atan2(dy,dx);
+        enemy.codeWindup=rage?.6:.85;
+        enemy.codeCooldown=rage?2.6:3.7;
+        continue;
+      }
+    }
     if(enemy.kind==='medic'||enemy.kind==='commander'){updateSupportEnemy(enemy,dt,movementSpeed,d,dx,dy);continue;}
-    if(enemy.kind!=='boxer'&&enemy.kind!=='beam'&&!enemy.windup&&enemy.lungeTime<=0&&tableHit(enemy,player)) {
+    if(!['boxer','beam','stepboxer','flyfighter'].includes(enemy.kind)&&!enemy.windup&&enemy.lungeTime<=0&&tableHit(enemy,player)) {
       moveActor(enemy,enemy.x+dx/d*movementSpeed*dt,enemy.y+dy/d*movementSpeed*dt,true);
       continue;
     }
     if(enemy.kind==='beam'){updateBeamEnemy(enemy,dt,movementSpeed,d,dx,dy);continue;}
+    if(enemy.kind==='stepboxer'||enemy.kind==='flyfighter'){updateLateMartialEnemy(enemy,dt,movementSpeed);continue;}
     if(enemy.kind==='heavykick') {
       if(enemy.windup>0) {
         enemy.windup=Math.max(0,enemy.windup-dt);
@@ -2093,19 +2365,19 @@ function updateEnemies(dt) {
         enemy.windup -= dt;
         if (enemy.windup <= 0) {
           if (enemy.kind === "mini1") { throwBottleCaps(enemy); enemy.attackClock = rage ? .85 : 1.35; }
-          else { throwTire(enemy); enemy.attackClock = rage ? 1.2 : 1.7; }
+          else { throwTire(enemy); enemy.attackClock = rage ? 1 : 1.4; }
         }
       } else {
         const direction = d > 320 ? 1 : d < 200 ? -1 : 0;
         moveActor(enemy,clamp(enemy.x + dx / d * movementSpeed * dt * direction, 40, MAP.w - 40),clamp(enemy.y + dy / d * movementSpeed * dt * direction, 85, MAP.h - 40),!enemy.lungeTime && !enemy.windup);
-        if (enemy.attackClock <= 0) { enemy.windup = .55; enemy.throwAngle = Math.atan2(dy, dx); }
+        if (enemy.attackClock <= 0) { enemy.windup = enemy.kind==='mini2'?(rage?.5:.6):.55; enemy.throwAngle = Math.atan2(dy, dx); }
       }
       continue;
     }
     if (enemy.windup > 0) {
       enemy.windup -= dt;
       if (enemy.windup <= 0) {
-        enemy.lungeTime = enemy.trainingThreat ? .5 : enemy.kind === "mini2" ? (rage?.6:.52) : enemy.kind==="final"?(rage?.5:.42):.32;
+        enemy.lungeTime = enemy.trainingThreat ? .5 : enemy.kind === "mini2" ? (rage?.63:.56) : enemy.kind==="final"?(rage?.5:.42):.32;
         enemy.hitPlayer = false;
       }
     } else if (enemy.lungeTime > 0) {
@@ -2116,9 +2388,9 @@ function updateEnemies(dt) {
         moveActor(enemy,enemy.x+dx/d*movementSpeed*dt,enemy.y+dy/d*movementSpeed*dt,true);
       }
       if (d < (enemy.kind === "mini2" ? 450 : enemy.kind==="final"?460:235) && enemy.attackClock <= 0) {
-        enemy.windup = enemy.trainingThreat ? .9 : enemy.kind === "mini2" ? (rage?.6:.7) : enemy.kind==="final"?(rage?.65:.8):.45;
-        enemy.attackClock = enemy.boss?(rage?1.4:1.9):random(2.2, 2.8);
-        const lungeSpeed = enemy.trainingThreat ? 260 : enemy.kind === "mini2" ? (rage?840:720) : enemy.kind==="final"?(rage?780:640):520;
+        enemy.windup = enemy.trainingThreat ? .9 : enemy.kind === "mini2" ? (rage?.55:.65) : enemy.kind==="final"?(rage?.65:.8):.45;
+        enemy.attackClock = enemy.kind==='mini2'?(rage?1.1:1.5):enemy.boss?(rage?1.4:1.9):random(2.2, 2.8);
+        const lungeSpeed = enemy.trainingThreat ? 260 : enemy.kind === "mini2" ? (rage?980:820) : enemy.kind==="final"?(rage?780:640):520;
         enemy.lungeVX = dx / d * lungeSpeed;
         enemy.lungeVY = dy / d * lungeSpeed;
       }
@@ -2179,16 +2451,16 @@ function update(dt) {
     spawnScheduledBosses();
     if(!hasActiveBoss()) {
       const nextBossTime=BOSS_SCHEDULE.filter(b=>!spawnedBosses.has(b.id)).reduce((next,b)=>Math.min(next,(b.lesson-1)*LESSON_LENGTH),Infinity);
-      gameTime=Math.min(gameTime+dt,nextBossTime,GAME_LENGTH);
+      gameTime=Math.min(gameTime+dt,nextBossTime,activeGameLength());
     }
     if (currentLesson() !== previousLesson) {
-      const firstAppearances={2:"水壺方塊人登場！",3:"橡皮筋方塊人登場！",4:"溼衛生紙方塊人登場！",5:"威龍登場！小心噴射衝刺與爆炸物！",6:"比特登場！小心機械蜘蛛！",7:"深藍登場！繞到盾牌側面或背後！",8:"訓犬員登場！小心追咬的狗！",9:"戳眼方塊人登場！別讓他靠近眼睛！",10:"牧羊人登場！避開陷阱與手雷！",11:"大聲公方塊人登場！音波命中會眩暈！",12:"飛踢方塊人登場！小心被踢飛的倒楣蛋！",13:"瞬移拳手登場！小心旁邊的瞬移落點！",14:"三球召喚者登場！側移閃避三顆球！",15:"保健股長登場！會幫周圍敵人回血！",16:"助威方塊人登場！會強化周圍敵人！",17:"氣功方塊人登場！蓄力光束會穿透課桌！",18:"重踢方塊人登場！蓄力後會把你踢到牆邊！"};
+      const firstAppearances={2:"水壺方塊人登場！",3:"橡皮筋方塊人登場！",4:"溼衛生紙方塊人登場！",5:"威龍登場！小心噴射衝刺與爆炸物！",6:"比特登場！小心機械蜘蛛！",7:"深藍登場！繞到盾牌側面或背後！",8:"訓犬員登場！小心追咬的狗！",9:"戳眼方塊人登場！別讓他靠近眼睛！",10:"牧羊人登場！避開陷阱與手雷！",11:"大聲公方塊人登場！音波命中會眩暈！",12:"飛踢方塊人登場！小心被踢飛的倒楣蛋！",13:"瞬移拳手登場！小心旁邊的瞬移落點！",14:"三球召喚者登場！側移閃避三顆球！",15:"保健股長登場！會幫周圍敵人回血！",16:"助威方塊人登場！會強化周圍敵人！",17:"氣功方塊人登場！蓄力光束會穿透課桌！",18:"重踢方塊人登場！蓄力後會把你踢到牆邊！",19:"閃身拳手登場！小心側移後的昇龍拳！",20:"飛踢重擊手登場！避開飛踢和蓄力重擊！"};
       const announcement = hasActiveBoss() ? "Boss 戰持續中！" : firstAppearances[currentLesson()] || "更多方塊人來了！";
-      showToast(`第 ${currentLesson()} / 30 節課！${announcement}`);
+      showToast(`第 ${currentLesson()} / ${activeLessons()} 節課！${announcement}`);
       if (!hasActiveBoss()) spawnClock = 0;
     }
     spawnScheduledBosses();
-    if (previousTime < GAME_LENGTH && gameTime >= GAME_LENGTH && defeatedBosses.size < BOSS_SCHEDULE.length) showToast("放學鐘響了！擊敗剩下的 Boss 才能離開！");
+    if (previousTime < CORE_GAME_LENGTH && gameTime >= CORE_GAME_LENGTH && defeatedBosses.size < BOSS_SCHEDULE.length) showToast("第三十節鐘響了！擊敗剩下的 Boss 才能領飲料！");
     if (!hasActiveBoss()) {
       spawnClock -= dt;
       const spawn = spawnSettings();
@@ -2199,6 +2471,7 @@ function update(dt) {
       }
     }
   }
+  updateUnityTool(dt);
   for(const step of [updateEnemies,updateEnemyProjectiles,weaponAttacks,updateProjectiles,updatePickups]) {
     step(dt);
     if(mode!=="playing"&&mode!=="tutorial"){updateHud();return;}
@@ -2209,7 +2482,8 @@ function update(dt) {
   if(mode!=="playing"&&mode!=="tutorial"){updateHud();return;}
   tutorialTick();
   if(mode==="playing") updateNarrative(dt);
-  if (mode === "playing" && gameTime >= GAME_LENGTH && defeatedBosses.size === BOSS_SCHEDULE.length) finishGame(true);
+  if (mode === "playing" && !bonusAccepted && gameTime >= CORE_GAME_LENGTH && defeatedBosses.size === BOSS_SCHEDULE.length) offerBonusLessons();
+  else if (mode === "playing" && bonusAccepted && gameTime >= GAME_LENGTH) finishGame(true);
   updateHud();
 }
 function regularEnemyKind() {
@@ -2222,7 +2496,9 @@ function regularEnemyKind() {
     if(currentLesson()>=16&&roll<.26)return "commander";
     if(currentLesson()>=17&&roll<.32)return "beam";
     if(currentLesson()>=18&&roll<.38)return "heavykick";
-    const reserved=currentLesson()>=18?.38:currentLesson()>=17?.32:currentLesson()>=16?.26:currentLesson()>=15?.20:currentLesson()>=14?.14:.07;
+    if(currentLesson()>=19&&roll<.44)return "stepboxer";
+    if(currentLesson()>=20&&roll<.50)return "flyfighter";
+    const reserved=currentLesson()>=20?.50:currentLesson()>=19?.44:currentLesson()>=18?.38:currentLesson()>=17?.32:currentLesson()>=16?.26:currentLesson()>=15?.20:currentLesson()>=14?.14:.07;
     roll=(roll-reserved)/(1-reserved);
   }
   if(currentLesson()>=5) {
@@ -2236,17 +2512,38 @@ function regularEnemyKind() {
   if(currentLesson()>=4&&roll<.65) return "tissue";
   return "basic";
 }
+function offerBonusLessons() {
+  if(mode !== 'playing' || bonusAccepted || defeatedBosses.size !== BOSS_SCHEDULE.length)return;
+  drinkEarned=true;
+  mode='reward';
+  showScreen('reward-screen');
+  playSound(780,.4,'triangle',.05);
+}
+function claimDrink() {
+  if(mode!=='reward')return;
+  finishGame(true);
+}
+function acceptBonusLessons() {
+  if(mode!=='reward')return;
+  bonusAccepted=true;
+  mode='playing';
+  spawnClock=0;
+  showScreen(null);
+  showToast('飲料已領取！加碼 10 節，挑戰茶葉蛋兌換券！');
+  updateNarrative(0);
+  updateHud();
+}
 function finishGame(won) {
   if (mode === "ended") return;
   mode = "ended";
   endingWon=won;storyAnimationTime=0;
   $("end-kicker").textContent = won ? "CLASS DISMISSED!" : "GAME OVER";
-  $("end-title").textContent = won ? "放學了！" : "再試一次！";
-  $("end-description").textContent = won ? "轉學生撐過了 30 節課，打敗兩個小 Boss 和最終 Boss！終於可以放學了。" : `轉學生在第 ${currentLesson()} 節課倒下了。調整走位和升級選擇，再挑戰一次！`;
+  $("end-title").textContent = won ? bonusAccepted ? '加碼成功！' : "放學了！" : "再試一次！";
+  $("end-description").textContent = won ? bonusAccepted ? '轉學生撐過 40 節課，拿到飲料與茶葉蛋兌換券！' : '轉學生撐過 30 節課並擊敗三組 Boss，領到一杯飲料！' : drinkEarned ? `第 ${currentLesson()} 節的加碼挑戰結束了。飲料已經拿到，茶葉蛋兌換券這次還沒取得。` : `轉學生在第 ${currentLesson()} 節課倒下了。調整走位和升級選擇，再挑戰一次！`;
   $("result-time").textContent = formatTime(Math.floor(gameTime));
   $("result-kills").textContent = kills;
   $("result-level").textContent = player.level;
-  $("end-epilogue").textContent=won?"下課鐘響了。門鎖鬆開，方塊人的影子也散去。班長笑著伸出手：「歡迎加入 102 班。」你把鉛筆收回筆袋：這一次，明天還要來上課。":"班長扶著你退回講台後：「先休息，102 班還在等你。」那本筆記沒有合上。下次，你會更清楚該怎麼走出這間教室。";
+  $("end-epilogue").textContent=won?bonusAccepted?'老師把茶葉蛋兌換券放進你手裡，同學們拍手歡呼。你拿著飲料，班長笑著說：「歡迎加入 102 班！」':'老師把飲料遞給你，同學們歡呼。班長笑著說：「歡迎加入 102 班！」你決定今天先放學。':drinkEarned?'老師替你保管著已贏得的飲料，班長說：「茶葉蛋兌換券下次再挑戰！」':'班長扶著你退回講台後：「先休息，102 班還在等你。」那本筆記沒有合上。下次，你會更清楚該怎麼走出這間教室。';
   $("chapter-dialogue").hidden=true;
   narrativeQueue=[];activeDialogue=null;
   dialogueEntrance?.cancel();dialogueEntrance=null;
@@ -2264,14 +2561,16 @@ function updateHud() {
   $("level-text").textContent = `Lv. ${player.level}`;
   $("xp-text").textContent = `${player.xp} / ${player.xpNeed}`;
   $("xp-fill").style.width = `${clamp(player.xp/player.xpNeed*100,0,100)}%`;
-  $("lesson-fill").style.width = `${gameTime>=GAME_LENGTH?100:(gameTime%LESSON_LENGTH)/LESSON_LENGTH*100}%`;
+  $("lesson-fill").style.width = `${gameTime>=activeGameLength()?100:(gameTime%LESSON_LENGTH)/LESSON_LENGTH*100}%`;
   $("hp-warning").hidden=player.hp<=0||player.hp>player.maxHp*.25;
-  $("lesson-label").textContent = `第 ${currentLesson()} / ${TOTAL_LESSONS} 節`;
+  $("lesson-label").textContent = `第 ${currentLesson()} / ${activeLessons()} 節`;
   if(hasActiveBoss()) $("lesson-label").textContent += " · Boss 戰，計時暫停";
-  $("timer").textContent = formatTime(gameTime >= GAME_LENGTH ? 0 : Math.ceil(LESSON_LENGTH - gameTime % LESSON_LENGTH));
-  $("wave").textContent = formatTime(Math.max(0, Math.ceil(GAME_LENGTH - gameTime)));
+  $("timer").textContent = formatTime(gameTime >= activeGameLength() ? 0 : Math.ceil(LESSON_LENGTH - gameTime % LESSON_LENGTH));
+  $("wave").textContent = formatTime(Math.max(0, Math.ceil(activeGameLength() - gameTime)));
+  $('wave-label').textContent=bonusAccepted?'距離茶葉蛋券':'距離領飲料';
   if(isTutorialSession()) {$("lesson-label").textContent="教學練習";$("timer").textContent="--:--";$("wave").textContent="30 節課";}
   $("loadout-label").textContent = `✎ 鉛筆揮砍 · 道具 ${Object.values(player.weapons).filter(level => level > 0).length} / 6`;
+  $('secret-tool').hidden=!unityTool;
   $("kill-count").textContent = `擊退 ${kills}`;
   $("slow-label").hidden = player.slowTime <= 0;
   $("slow-label").textContent = `減速 ${player.slowTime.toFixed(1)} 秒`;
@@ -2308,6 +2607,7 @@ function renderLoadoutGuide() {
     heading.textContent=title;body.textContent=text;article.append(heading);article.append(body);list.append(article);
   };
   add("✎ 鉛筆 · 開局武器","自動揮砍附近敵人，不占 6 個道具欄位。選到工具與天賦後，記得走過去撿起來。");
+  if(unityTool)add('🤝 大家的團結 · 隱藏道具','每 2.5 秒攻擊全圖所有敵人，每隻造成 999999 傷害；不占六個道具欄。');
   for(const tool of CONTENT.weapons) {
     const level=player.weapons[tool.id],talent=matchingTalent(tool.id),hasTalent=!!player.talents[talent.id];
     const waiting=pickups.some(p=>!p.collected&&((p.type==='weapon'&&p.weaponId===tool.id)||(p.type==='talent'&&p.talentId===talent.id)));
@@ -2655,6 +2955,13 @@ function drawWaterBottle(c, x, y, size = 1, angle = 0) {
   c.beginPath(); c.moveTo(6, -16); c.quadraticCurveTo(18, -14, 10, -6); c.stroke();
   c.restore();
 }
+function warningEndpoint(enemy,dx,dy) {
+  const target={x:clamp(enemy.x+dx,40,MAP.w-40),y:clamp(enemy.y+dy,85,MAP.h-40)};
+  const hit=tableHit(enemy,target,enemy.r);
+  if(!hit)return target;
+  const safe=Math.max(0,hit.t-.02);
+  return {x:enemy.x+(target.x-enemy.x)*safe,y:enemy.y+(target.y-enemy.y)*safe};
+}
 function drawEnemy(enemy, time) {
   if(enemy.kind==="dog") {
     ctx.save();ctx.translate(enemy.x,enemy.y);ctx.rotate(Math.atan2(player.y-enemy.y,player.x-enemy.x));
@@ -2682,7 +2989,7 @@ function drawEnemy(enemy, time) {
   }
   const size = enemy.r / 21;
   const x = enemy.x, y = enemy.y + Math.sin(time * 5 + enemy.wobble) * 2;
-  const main = enemy.hitFlash ? "#fff6e5" : enemy.windup > 0 ? "#e69b76" : enemy.lungeTime > 0 ? "#db7868" : enemy.kind === "heavykick" ? "#aa7768" : enemy.kind === "medic" ? "#69a98b" : enemy.kind === "commander" ? "#cf9b56" : enemy.kind === "beam" ? "#668cb9" : enemy.kind === "kicker" ? "#ba785e" : enemy.kind === "megaphone" ? "#ba955d" : enemy.kind === "weilong" ? "#637777" : enemy.kind === "bit" ? "#7373a4" : enemy.kind === "deepblue" ? "#486b99" : enemy.kind === "handler" ? "#a98459" : enemy.kind === "eye" ? "#b88486" : enemy.kind === "shepherd" ? "#788369" : enemy.kind === "rubber" ? "#af9869" : enemy.kind === "tissue" ? "#a1b6a0" : enemy.kind === "water" || (enemy.kind === "mini2" && enemy.memberIndex === 1) ? "#6d92ae" : enemy.boss ? enemy.boss.color : enemy.kind === "practice" ? "#7aabb4" : "#829b93";
+  const main = enemy.hitFlash ? "#fff6e5" : enemy.windup > 0 ? "#e69b76" : enemy.lungeTime > 0 ? "#db7868" : enemy.kind === "stepboxer" ? "#4e9590" : enemy.kind === "flyfighter" ? "#ba7363" : enemy.kind === "heavykick" ? "#aa7768" : enemy.kind === "medic" ? "#69a98b" : enemy.kind === "commander" ? "#cf9b56" : enemy.kind === "beam" ? "#668cb9" : enemy.kind === "kicker" ? "#ba785e" : enemy.kind === "megaphone" ? "#ba955d" : enemy.kind === "weilong" ? "#637777" : enemy.kind === "bit" ? "#7373a4" : enemy.kind === "deepblue" ? "#486b99" : enemy.kind === "handler" ? "#a98459" : enemy.kind === "eye" ? "#b88486" : enemy.kind === "shepherd" ? "#788369" : enemy.kind === "rubber" ? "#af9869" : enemy.kind === "tissue" ? "#a1b6a0" : enemy.kind === "water" || (enemy.kind === "mini2" && enemy.memberIndex === 1) ? "#6d92ae" : enemy.boss ? enemy.boss.color : enemy.kind === "practice" ? "#7aabb4" : "#829b93";
   const edge = "#4c6a68";
   ctx.save(); ctx.translate(x, y); ctx.scale(size, size);
   ctx.fillStyle = "#34505a44"; ctx.beginPath(); ctx.ellipse(0, 22, 22, 7, 0, 0, Math.PI * 2); ctx.fill();
@@ -2692,7 +2999,24 @@ function drawEnemy(enemy, time) {
   roundedRect(-17, -26, 34, 29, 2, main, edge, 3);
   ctx.fillStyle = "#253d46"; ctx.fillRect(-9, -13, 4, 5); ctx.fillRect(6, -13, 4, 5);
   ctx.strokeStyle = "#253d46"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-4, -5); ctx.lineTo(4, -5); ctx.stroke();
-  if(enemy.kind==='heavykick') {
+  if(enemy.kind==='basic') {
+    roundedRect(-12,5,24,18,3,'#527a9d','#2e556f',2);
+    ctx.fillStyle='#f8efd7';ctx.beginPath();ctx.moveTo(-9,5);ctx.lineTo(0,13);ctx.lineTo(9,5);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#d17b6f';ctx.beginPath();ctx.moveTo(0,11);ctx.lineTo(-4,19);ctx.lineTo(0,23);ctx.lineTo(4,19);ctx.closePath();ctx.fill();
+  } else if(enemy.kind==='stepboxer') {
+    roundedRect(-20,-31,40,9,3,'#9de1cf','#39756e',2);
+    roundedRect(-12,5,24,18,3,'#2f6d6e','#284e57',2);
+    ctx.fillStyle='#d8fff0';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('19',0,18);
+    roundedRect(-26,enemy.martialPhase==='uppercut-windup'?-18:3,12,15,3,'#74d8cb','#2d6167',2);
+    roundedRect(15,enemy.martialPhase==='uppercut-windup'?-24:3,12,15,3,'#74d8cb','#2d6167',2);
+  } else if(enemy.kind==='flyfighter') {
+    roundedRect(-20,-31,40,9,3,'#e8b680','#86564d',2);
+    roundedRect(-12,5,24,18,3,'#8d4f4b','#663d42',2);
+    ctx.fillStyle='#ffe2bd';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('20',0,18);
+    ctx.save();ctx.rotate(enemy.throwAngle||0);
+    roundedRect(15,enemy.martialPhase==='kick-flight'?7:19,enemy.martialPhase==='kick-flight'?36:25,11,3,'#e5b18a','#6e4c48',2);
+    ctx.restore();
+  } else if(enemy.kind==='heavykick') {
     roundedRect(-20,-31,40,9,3,'#e6b394','#7b554e',2);
     roundedRect(-12,5,24,17,3,'#6e4a4c','#503d46',2);
     ctx.fillStyle='#ffe2be';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('18',0,18);
@@ -2831,24 +3155,44 @@ function drawEnemy(enemy, time) {
     ctx.strokeStyle = enemy.memberIndex === 1 ? "#c4e6ec" : "#f6be6e";
     ctx.beginPath(); ctx.moveTo(-23, 30); ctx.lineTo(-10, 12); ctx.lineTo(0, 30); ctx.closePath(); ctx.moveTo(-10, 12); ctx.lineTo(13, 12); ctx.lineTo(23, 30); ctx.lineTo(0, 30); ctx.lineTo(13, 12); ctx.stroke();
     ctx.strokeStyle = "#304b5a"; ctx.beginPath(); ctx.moveTo(13, 12); ctx.lineTo(16, 6); ctx.lineTo(24, 6); ctx.stroke();
+  } else if (enemy.kind === "final") {
+    ctx.fillStyle='#d9d5c4';ctx.beginPath();ctx.ellipse(20,-26,5,11,-.3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#f3c478';ctx.beginPath();ctx.arc(17,-34,3,0,Math.PI*2);ctx.fill();
+    roundedRect(-20,-35,40,9,3,'#d9d5c4','#556878',2);
+    ctx.strokeStyle='#d5f5ec';ctx.lineWidth=2;ctx.strokeRect(-13,-17,11,9);ctx.strokeRect(2,-17,11,9);
+    ctx.beginPath();ctx.moveTo(-2,-13);ctx.lineTo(2,-13);ctx.stroke();
+    roundedRect(-15,5,30,20,3,'#7b6574','#4f4d62',2);
+    roundedRect(16,-3,27,29,3,'#294954','#9ae4d7',2);
+    ctx.fillStyle='#baf9d9';ctx.font='900 13px monospace';ctx.textAlign='center';ctx.fillText('</>',30,16);
   } else if (enemy.boss) {
     ctx.fillStyle = enemy.kind === "final" ? "#ffd46d" : "#d6e9ed";
     ctx.beginPath(); ctx.moveTo(-16, -28); ctx.lineTo(-18, -39); ctx.lineTo(-8, -34); ctx.lineTo(0, -43); ctx.lineTo(8, -34); ctx.lineTo(18, -39); ctx.lineTo(16, -28); ctx.closePath(); ctx.fill();
   }
   ctx.restore();
+  if(enemy.kind==='flyfighter'&&enemy.martialPhase==='kick-flight'){
+    ctx.strokeStyle='#ffc38b99';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x-enemy.dashVX*.08,y-enemy.dashVY*.08);ctx.lineTo(x,y);ctx.stroke();
+  }
   if(enemy.kind==='commander') {
     ctx.strokeStyle='#f3bf69aa';ctx.lineWidth=2;ctx.setLineDash([8,8]);ctx.beginPath();ctx.arc(x,y,SUPPORT_RADIUS,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
   } else if(enemy.kind==='medic') {
     ctx.strokeStyle='#7fe5a288';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,55+Math.sin(time*4)*3,0,Math.PI*2);ctx.stroke();
   }
   if(enemy.rallyBoost){ctx.strokeStyle='#f6d070';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,enemy.r+5,0,Math.PI*2);ctx.stroke();}
+  if(enemy.kind==='final'&&enemy.codeWindup>0) {
+    ctx.save();ctx.strokeStyle='#92f5e5';ctx.lineWidth=3;ctx.setLineDash([9,7]);
+    for(let i=-1;i<=1;i++) {
+      const angle=enemy.codeAngle+i*.22,target=warningEndpoint(enemy,Math.cos(angle)*650,Math.sin(angle)*650);
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(target.x,target.y);ctx.stroke();
+    }
+    ctx.setLineDash([]);ctx.fillStyle='#d4fff1';ctx.textAlign='center';ctx.font='900 17px monospace';ctx.fillText('RUN { }',x,y-enemy.r-50);ctx.restore();
+  }
   if(enemy.kind==="kicker"&&enemy.windup>0) {
     drawUnlucky(ctx,x+Math.cos(enemy.throwAngle)*45,y+Math.sin(enemy.throwAngle)*45,0,.7);
   }
   if(enemy.stunTime>0){ctx.strokeStyle="#c6b7ff";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-enemy.r-12,16,5,time*3,0,Math.PI*2);ctx.stroke();}
   if(enemy.boss&&enemy.hp<=enemy.maxHp/2){ctx.strokeStyle="#ff9f6b99";ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y+15,enemy.r+8,enemy.r*.42,0,0,Math.PI*2);ctx.stroke();}
-  const name={weilong:"威龍",bit:"比特",deepblue:"深藍",handler:"訓犬員",eye:"戳眼方塊人",shepherd:"牧羊人",megaphone:"大聲公方塊人",kicker:"飛踢方塊人",boxer:"瞬移拳手",striker:"三球召喚者",medic:"保健股長",commander:"助威方塊人",beam:"氣功方塊人",heavykick:"重踢方塊人"}[enemy.kind];
-  if(name){const width=name.length*11+12;roundedRect(x-width/2,y-56,width,17,4,"#29464bde");ctx.fillStyle="#d9f5ec";ctx.font="900 11px sans-serif";ctx.textAlign="center";ctx.fillText(name,x,y-43);}
+  const name={weilong:"威龍",bit:"比特",deepblue:"深藍",handler:"訓犬員",eye:"戳眼方塊人",shepherd:"牧羊人",megaphone:"大聲公方塊人",kicker:"飛踢方塊人",boxer:"瞬移拳手",striker:"三球召喚者",medic:"保健股長",commander:"助威方塊人",beam:"氣功方塊人",heavykick:"重踢方塊人",stepboxer:"閃身拳手",flyfighter:"飛踢重擊手"}[enemy.kind];
+  if(name){const width=name.length*11+12;roundedRect(x-width/2,y-56,width,17,4,"#29464bde");ctx.fillStyle="#d9f5ec";ctx.font="900 11px 'Noto Sans TC',sans-serif";ctx.textAlign="center";ctx.fillText(name,x,y-43);}
   if (enemy.windup > 0) {
     ctx.strokeStyle = `rgba(221,99,78,${.4 + Math.sin(time * 35) * .25})`;
     ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x, y, enemy.r + 8, 0, 7); ctx.stroke();
@@ -2858,6 +3202,21 @@ function drawEnemy(enemy, time) {
     }
     if(enemy.kind==='heavykick') {
       ctx.strokeStyle='#ffcca5';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x,y);ctx.arc(x,y,130,enemy.throwAngle-.9,enemy.throwAngle+.9);ctx.closePath();ctx.stroke();
+    }
+    if(enemy.kind==='stepboxer') {
+      ctx.strokeStyle='#8ef0d2';ctx.lineWidth=3;ctx.setLineDash([6,5]);ctx.beginPath();
+      if(enemy.martialPhase==='step-windup') {
+        const side=enemy.stepSide||1;
+        const target=warningEndpoint(enemy,(Math.cos(enemy.throwAngle)*500-Math.sin(enemy.throwAngle)*480*side)*.24,(Math.sin(enemy.throwAngle)*500+Math.cos(enemy.throwAngle)*480*side)*.24);
+        ctx.moveTo(x,y);ctx.lineTo(target.x,target.y);ctx.moveTo(target.x+20,target.y);ctx.arc(target.x,target.y,20,0,Math.PI*2);
+      } else {ctx.moveTo(x,y);ctx.arc(x,y,110,enemy.throwAngle-.85,enemy.throwAngle+.85);ctx.closePath();}
+      ctx.stroke();ctx.setLineDash([]);
+    }
+    if(enemy.kind==='flyfighter') {
+      ctx.strokeStyle='#ffc18d';ctx.lineWidth=4;ctx.setLineDash([8,7]);ctx.beginPath();
+      if(enemy.martialPhase==='kick-windup'){const target=warningEndpoint(enemy,Math.cos(enemy.throwAngle)*375,Math.sin(enemy.throwAngle)*375);ctx.moveTo(x,y);ctx.lineTo(target.x,target.y);}
+      else {ctx.moveTo(x,y);ctx.arc(x,y,125,enemy.throwAngle-.85,enemy.throwAngle+.85);ctx.closePath();}
+      ctx.stroke();ctx.setLineDash([]);
     }
     if(enemy.kind==="boxer"||enemy.kind==="striker") {
       ctx.strokeStyle=enemy.kind==="boxer"?"#99eee4cc":"#f2b9ffcc";ctx.lineWidth=3;
@@ -3008,8 +3367,14 @@ function drawEnemyProjectile(cap) {
     drawSummonedBall(ctx,cap.x,cap.y,cap.r,cap.angle);return;
   }
   if(cap.type==="boss-wave") {
-    ctx.save();ctx.translate(cap.x,cap.y);ctx.rotate(Math.atan2(cap.vy,cap.vx));ctx.strokeStyle="#ffae82";ctx.lineWidth=5;
-    ctx.beginPath();ctx.arc(-9,0,19,-.9,.9);ctx.stroke();ctx.strokeStyle="#fff0c8";ctx.lineWidth=2;ctx.beginPath();ctx.arc(-9,0,12,-.9,.9);ctx.stroke();ctx.restore();return;
+    ctx.save();ctx.translate(cap.x,cap.y);ctx.rotate(Math.atan2(cap.vy,cap.vx));ctx.strokeStyle="#70d9e5";ctx.lineWidth=5;
+    ctx.beginPath();ctx.arc(-9,0,19,-.9,.9);ctx.stroke();ctx.fillStyle='#e2fff6';ctx.font='900 14px monospace';ctx.textAlign='center';ctx.fillText('01',0,5);ctx.restore();return;
+  }
+  if(cap.type==='code-glyph') {
+    ctx.save();ctx.translate(cap.x,cap.y);ctx.rotate(Math.atan2(cap.vy,cap.vx));
+    ctx.strokeStyle='#6be5d4aa';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-28,0);ctx.lineTo(-10,0);ctx.stroke();
+    roundedRect(-13,-13,26,26,5,'#326778','#b7fff0',2);
+    ctx.fillStyle='#e2fff6';ctx.font='900 13px monospace';ctx.textAlign='center';ctx.fillText('{}',0,5);ctx.restore();return;
   }
   if(cap.type==="unlucky") {
     ctx.strokeStyle="#efd69d88";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(cap.x-cap.vx*.065,cap.y-cap.vy*.065);ctx.lineTo(cap.x,cap.y);ctx.stroke();
@@ -3068,9 +3433,21 @@ function drawUnlucky(c,x,y,angle,size=1) {
 }
 function drawEffect(effect) {
   const t = effect.age / effect.duration;
-  if(effect.type==='heavy-kick'||effect.type==='wall-impact') {
+  if(effect.type==='sidestep') {
+    ctx.save();ctx.translate(effect.x,effect.y);ctx.rotate(effect.angle);ctx.globalAlpha=1-t;
+    ctx.strokeStyle='#a2f2d8';ctx.lineWidth=5*(1-t)+1;
+    for(const offset of [-12,0,12]){ctx.beginPath();ctx.moveTo(-effect.radius+offset,-14);ctx.lineTo(effect.radius*.4+offset,-14);ctx.stroke();}
+    ctx.restore();
+  } else if(effect.type==='heavy-strike') {
+    ctx.save();ctx.translate(effect.x,effect.y);ctx.globalAlpha=1-t;ctx.strokeStyle='#ffbd8d';ctx.lineWidth=8*(1-t)+2;
+    ctx.beginPath();ctx.arc(0,0,effect.radius*(.6+t*.4),effect.angle-.85,effect.angle+.85);ctx.stroke();ctx.restore();
+  } else if(effect.type==='heavy-kick'||effect.type==='wall-impact') {
     ctx.save();ctx.globalAlpha=1-t;ctx.strokeStyle=effect.type==='wall-impact'?'#fff0bb':'#ffb98d';ctx.lineWidth=8*(1-t)+2;
     ctx.beginPath();ctx.arc(effect.x,effect.y,effect.radius*(.3+t*.7),0,Math.PI*2);ctx.stroke();ctx.restore();
+  } else if(effect.type==='unity-wave') {
+    ctx.save();ctx.globalAlpha=(1-t)*.75;ctx.strokeStyle='#ffe58a';ctx.lineWidth=18*(1-t)+2;
+    ctx.beginPath();ctx.arc(effect.x,effect.y,effect.radius*t,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='#fff5b8';ctx.textAlign='center';ctx.font="900 28px 'Noto Sans TC',sans-serif";ctx.fillText('大家的團結！',effect.x,effect.y-50-t*35);ctx.restore();
   } else if(effect.type==='heal-pulse') {
     ctx.save();ctx.globalAlpha=1-t;ctx.strokeStyle='#79e6a5';ctx.lineWidth=5*(1-t)+1;
     ctx.beginPath();ctx.arc(effect.x,effect.y,effect.radius*t,0,Math.PI*2);ctx.stroke();ctx.restore();
@@ -3272,6 +3649,14 @@ for(const id of ['boy','girl'])bindButtonAction($(`character-${id}`),()=>chooseC
 renderCharacterPicker();
 bindButtonAction($("pause-menu-btn"),returnToMenu);
 bindButtonAction($("end-menu-btn"),returnToMenu);
+bindButtonAction($('bestiary-btn'),openBestiary);
+bindButtonAction($('start-bestiary-btn'),openBestiary);
+bindButtonAction($('pause-bestiary-btn'),openBestiary);
+bindButtonAction($('cheat-submit'),()=>applyCheat($('cheat-input').value));
+$('cheat-input').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();applyCheat($('cheat-input').value);}});
+bindButtonAction($('bestiary-close-btn'),closeBestiary);
+bindButtonAction($('claim-drink-btn'),claimDrink);
+bindButtonAction($('accept-bonus-btn'),acceptBonusLessons);
 bindButtonAction($("story-next"), nextStory);
 bindButtonAction($("story-skip"), startTutorial);
 bindButtonAction($("dialogue-next"),nextDialogue);
@@ -3299,6 +3684,7 @@ $("sound-btn").classList.add("muted");
 document.addEventListener("keydown", event => {
   const key = event.key.toLowerCase();
   const interactive=event.target?.closest?.('button,summary,input,textarea,select');
+  if(interactive&&key!=='escape')return;
   if (!interactive&&["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) event.preventDefault?.();
   if(mode==="playing"||mode==="tutorial")keys.add(key);
   if ((key === "p" || key === "escape")&&!event.repeat) togglePause();
