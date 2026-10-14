@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#172b3c">
-  <title>下課生存戰｜國中 102 班</title>
+  <title>轉學生的 102 班挑戰</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="story.css">
   <link rel="stylesheet" href="tools.css">
   <link rel="stylesheet" href="polish.css">
 </head>
 <body>
-  <main id="game-shell" aria-label="下課生存戰遊戲">
+  <main id="game-shell" aria-label="轉學生的 102 班挑戰遊戲">
     <canvas id="game" aria-label="教室生存遊戲畫面"></canvas>
 
     <div class="topbar">
-      <div class="brand"><span class="brand-icon">✎</span><span>下課生存戰</span><small>國中 102 班</small></div>
+      <div class="brand"><span class="brand-icon">✎</span><span>轉學生的 102 班挑戰</span><small>迎新生存遊戲</small></div>
       <div class="hud-center">
         <div class="timer-box"><span id="lesson-label" class="hud-label">第 1 / 30 節</span><strong id="timer">00:30</strong><div class="lesson-progress" aria-hidden="true"><div id="lesson-fill"></div></div></div>
         <div class="wave-box"><span id="wave-label" class="hud-label">距離領飲料</span><strong id="wave">15:00</strong></div>
@@ -25,6 +25,7 @@
 
     <div class="status-panel">
       <div id="difficulty-indicator" class="difficulty-indicator">難度：困難</div>
+      <div class="status-row skin-ticket-row"><span>🎟️ 皮膚券</span><strong id="skin-ticket-count">0（本局 +0）</strong></div>
       <div class="loadout"><span id="loadout-label">✎ 鉛筆揮砍 · 道具 0 / 6</span><strong id="weapon-levels">🫐 0/5　⌖ 0/5　✹ 0/5<br>🏹 0/5　▰ 0/5　△ 0/5</strong></div>
       <div id="secret-tool" class="secret-tool" hidden>🤝 隱藏道具：大家的團結</div>
       <div class="talent-loadout"><span id="talent-label">天賦 0 / 6</span><div id="talent-slots" class="talent-slots"></div></div>
@@ -74,20 +75,22 @@
         <li>第 10 節：瓶蓋收藏家丟出的瓶蓋會從課桌和牆壁反彈，5 秒後消失。</li>
         <li>第 20 節：雙人單車隊，一人衝撞、一人丟輪胎；一人倒下就觸發劇情，兩人都倒下才結束 Boss 戰。</li>
         <li>課桌和講桌是實體障礙，會擋住你、敵人和敵方攻擊；沿著走道移動，也能利用桌子掩護。</li>
-        <li>第 30 節：最終 Boss 是程式老師。看準程式碼預告線避開射擊與錯誤碼彈幕；打敗老師、撐到鐘響可領飲料，之後可加碼 10 節挑戰茶葉蛋兌換券。</li>
+        <li>第 30 節：最終 Boss 是程式老師。看準每輪程式碼預告線，閃開衝刺與錯誤碼彈幕；半血後老師會重新鎖定，連續施放兩輪程式碼。打敗老師、撐到鐘響可領飲料，之後可加碼 10 節挑戰茶葉蛋兌換券。</li>
         <li>Boss 登場時場上小怪與敵方投射物、陷阱消失；Boss 戰暫停課節計時與小怪生成。整組 Boss 擊敗後恢復倒數。</li>
         <li>Boss 半血後會暴走，加快攻擊；看到蓄力方向先閃避，再找空檔反擊。</li>
         <li>先撿起並裝備 6 個不同道具，天賦才會出現在升級選項；天賦最多 6 個。鉛筆另外保留，每種工具最多 5 級。</li>
+        <li>6 個道具都升到 5 級、6 個天賦都撿齊後，往後每次升級會增加 2 點生命上限並回復 2 點體力。</li>
+        <li>每完成一節課可得 1 張皮膚券；累積後可在皮膚收藏室花 1 張，隨機抽取一款尚未擁有的道具皮膚。皮膚只改變外觀。</li>
       </ul>
       <div class="tutorial-actions"><button id="tutorial-next" type="button" hidden>我準備好了 →</button><button id="skip-tutorial" type="button">跳過教學，開始挑戰</button></div>
     </div>
 
     <section id="start-screen" class="overlay visible" aria-labelledby="start-title">
       <div class="hero-card">
-        <div class="hero-badge">SURVIVE THE SCHOOL DAY</div>
+        <div class="hero-badge">WELCOME TO CLASS 102</div>
         <div class="hero-doodles"><span>✎</span><span>✦</span><span>▤</span></div>
-        <h1 id="start-title">下課<span>生存戰</span></h1>
-        <p class="hero-subtitle">轉學第一天，老師和同學給你一個驚喜：與同學們的方塊戰鬥造型交手，最後挑戰會寫程式的老師。撐過 30 節領飲料，再加碼 10 節可贏茶葉蛋兌換券！</p>
+        <h1 id="start-title">轉學生的<br><span>102 班挑戰</span></h1>
+        <p class="hero-subtitle">轉學第一天，年輕的老師與全班同學送上迎新挑戰：撐過 30 節課、打敗老師，就能領一杯飲料。想繼續？到操場加碼 10 節，還有茶葉蛋兌換券等著你！</p>
         <div class="how-to">
           <div><span class="how-icon">⌘</span><strong>移動閃避</strong><small>WASD、方向鍵或觸控搖桿</small></div>
           <div><span class="how-icon">◎</span><strong>自動攻擊</strong><small>靠近目標就會自動瞄準</small></div>
@@ -96,9 +99,11 @@
         <div class="difficulty-picker" role="group" aria-label="選擇主角"><button id="character-boy" type="button" class="selected" aria-pressed="true">男生 · 短髮</button><button id="character-girl" type="button" aria-pressed="false">女生 · 馬尾</button></div>
         <div class="difficulty-picker difficulty-options" role="group" aria-label="選擇遊戲難度"><button id="difficulty-easy" type="button" aria-pressed="false">簡單</button><button id="difficulty-normal" type="button" aria-pressed="false">普通</button><button id="difficulty-hard" type="button" class="selected" aria-pressed="true">困難</button><button id="difficulty-very-hard" type="button" aria-pressed="false">很難</button><button id="difficulty-ultra-hard" type="button" aria-pressed="false">超難</button></div>
         <p id="difficulty-description" class="difficulty-description" aria-live="polite"></p>
+        <div class="joystick-size-picker" role="group" aria-label="觸控搖桿大小"><span>移動搖桿</span><div><button id="joystick-size-small" type="button" aria-pressed="false">小手</button><button id="joystick-size-standard" type="button" class="selected" aria-pressed="true">標準</button><button id="joystick-size-large" type="button" aria-pressed="false">大手</button></div></div>
         <button id="start-btn" class="primary-btn">開始故事 <span>→</span></button>
         <button id="practice-btn" class="secondary-btn">直接練習新手教學</button>
         <button id="start-bestiary-btn" class="secondary-btn">敵人圖鑑 · 擊敗後解鎖</button>
+        <button id="start-skins-btn" class="secondary-btn">皮膚收藏室 · 使用皮膚券</button>
         <button id="quick-start-btn" class="secondary-btn">已熟悉操作，直接挑戰</button>
         <p class="microcopy">30 節領飲料 · 可加碼 10 節 · 每節 30 秒 · 支援倍速</p>
       </div>
@@ -146,7 +151,9 @@
         <details class="loadout-guide-panel" open><summary>我的裝備與進化條件</summary><div id="loadout-guide"></div></details>
         <details class="story-journal"><summary>102 班劇情回顧</summary><div id="pause-story-log"></div></details>
         <div class="cheat-panel"><label for="cheat-input">密技</label><div class="cheat-controls"><input id="cheat-input" type="text" autocomplete="off" spellcheck="false" placeholder="輸入密技"><button id="cheat-submit" type="button">啟動</button></div><small id="cheat-status" role="status">輸入後按「啟動」；每個密技每局可用一次。</small></div>
+        <div class="joystick-size-picker" role="group" aria-label="觸控搖桿大小"><span>移動搖桿</span><div><button id="pause-joystick-size-small" type="button" aria-pressed="false">小手</button><button id="pause-joystick-size-standard" type="button" class="selected" aria-pressed="true">標準</button><button id="pause-joystick-size-large" type="button" aria-pressed="false">大手</button></div></div>
         <button id="pause-bestiary-btn" class="secondary-btn">查看敵人圖鑑</button>
+        <button id="pause-skins-btn" class="secondary-btn">皮膚收藏室 · 抽道具皮膚</button>
         <button id="resume-btn" class="primary-btn">繼續遊戲 <span>→</span></button>
         <button id="pause-restart-btn" class="secondary-btn">重新開始</button>
         <button id="pause-menu-btn" class="secondary-btn">結束本局，回主選單</button>
@@ -157,10 +164,11 @@
       <div class="modal-card end-modal reward-modal">
         <div class="modal-kicker">30 節課達成！</div>
         <h2 id="reward-title">老師的飲料到手了！</h2>
-        <p>老師把一杯飲料遞給你，同學們齊聲歡呼。班長拿出另一張獎券：「新同學，還想再撐 10 節課嗎？」</p>
-        <div class="reward-prizes"><span>🥤 飲料：已獲得</span><span>🥚 茶葉蛋兌換券：再撐 10 節</span></div>
+        <p>老師把一杯飲料遞給你，同學們齊聲歡呼。你可以今天放學，或自己選擇到操場加碼 10 節；操場沒有課桌掩護，撐過第 40 節就能拿到茶葉蛋兌換券！</p>
+        <div class="reward-prizes"><span>🥤 飲料：已獲得</span><span>🥚 茶葉蛋兌換券：再撐 10 節</span><span id="reward-skin-tickets">🎟️ 本局獲得 30 張皮膚券</span></div>
+        <button id="reward-skins-btn" class="secondary-btn">到皮膚收藏室抽獎</button>
         <button id="claim-drink-btn" class="primary-btn">領飲料，今天放學 <span>→</span></button>
-        <button id="accept-bonus-btn" class="secondary-btn">加碼 10 節，挑戰茶葉蛋兌換券</button>
+        <button id="accept-bonus-btn" class="secondary-btn">去操場加碼 10 節，挑戰茶葉蛋兌換券</button>
       </div>
     </section>
 
@@ -168,10 +176,23 @@
       <div class="modal-card bestiary-modal">
         <div class="modal-kicker">102 班 · 敵人記錄</div>
         <h2 id="bestiary-title">敵人圖鑑</h2>
-        <p id="bestiary-progress" role="status">已解鎖 0 / 23</p>
+        <p id="bestiary-progress" role="status">已解鎖 0 / 25</p>
         <p>擊敗對應敵人至少 1 隻，就能查看專屬招式圖與應對方式。進度會保存在這台裝置。</p>
         <div id="bestiary-list" class="bestiary-list"></div>
         <button id="bestiary-close-btn" class="primary-btn">返回 <span>→</span></button>
+      </div>
+    </section>
+
+    <section id="skin-screen" class="overlay" aria-labelledby="skin-title">
+      <div class="modal-card skin-modal">
+        <div class="modal-kicker">CLASS 102 COLLECTION</div>
+        <h2 id="skin-title">道具皮膚收藏室</h2>
+        <p id="skin-balance" role="status">皮膚券 0 張 · 已收藏 0 / 12</p>
+        <p>每次使用 1 張皮膚券，隨機抽到一款尚未擁有的皮膚；抽到後會自動套用在對應道具上，攻擊能力不變。</p>
+        <button id="skin-draw-btn" type="button" class="primary-btn">🎟️ 抽一款皮膚</button>
+        <p id="skin-result" class="skin-result" role="status">完成課節就能獲得皮膚券。</p>
+        <div id="skin-list" class="skin-list"></div>
+        <button id="skin-close-btn" class="secondary-btn">返回遊戲</button>
       </div>
     </section>
 
@@ -182,9 +203,11 @@
         <p id="end-description"></p>
         <div class="ending-art" aria-hidden="true"><canvas id="ending-canvas" width="900" height="300"></canvas></div>
         <p id="end-epilogue" class="end-epilogue"></p>
+        <p id="end-skin-tickets" class="end-skin-tickets">🎟️ 本局獲得 0 張皮膚券</p>
         <details class="story-journal"><summary>102 班劇情回顧</summary><div id="end-story-log"></div></details>
         <div class="result-stats"><div><strong id="result-time">00:00</strong><span>課程進度</span></div><div><strong id="result-kills">0</strong><span>擊退敵人</span></div><div><strong id="result-level">1</strong><span>達到等級</span></div></div>
         <button id="restart-btn" class="primary-btn">再玩一局 <span>↻</span></button>
+        <button id="end-skins-btn" class="secondary-btn">到皮膚收藏室抽獎</button>
         <button id="end-menu-btn" class="secondary-btn">回主選單選擇難度</button>
       </div>
     </section>

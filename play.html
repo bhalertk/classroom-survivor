@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#172b3c">
-  <title>下課生存戰｜國中 102 班</title>
+  <title>轉學生的 102 班挑戰</title>
   <style>
 :root{font-family:Nunito,"Noto Sans TC",system-ui,sans-serif;color:#183249;background:#172b3c;font-synthesis:none}*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}button{font:inherit;cursor:pointer}#game-shell{position:relative;width:100%;height:100%;min-height:400px;overflow:hidden;background:#d9ceb7}canvas{display:block;width:100%;height:100%;touch-action:none}.topbar{position:absolute;top:0;left:0;right:0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 22px;pointer-events:none}.brand,.hud-center,.hud-right{pointer-events:auto}.brand{display:flex;align-items:center;gap:9px;padding:9px 13px;background:#172b3ce8;border:2px solid #ffffff24;border-radius:13px;box-shadow:0 5px 0 #0c1b28aa;color:white;font-weight:900;white-space:nowrap}.brand-icon{display:grid;place-items:center;width:29px;height:29px;border-radius:8px;color:#17384c;background:#ffd36f;font-size:23px}.brand small{display:block;margin-left:5px;color:#a7b9bd;font-size:9px;font-weight:800;letter-spacing:1.4px}.hud-center{display:flex;gap:7px}.timer-box,.wave-box{min-width:100px;padding:5px 15px 7px;text-align:center;background:#fff9eae9;border:2px solid #fff;border-radius:12px;box-shadow:0 5px 0 #344a4850}.hud-label{display:block;color:#708082;font-size:10px;font-weight:900;letter-spacing:1px}.timer-box strong{font-size:26px;line-height:1;color:#17384c;font-variant-numeric:tabular-nums}.wave-box strong{font-size:16px;line-height:1.5;color:#17384c}.hud-right{display:flex;align-items:center;gap:8px}#kill-count{padding:9px 12px;color:white;background:#172b3ce8;border-radius:10px;font-size:13px;font-weight:900}.icon-btn{width:38px;height:38px;color:white;background:#172b3ce8;border:2px solid #ffffff44;border-radius:10px;font-size:18px;font-weight:900}.icon-btn:hover,.icon-btn:focus-visible{background:#34546a}.icon-btn.muted{opacity:.55}.status-panel{position:absolute;left:22px;bottom:24px;width:226px;padding:12px 14px;background:#172b3ce9;border:2px solid #ffffff25;border-radius:14px;box-shadow:0 6px 0 #0d1b29a8;color:white}.status-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12px;font-weight:900}.status-row strong{font-variant-numeric:tabular-nums}.xp-row{margin-top:10px}.bar{height:11px;overflow:hidden;border-radius:10px;background:#0d1d2a;box-shadow:inset 0 2px 3px #0007}.bar>div{height:100%;width:100%;border-radius:inherit;transition:width .18s}.hp-bar>div{background:linear-gradient(90deg,#ff7a63,#ffb075)}.xp-bar>div{background:linear-gradient(90deg,#6bd4d0,#a5e9c8)}.bottom-hint{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);padding:8px 14px;background:#172b3cb9;border-radius:8px;color:#fff;font-size:11px;font-weight:800;white-space:nowrap;pointer-events:none}.toast{position:absolute;left:50%;top:100px;transform:translate(-50%,-12px);opacity:0;padding:9px 17px;border-radius:12px;background:#17384de8;color:white;font-size:15px;font-weight:900;box-shadow:0 4px 0 #0c1b28aa;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}.overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:linear-gradient(130deg,#102a39db,#1b3544db);backdrop-filter:blur(6px);z-index:5}.overlay.visible{display:flex}.hero-card,.modal-card{position:relative;width:min(100%,650px);padding:30px 38px;background:#fff9eb;border:4px solid #fff;border-radius:25px;box-shadow:0 14px 0 #0b1d2a88,0 28px 55px #08182188;text-align:center}.hero-card:before,.modal-card:before{content:"";position:absolute;inset:7px;border:2px dashed #d4c9ac;border-radius:17px;pointer-events:none}.hero-badge,.modal-kicker{display:inline-block;padding:6px 13px;background:#f6cd74;border-radius:7px;color:#714c2b;font-size:11px;font-weight:900;letter-spacing:2px;transform:rotate(-2deg)}.hero-doodles{display:flex;justify-content:center;gap:120px;height:13px;color:#e17b62;font-size:29px;font-weight:900}.hero-doodles span:nth-child(2){color:#e5b65c;transform:translateY(-7px)}.hero-doodles span:nth-child(3){color:#5cb2a6}h1,h2,p{margin-top:0}.hero-card h1{margin:17px 0 7px;color:#193e50;font-size:clamp(38px,6vw,66px);font-weight:900;letter-spacing:2px;line-height:1.15;text-shadow:3px 4px 0 #d8d1bd}.hero-card h1 span{color:#ea795f}.hero-subtitle{max-width:470px;margin:0 auto 24px;color:#64747b;font-size:15px;font-weight:700;line-height:1.7}.how-to{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}.how-to>div{padding:12px 7px;background:#f3ead6;border:2px solid #e6dcc4;border-radius:12px}.how-icon{display:block;height:33px;color:#ea795f;font-size:25px;font-weight:900}.how-to strong{display:block;color:#233e4d;font-size:13px}.how-to small{display:block;margin-top:4px;color:#708086;font-size:10px;font-weight:700}.primary-btn{min-width:230px;padding:12px 25px;background:#e9755b;border:3px solid #b95241;border-radius:12px;box-shadow:0 6px 0 #a54639;color:#fff;font-size:18px;font-weight:900;transition:transform .1s,box-shadow .1s}.primary-btn span{margin-left:12px}.primary-btn:hover,.primary-btn:focus-visible{background:#f28866;transform:translateY(-2px)}.primary-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #a54639}.microcopy{margin:15px 0 0;color:#99a1a1;font-size:11px;font-weight:800}.modal-card{width:min(100%,580px);padding:34px}.modal-card h2{margin:14px 0 5px;color:#193e50;font-size:39px;font-weight:900}.modal-card>p{margin-bottom:20px;color:#6e7a7d;font-weight:700}.upgrade-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.upgrade-card{min-height:178px;padding:14px 10px 12px;background:#f3ead6;border:3px solid #e4d9c0;border-radius:14px;text-align:center;transition:transform .15s,border-color .15s,background .15s}.upgrade-card:hover,.upgrade-card:focus-visible{transform:translateY(-5px);border-color:#ea795f;background:#fff1d5}.upgrade-card .up-icon{display:grid;place-items:center;width:59px;height:59px;margin:0 auto 10px;background:#fffaf0;border:3px solid #ead9bd;border-radius:14px;color:#e7755b;font-size:33px;font-weight:900}.upgrade-card strong{display:block;color:#17384c;font-size:15px;font-weight:900}.upgrade-card small{display:block;margin-top:6px;color:#697980;font-size:11px;font-weight:700;line-height:1.4}.key-hint{margin-top:17px;color:#9b9a8d;font-size:11px;font-weight:800}.end-modal{max-width:460px}.end-modal .primary-btn{margin-top:12px}.secondary-btn{display:block;margin:17px auto 0;padding:5px 10px;color:#77838a;background:none;border:0;font-size:12px;font-weight:900}.secondary-btn:hover{text-decoration:underline}.result-stats{display:flex;justify-content:space-around;margin:22px 0 15px;padding:15px;background:#f3ead6;border-radius:12px}.result-stats div{display:flex;flex-direction:column}.result-stats strong{color:#193e50;font-size:25px}.result-stats span{color:#7e8a8d;font-size:11px;font-weight:800}.joystick{position:absolute;left:27px;bottom:35px;display:none;width:116px;height:116px;border:3px solid #ffffff7a;border-radius:50%;background:#1537496b;touch-action:none;z-index:2}.joystick:after{content:"";position:absolute;inset:26px;border:1px dashed #ffffff80;border-radius:50%}#stick{position:absolute;left:35px;top:35px;width:40px;height:40px;border:3px solid #fff;border-radius:50%;background:#e9755bdc;box-shadow:0 3px 8px #17384c88;z-index:1}@media (pointer:coarse){.joystick{display:block}.bottom-hint{display:none}.status-panel{left:auto;right:15px;bottom:19px;width:180px}}@media(max-width:650px){.topbar{padding:10px;gap:5px}.brand{padding:6px;gap:4px;font-size:12px}.brand-icon{width:24px;height:24px;font-size:19px}.brand small,.wave-box,.bottom-hint{display:none}.timer-box{min-width:76px;padding:5px}.timer-box strong{font-size:20px}.hud-label{font-size:8px}.hud-right{gap:4px}#kill-count{display:none}.icon-btn{width:30px;height:32px;font-size:15px}.hero-card,.modal-card{padding:22px 18px}.hero-card h1{font-size:42px}.hero-subtitle{font-size:12px;margin-bottom:15px}.how-to{gap:5px;margin-bottom:16px}.how-to>div{padding:9px 4px}.how-to strong{font-size:11px}.how-to small{font-size:9px}.how-icon{font-size:20px;height:26px}.upgrade-options{gap:5px}.upgrade-card{min-height:156px;padding:9px 5px}.upgrade-card .up-icon{width:43px;height:43px;font-size:25px}.upgrade-card strong{font-size:12px}.upgrade-card small{font-size:9px}.modal-card h2{font-size:30px}.status-panel{width:162px;padding:8px}.status-row{font-size:10px}.bar{height:8px}}@media(max-height:600px){.hero-card{padding-top:14px;padding-bottom:14px}.hero-card h1{margin-top:7px}.hero-subtitle{margin-bottom:10px}.how-to{margin-bottom:10px}.microcopy{margin-top:8px}.modal-card{padding-top:17px;padding-bottom:17px}}
 
@@ -71,6 +71,15 @@ button.touch-pressed { filter: brightness(1.12); }
 .difficulty-picker button.selected { border-color: #297b77; background: #377f79; color: #fff8dc; box-shadow: inset 0 0 0 2px #ffffff40; }
 .difficulty-description { margin-bottom: 18px; font-size: 14px; color: #526d70; line-height: 1.6; }
 .difficulty-indicator { margin-bottom: 7px; color: #efd298; font-size: 11px; font-weight: 900; }
+.joystick-size-picker { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px; margin: 8px 0 18px; color: #365e59; font-size: 14px; font-weight: 900; }
+.joystick-size-picker > div { display: flex; flex: 1 1 230px; max-width: 310px; gap: 6px; }
+.joystick-size-picker button { flex: 1; min-height: 44px; padding: 7px 9px; border: 2px solid #c0cbb7; border-radius: 9px; background: #edf0df; color: #4c6766; font: inherit; cursor: pointer; }
+.joystick-size-picker button.selected { border-color: #297b77; background: #377f79; color: #fff8dc; box-shadow: inset 0 0 0 2px #ffffff55, 0 4px 0 #215856; }
+.joystick { width: 132px; height: 132px; }
+.joystick:after { inset: 24%; }
+.joystick #stick { left: 32%; top: 32%; width: 36%; height: 36%; }
+#game-shell.joystick-small .joystick { width: 108px; height: 108px; }
+#game-shell.joystick-large .joystick { width: 164px; height: 164px; }
 /* Give the classroom HUD a clearer hierarchy against the brighter floor. */
 .brand, #kill-count, .icon-btn, .status-panel { background: #173447ee; border-color: #e2e9dc50; box-shadow: 0 5px 0 #0b1c2bb3, 0 10px 22px #19373d36; }
 .brand-icon { background: linear-gradient(140deg, #ffeb9a, #edb85d); box-shadow: inset 0 -3px 0 #b47c41; }
@@ -149,15 +158,32 @@ button.touch-pressed { filter: brightness(1.12); }
 .move-art-scroll { max-width: 100%; overflow-x: auto; margin-top: 10px; }
 .move-art-scroll img { display: block; width: 800px; max-width: none; height: 280px; border-radius: 8px; }
 @media (max-width: 650px) { .bestiary-list { grid-template-columns: 1fr; } .bestiary-modal { max-height: 94dvh; } }
+.skin-ticket-row { margin: 5px 0 10px; padding: 6px 2px; border-bottom: 1px solid #ffffff36; color: #ffe5a2; }
+.skin-ticket-row strong { font-size: 12px; }
+.upgrade-card .talent-passive { display: block; margin-top: 7px; color: #326d69; font-weight: 900; }
+.skin-modal { width: min(840px, 96vw); max-height: 92dvh; overflow-y: auto; text-align: center; }
+.skin-modal h2 { margin-bottom: 6px; }
+.skin-modal > p { line-height: 1.55; }
+.skin-modal .primary-btn:disabled { opacity: .55; cursor: default; box-shadow: none; }
+.skin-result, .end-skin-tickets { padding: 9px 12px; border-radius: 9px; background: #e8f2e2; color: #325b54; font-weight: 900; }
+.skin-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 15px 0; text-align: left; }
+.skin-entry { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 7px; border: 2px solid #c0cec6; border-radius: 11px; background: #f0f2e9; }
+.skin-entry.owned { border-color: #7fb7a2; background: #e7f5e8; }
+.skin-entry canvas { flex: 0 0 70px; width: 70px; height: 62px; }
+.skin-entry strong, .skin-entry small { display: block; }
+.skin-entry strong { color: #274d52; font-size: 13px; }
+.skin-entry small { color: #698079; font-size: 11px; }
+@media (max-width: 650px) { .skin-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 410px) { .skin-list { grid-template-columns: 1fr; } }
 
 </style>
 </head>
 <body>
-  <main id="game-shell" aria-label="下課生存戰遊戲">
+  <main id="game-shell" aria-label="轉學生的 102 班挑戰遊戲">
     <canvas id="game" aria-label="教室生存遊戲畫面"></canvas>
 
     <div class="topbar">
-      <div class="brand"><span class="brand-icon">✎</span><span>下課生存戰</span><small>國中 102 班</small></div>
+      <div class="brand"><span class="brand-icon">✎</span><span>轉學生的 102 班挑戰</span><small>迎新生存遊戲</small></div>
       <div class="hud-center">
         <div class="timer-box"><span id="lesson-label" class="hud-label">第 1 / 30 節</span><strong id="timer">00:30</strong><div class="lesson-progress" aria-hidden="true"><div id="lesson-fill"></div></div></div>
         <div class="wave-box"><span id="wave-label" class="hud-label">距離領飲料</span><strong id="wave">15:00</strong></div>
@@ -167,6 +193,7 @@ button.touch-pressed { filter: brightness(1.12); }
 
     <div class="status-panel">
       <div id="difficulty-indicator" class="difficulty-indicator">難度：困難</div>
+      <div class="status-row skin-ticket-row"><span>🎟️ 皮膚券</span><strong id="skin-ticket-count">0（本局 +0）</strong></div>
       <div class="loadout"><span id="loadout-label">✎ 鉛筆揮砍 · 道具 0 / 6</span><strong id="weapon-levels">🫐 0/5　⌖ 0/5　✹ 0/5<br>🏹 0/5　▰ 0/5　△ 0/5</strong></div>
       <div id="secret-tool" class="secret-tool" hidden>🤝 隱藏道具：大家的團結</div>
       <div class="talent-loadout"><span id="talent-label">天賦 0 / 6</span><div id="talent-slots" class="talent-slots"></div></div>
@@ -216,20 +243,22 @@ button.touch-pressed { filter: brightness(1.12); }
         <li>第 10 節：瓶蓋收藏家丟出的瓶蓋會從課桌和牆壁反彈，5 秒後消失。</li>
         <li>第 20 節：雙人單車隊，一人衝撞、一人丟輪胎；一人倒下就觸發劇情，兩人都倒下才結束 Boss 戰。</li>
         <li>課桌和講桌是實體障礙，會擋住你、敵人和敵方攻擊；沿著走道移動，也能利用桌子掩護。</li>
-        <li>第 30 節：最終 Boss 是程式老師。看準程式碼預告線避開射擊與錯誤碼彈幕；打敗老師、撐到鐘響可領飲料，之後可加碼 10 節挑戰茶葉蛋兌換券。</li>
+        <li>第 30 節：最終 Boss 是程式老師。看準每輪程式碼預告線，閃開衝刺與錯誤碼彈幕；半血後老師會重新鎖定，連續施放兩輪程式碼。打敗老師、撐到鐘響可領飲料，之後可加碼 10 節挑戰茶葉蛋兌換券。</li>
         <li>Boss 登場時場上小怪與敵方投射物、陷阱消失；Boss 戰暫停課節計時與小怪生成。整組 Boss 擊敗後恢復倒數。</li>
         <li>Boss 半血後會暴走，加快攻擊；看到蓄力方向先閃避，再找空檔反擊。</li>
         <li>先撿起並裝備 6 個不同道具，天賦才會出現在升級選項；天賦最多 6 個。鉛筆另外保留，每種工具最多 5 級。</li>
+        <li>6 個道具都升到 5 級、6 個天賦都撿齊後，往後每次升級會增加 2 點生命上限並回復 2 點體力。</li>
+        <li>每完成一節課可得 1 張皮膚券；累積後可在皮膚收藏室花 1 張，隨機抽取一款尚未擁有的道具皮膚。皮膚只改變外觀。</li>
       </ul>
       <div class="tutorial-actions"><button id="tutorial-next" type="button" hidden>我準備好了 →</button><button id="skip-tutorial" type="button">跳過教學，開始挑戰</button></div>
     </div>
 
     <section id="start-screen" class="overlay visible" aria-labelledby="start-title">
       <div class="hero-card">
-        <div class="hero-badge">SURVIVE THE SCHOOL DAY</div>
+        <div class="hero-badge">WELCOME TO CLASS 102</div>
         <div class="hero-doodles"><span>✎</span><span>✦</span><span>▤</span></div>
-        <h1 id="start-title">下課<span>生存戰</span></h1>
-        <p class="hero-subtitle">轉學第一天，老師和同學給你一個驚喜：與同學們的方塊戰鬥造型交手，最後挑戰會寫程式的老師。撐過 30 節領飲料，再加碼 10 節可贏茶葉蛋兌換券！</p>
+        <h1 id="start-title">轉學生的<br><span>102 班挑戰</span></h1>
+        <p class="hero-subtitle">轉學第一天，年輕的老師與全班同學送上迎新挑戰：撐過 30 節課、打敗老師，就能領一杯飲料。想繼續？到操場加碼 10 節，還有茶葉蛋兌換券等著你！</p>
         <div class="how-to">
           <div><span class="how-icon">⌘</span><strong>移動閃避</strong><small>WASD、方向鍵或觸控搖桿</small></div>
           <div><span class="how-icon">◎</span><strong>自動攻擊</strong><small>靠近目標就會自動瞄準</small></div>
@@ -238,9 +267,11 @@ button.touch-pressed { filter: brightness(1.12); }
         <div class="difficulty-picker" role="group" aria-label="選擇主角"><button id="character-boy" type="button" class="selected" aria-pressed="true">男生 · 短髮</button><button id="character-girl" type="button" aria-pressed="false">女生 · 馬尾</button></div>
         <div class="difficulty-picker difficulty-options" role="group" aria-label="選擇遊戲難度"><button id="difficulty-easy" type="button" aria-pressed="false">簡單</button><button id="difficulty-normal" type="button" aria-pressed="false">普通</button><button id="difficulty-hard" type="button" class="selected" aria-pressed="true">困難</button><button id="difficulty-very-hard" type="button" aria-pressed="false">很難</button><button id="difficulty-ultra-hard" type="button" aria-pressed="false">超難</button></div>
         <p id="difficulty-description" class="difficulty-description" aria-live="polite"></p>
+        <div class="joystick-size-picker" role="group" aria-label="觸控搖桿大小"><span>移動搖桿</span><div><button id="joystick-size-small" type="button" aria-pressed="false">小手</button><button id="joystick-size-standard" type="button" class="selected" aria-pressed="true">標準</button><button id="joystick-size-large" type="button" aria-pressed="false">大手</button></div></div>
         <button id="start-btn" class="primary-btn">開始故事 <span>→</span></button>
         <button id="practice-btn" class="secondary-btn">直接練習新手教學</button>
         <button id="start-bestiary-btn" class="secondary-btn">敵人圖鑑 · 擊敗後解鎖</button>
+        <button id="start-skins-btn" class="secondary-btn">皮膚收藏室 · 使用皮膚券</button>
         <button id="quick-start-btn" class="secondary-btn">已熟悉操作，直接挑戰</button>
         <p class="microcopy">30 節領飲料 · 可加碼 10 節 · 每節 30 秒 · 支援倍速</p>
       </div>
@@ -288,7 +319,9 @@ button.touch-pressed { filter: brightness(1.12); }
         <details class="loadout-guide-panel" open><summary>我的裝備與進化條件</summary><div id="loadout-guide"></div></details>
         <details class="story-journal"><summary>102 班劇情回顧</summary><div id="pause-story-log"></div></details>
         <div class="cheat-panel"><label for="cheat-input">密技</label><div class="cheat-controls"><input id="cheat-input" type="text" autocomplete="off" spellcheck="false" placeholder="輸入密技"><button id="cheat-submit" type="button">啟動</button></div><small id="cheat-status" role="status">輸入後按「啟動」；每個密技每局可用一次。</small></div>
+        <div class="joystick-size-picker" role="group" aria-label="觸控搖桿大小"><span>移動搖桿</span><div><button id="pause-joystick-size-small" type="button" aria-pressed="false">小手</button><button id="pause-joystick-size-standard" type="button" class="selected" aria-pressed="true">標準</button><button id="pause-joystick-size-large" type="button" aria-pressed="false">大手</button></div></div>
         <button id="pause-bestiary-btn" class="secondary-btn">查看敵人圖鑑</button>
+        <button id="pause-skins-btn" class="secondary-btn">皮膚收藏室 · 抽道具皮膚</button>
         <button id="resume-btn" class="primary-btn">繼續遊戲 <span>→</span></button>
         <button id="pause-restart-btn" class="secondary-btn">重新開始</button>
         <button id="pause-menu-btn" class="secondary-btn">結束本局，回主選單</button>
@@ -299,10 +332,11 @@ button.touch-pressed { filter: brightness(1.12); }
       <div class="modal-card end-modal reward-modal">
         <div class="modal-kicker">30 節課達成！</div>
         <h2 id="reward-title">老師的飲料到手了！</h2>
-        <p>老師把一杯飲料遞給你，同學們齊聲歡呼。班長拿出另一張獎券：「新同學，還想再撐 10 節課嗎？」</p>
-        <div class="reward-prizes"><span>🥤 飲料：已獲得</span><span>🥚 茶葉蛋兌換券：再撐 10 節</span></div>
+        <p>老師把一杯飲料遞給你，同學們齊聲歡呼。你可以今天放學，或自己選擇到操場加碼 10 節；操場沒有課桌掩護，撐過第 40 節就能拿到茶葉蛋兌換券！</p>
+        <div class="reward-prizes"><span>🥤 飲料：已獲得</span><span>🥚 茶葉蛋兌換券：再撐 10 節</span><span id="reward-skin-tickets">🎟️ 本局獲得 30 張皮膚券</span></div>
+        <button id="reward-skins-btn" class="secondary-btn">到皮膚收藏室抽獎</button>
         <button id="claim-drink-btn" class="primary-btn">領飲料，今天放學 <span>→</span></button>
-        <button id="accept-bonus-btn" class="secondary-btn">加碼 10 節，挑戰茶葉蛋兌換券</button>
+        <button id="accept-bonus-btn" class="secondary-btn">去操場加碼 10 節，挑戰茶葉蛋兌換券</button>
       </div>
     </section>
 
@@ -310,10 +344,23 @@ button.touch-pressed { filter: brightness(1.12); }
       <div class="modal-card bestiary-modal">
         <div class="modal-kicker">102 班 · 敵人記錄</div>
         <h2 id="bestiary-title">敵人圖鑑</h2>
-        <p id="bestiary-progress" role="status">已解鎖 0 / 23</p>
+        <p id="bestiary-progress" role="status">已解鎖 0 / 25</p>
         <p>擊敗對應敵人至少 1 隻，就能查看專屬招式圖與應對方式。進度會保存在這台裝置。</p>
         <div id="bestiary-list" class="bestiary-list"></div>
         <button id="bestiary-close-btn" class="primary-btn">返回 <span>→</span></button>
+      </div>
+    </section>
+
+    <section id="skin-screen" class="overlay" aria-labelledby="skin-title">
+      <div class="modal-card skin-modal">
+        <div class="modal-kicker">CLASS 102 COLLECTION</div>
+        <h2 id="skin-title">道具皮膚收藏室</h2>
+        <p id="skin-balance" role="status">皮膚券 0 張 · 已收藏 0 / 12</p>
+        <p>每次使用 1 張皮膚券，隨機抽到一款尚未擁有的皮膚；抽到後會自動套用在對應道具上，攻擊能力不變。</p>
+        <button id="skin-draw-btn" type="button" class="primary-btn">🎟️ 抽一款皮膚</button>
+        <p id="skin-result" class="skin-result" role="status">完成課節就能獲得皮膚券。</p>
+        <div id="skin-list" class="skin-list"></div>
+        <button id="skin-close-btn" class="secondary-btn">返回遊戲</button>
       </div>
     </section>
 
@@ -324,9 +371,11 @@ button.touch-pressed { filter: brightness(1.12); }
         <p id="end-description"></p>
         <div class="ending-art" aria-hidden="true"><canvas id="ending-canvas" width="900" height="300"></canvas></div>
         <p id="end-epilogue" class="end-epilogue"></p>
+        <p id="end-skin-tickets" class="end-skin-tickets">🎟️ 本局獲得 0 張皮膚券</p>
         <details class="story-journal"><summary>102 班劇情回顧</summary><div id="end-story-log"></div></details>
         <div class="result-stats"><div><strong id="result-time">00:00</strong><span>課程進度</span></div><div><strong id="result-kills">0</strong><span>擊退敵人</span></div><div><strong id="result-level">1</strong><span>達到等級</span></div></div>
         <button id="restart-btn" class="primary-btn">再玩一局 <span>↻</span></button>
+        <button id="end-skins-btn" class="secondary-btn">到皮膚收藏室抽獎</button>
         <button id="end-menu-btn" class="secondary-btn">回主選單選擇難度</button>
       </div>
     </section>
@@ -397,21 +446,23 @@ const LESSON_CHATS = [
   ["老師","第三十節：程式老師登場","同學們聊得很開心吧？現在換我測試你的走位！避開程式碼，飲料就是你的。"]
 ];
 const STORY_BEATS = LESSON_CHATS.map(([speaker,title,text],index)=>({id:`lesson-${index+1}`,lesson:index+1,speaker,title,text,emotion:index===29?'determined':index===15?'happy':undefined})).concat([
-  {id:"lesson-31",lesson:31,speaker:"老師",title:"加碼挑戰開始",text:"飲料已經是你的了！接下來十節是自選挑戰。撐到第四十節下課，茶葉蛋兌換券也給你！"},
-  {id:"lesson-32",lesson:32,speaker:"1 號同學",title:"加碼也有觀眾",text:"我已經把你的走位畫成戰術圖了！雖然畫得像一碗麵，但真的很厲害。"},
-  {id:"lesson-33",lesson:33,speaker:"21 號同學",title:"茶葉蛋情報",text:"茶葉蛋兌換券就在班長手裡。別擔心，她不會把它拿去換掉……應該啦！"},
-  {id:"lesson-34",lesson:34,speaker:"8 號同學",title:"課桌掩護隊",text:"你繞桌的速度比值日生還快。下次打掃我可以邀你加入嗎？"},
-  {id:"lesson-35",lesson:35,speaker:"班長",title:"加碼的中途",text:"已經多撐了五節！飲料先放在講桌上，我替你看著。你只要繼續躲開同學們的熱情！"},
-  {id:"lesson-36",lesson:36,speaker:"22 號同學",title:"牆壁請假中",text:"重踢手說今天不再把人踢到牆上。牆壁表示：謝謝體諒。"},
-  {id:"lesson-37",lesson:37,speaker:"12 號同學",title:"小聲加油",text:"我把大聲公關掉了，改用正常音量說：新同學，加油！"},
-  {id:"lesson-38",lesson:38,speaker:"27 號同學",title:"裝備畢業典禮",text:"你的工具都快能自己去上課了！再撐兩節，就可以帶著獎品放學。"},
-  {id:"lesson-39",lesson:39,speaker:"33 號同學",title:"兌換券就在眼前",text:"再一節就完成了！我已經幫你問好福利社，茶葉蛋還有喔。"},
-  {id:"lesson-40",lesson:40,speaker:"老師",title:"最後一聲鐘響",text:"好，最後一節也撐住了！今天的迎新挑戰圓滿結束，飲料和茶葉蛋券都歸你。"}
-]);
+  {id:"lesson-31",lesson:31,speaker:"7 號同學",title:"我是在跟你說話",emotion:'happy',text:"嗨，螢幕前的你！我是 7 號。剛剛是你按下加碼的吧？我現在直接跟操作遊戲的你聊天，不是跟畫面裡的轉學生說喔。"},
+  {id:"lesson-32",lesson:32,speaker:"7 號同學",title:"你的手指很忙",text:"你握搖桿的那隻手還好嗎？操場沒有課桌，記得用另一隻手按暫停或倍速。對，我看得到你在操作！"},
+  {id:"lesson-33",lesson:33,speaker:"7 號同學",title:"螢幕外的戰術",emotion:'determined',text:"我有個只告訴玩家的祕訣：別只盯著角色，先看敵人蓄力的方向。你看到預告線，就有時間把手指往旁邊滑。"},
+  {id:"lesson-34",lesson:34,speaker:"7 號同學",title:"下一節小心嘉豪",emotion:'nervous',text:"喂，螢幕前的你，下一節嘉豪要上場！看他射門前的球路，還有衝刺預告。你可別為了聽我說話忘了閃。"},
+  {id:"lesson-35",lesson:35,speaker:"7 號同學",title:"嘉豪登場",emotion:'surprised',text:"嘉豪拿著足球來了！我知道你正在看這行字，但手先別停；看準他蓄力後的方向，往側邊閃就好。"},
+  {id:"lesson-36",lesson:36,speaker:"7 號同學",title:"鏡頭前的喘口氣",emotion:'relieved',text:"剛才那關夠熱鬧吧？螢幕前的你也可以喘口氣。遊戲裡的體力會慢慢回復，你的手可要自己休息喔。"},
+  {id:"lesson-37",lesson:37,speaker:"7 號同學",title:"玩家的視野",text:"從螢幕看過去，跑道邊的敵人會先冒出來。你能同時看整個畫面，這可是畫面裡的轉學生沒有的優勢！"},
+  {id:"lesson-38",lesson:38,speaker:"7 號同學",title:"工具交給你決定",emotion:'happy',text:"你選的六件工具打得很有節奏！升級時慢慢看效果；這裡會暫停，我可以等你選好再繼續說。"},
+  {id:"lesson-39",lesson:39,speaker:"7 號同學",title:"小黃狗要來了",emotion:'nervous',text:"螢幕前的你，再一節就到小黃狗！牠會撲過來，還會汪汪叫出一圈聲波。先留一條能閃的路。"},
+  {id:"lesson-40",lesson:40,speaker:"7 號同學",title:"最後一節交給你",emotion:'determined',text:"最後一節開始！我不跟轉學生喊話，這句是給你的：看小黃狗的預告、躲開撲擊，打贏後茶葉蛋兌換券就是你的！"}
+].map(beat=>({...beat,audience:'real-player'})));
 const BOSS_DIALOGUE = {
   mini1:{arrival:{speaker:"瓶蓋收藏家",title:"第一道關卡",text:"我收集的瓶蓋都派上用場了！新同學，躲得開這一輪才算過關！"},defeat:{speaker:"班長",title:"第一關通過",text:"瓶蓋散開了，時鐘又開始走了！你通過第一關，還有兩道關卡。"}},
   mini2:{arrival:{speaker:"雙人單車隊",title:"第二道關卡",text:"一人封住走道，一人用輪胎攔截。轉學生，這間教室可沒那麼容易通過！"},defeat:{speaker:"轉學生",title:"兩人都倒下了",text:"一個衝撞、一個丟輪胎……現在終於都停下了。班長，把最後一頁給我。下一關是老師吧？"}},
-  final:{arrival:{speaker:"老師",title:"最終關卡：程式老師",emotion:'determined',text:"同學們的迎新戰打得不錯！接下來換我。看好黑板上的程式碼，能躲開我的指令，飲料才算贏到手。"},defeat:{speaker:"老師",title:"程式執行完畢",emotion:'relieved',text:"你把我的程式招式都破解了！最後一關通過。撐完第三十節剩下的時間，我就把飲料交給你。"}}
+  final:{arrival:{speaker:"老師",title:"最終關卡：程式老師",emotion:'determined',text:"同學們的迎新戰打得不錯！接下來換我。看好黑板上的程式碼，能躲開我的指令，飲料才算贏到手。"},defeat:{speaker:"老師",title:"程式執行完畢",emotion:'relieved',text:"你把我的程式招式都破解了！最後一關通過。撐完第三十節剩下的時間，我就把飲料交給你。"}},
+  jiahao:{arrival:{speaker:"嘉豪",title:"操場第 35 節 · 嘉豪",emotion:'determined',text:"操場借我一圈！看好我的射門路線，再來躲跑道衝刺！"},defeat:{speaker:"7 號同學",audience:'real-player',title:"嘉豪停下來了",emotion:'relieved',text:"螢幕前的你，剛才的側移真漂亮！嘉豪的足球停了，操場加碼賽還有五節。"}},
+  yellowdog:{arrival:{speaker:"7 號同學",audience:'real-player',title:"操場第 40 節 · 小黃狗",emotion:'surprised',text:"螢幕前的你，小黃狗跑進球場了！牠會先吠出聲波，再朝預告方向撲過來。這是最後一關！"},defeat:{speaker:"7 號同學",audience:'real-player',title:"小黃狗跑去喝水了",emotion:'happy',text:"你成功讓小黃狗停下來了！撐完最後這節，我就把茶葉蛋兌換券交給你。"}}
 };
 const BOSS_VICTORY_STORIES = {
   mini1:[
@@ -428,6 +479,16 @@ const BOSS_VICTORY_STORIES = {
     {...BOSS_DIALOGUE.final.defeat,emotion:'surprised'},
     {speaker:'班長',title:'同學們收起裝備',emotion:'relieved',text:'老師的程式停止了，同學們也收起方塊戰鬥裝備。這場迎新戰真的快結束了！'},
     {speaker:'轉學生',title:'102 班的新同學',emotion:'happy',text:'原來這就是你們的歡迎方式！等鐘響後，飲料可別忘了給我。'}
+  ],
+  jiahao:[
+    BOSS_DIALOGUE.jiahao.defeat,
+    {speaker:'嘉豪',title:'球場握手',emotion:'happy',text:'你閃得很準！我先到場邊休息，下一次再比射門。'},
+    {speaker:'7 號同學',audience:'real-player',title:'玩家繼續上場',emotion:'determined',text:'你選的加碼還沒結束喔。看好操場四周，最後一關會更熱鬧！'}
+  ],
+  yellowdog:[
+    BOSS_DIALOGUE.yellowdog.defeat,
+    {speaker:'7 號同學',audience:'real-player',title:'最後的倒數',emotion:'relieved',text:'牠只是玩得太開心啦。螢幕前的你，繼續撐到鐘響，獎品就在終點！'},
+    {speaker:'7 號同學',audience:'real-player',title:'茶葉蛋券預備',emotion:'happy',text:'我已經把兌換券準備好了。你親手完成這場操場挑戰，我會替你鼓掌！'}
   ]
 };
 const BESTIARY = [
@@ -453,7 +514,9 @@ const BESTIARY = [
   {kind:'flyfighter',name:'敵人 20 · 飛踢重擊手',move:'交替施展直線飛踢和前方扇形重擊。',tip:'飛踢向側面閃；重擊離開前方扇形。',art:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+5pW15Lq6IDIwIOmjm+i4oumHjeaTiuaJi+aLm+W8j+WcljwvdGl0bGU+CiAgPGRlc2MgaWQ9ImRlc2MiPuW3puWBtOekuuevhOayv+ebtOe3muihneWIuueahOmjm+i4ou+8m+WPs+WBtOekuuevhOWJjeaWueaJh+W9oumHjeaTiuOAgumjm+i4ouWQkeWBtOmdoumWg++8jOmHjeaTiumboumWi+aJh+W9ouOAgjwvZGVzYz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iIzYyNGE0YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzJlMzQ0MCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFya2VyIGlkPSJhcnJvdyIgbWFya2VyV2lkdGg9IjEwIiBtYXJrZXJIZWlnaHQ9IjEwIiByZWZYPSI4IiByZWZZPSI1IiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wIDAgTDEwIDUgTDAgMTAiIGZpbGw9IiNmZmQyOTQiLz48L21hcmtlcj4KICAgIDxnIGlkPSJmaWdodGVyIiBzdHJva2U9IiM3NTRkNGEiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICAgIDxyZWN0IHg9Ii0xOSIgeT0iLTQ3IiB3aWR0aD0iMzgiIGhlaWdodD0iMzEiIHJ4PSI0IiBmaWxsPSIjY2I4YTc2Ii8+CiAgICAgIDxyZWN0IHg9Ii0xNiIgeT0iLTUwIiB3aWR0aD0iMzIiIGhlaWdodD0iOCIgcng9IjMiIGZpbGw9IiNmZmQyOWEiLz4KICAgICAgPHJlY3QgeD0iLTE3IiB5PSItMTUiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNSIgcng9IjQiIGZpbGw9IiM5ZDViNTUiLz4KICAgICAgPHJlY3QgeD0iLTI4IiB5PSItOCIgd2lkdGg9IjExIiBoZWlnaHQ9IjE5IiByeD0iMyIgZmlsbD0iI2U5YjM4YiIvPgogICAgICA8cmVjdCB4PSIxNyIgeT0iLTgiIHdpZHRoPSIxMSIgaGVpZ2h0PSIxOSIgcng9IjMiIGZpbGw9IiNlOWIzOGIiLz4KICAgICAgPHJlY3QgeD0iLTE1IiB5PSIxOCIgd2lkdGg9IjExIiBoZWlnaHQ9IjE1IiByeD0iMiIgZmlsbD0iIzU2NTI2MiIvPgogICAgICA8cmVjdCB4PSI0IiB5PSIxOCIgd2lkdGg9IjExIiBoZWlnaHQ9IjE1IiByeD0iMiIgZmlsbD0iIzU2NTI2MiIvPgogICAgICA8cGF0aCBkPSJNLTkgLTMxaDRtMTAgMGg0IiBzdHJva2U9IiM0OTM3M2UiIHN0cm9rZS13aWR0aD0iNSIvPgogICAgPC9nPgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjI4MCIgcng9IjE4IiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxwYXRoIGQ9Ik00MDAgMTZ2MjQ4IiBzdHJva2U9IiM5OTczNmIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA4Ii8+CiAgPHRleHQgeD0iMjQiIHk9IjM2IiBmaWxsPSIjZmZmMGRhIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+RU5FTVkgMjAgfCBGTFlJTkcgS0lDS0VSPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSI3NCIgZmlsbD0iI2ZmZTBiNyIgZm9udC1zaXplPSIxOCIgZm9udC13ZWlnaHQ9IjgwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPjAxIEZMWUlORyBLSUNLIHwgMC42NXM8L3RleHQ+CiAgPGVsbGlwc2UgY3g9IjEwMiIgY3k9IjE5NyIgcng9IjQxIiByeT0iMTEiIGZpbGw9IiMyZTI4MzQiLz4KICA8dXNlIGhyZWY9IiNmaWdodGVyIiB4bGluazpocmVmPSIjZmlnaHRlciIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjEwMiIgeT0iMTc1Ii8+CiAgPHBhdGggZD0iTTE0OSAxNzAgSDMzNSIgc3Ryb2tlPSIjZmZkMjk0IiBzdHJva2Utd2lkdGg9IjIzIiBvcGFjaXR5PSIuMTgiLz4KICA8cGF0aCBkPSJNMTQ5IDE3MCBIMzM1IiBzdHJva2U9IiNmZmQyOTQiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWRhc2hhcnJheT0iMTAgOCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KICA8cGF0aCBkPSJNMjUzIDE0MiBMMjcxIDExOSIgc3Ryb2tlPSIjYjlmMGUxIiBzdHJva2Utd2lkdGg9IjQiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CiAgPHRleHQgeD0iMjE3IiB5PSIyMzciIGZpbGw9IiNmZmVkYmQiIGZvbnQtc2l6ZT0iMTciIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj5ET0RHRSBTSURFV0FZUzwvdGV4dD4KICA8dGV4dCB4PSI0MzEiIHk9Ijc0IiBmaWxsPSIjZmZlMGI3IiBmb250LXNpemU9IjE4IiBmb250LXdlaWdodD0iODAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+MDIgSEVBVlkgU1RSSUtFIHwgMC43NXM8L3RleHQ+CiAgPGVsbGlwc2UgY3g9IjUyOCIgY3k9IjE5OCIgcng9IjQxIiByeT0iMTEiIGZpbGw9IiMyZTI4MzQiLz4KICA8dXNlIGhyZWY9IiNmaWdodGVyIiB4bGluazpocmVmPSIjZmlnaHRlciIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjUyOCIgeT0iMTc1Ii8+CiAgPHBhdGggZD0iTTU1NyAxNzAgTDY3NCA5NiBRNzIyIDE2OSA2NzQgMjM4IFoiIGZpbGw9IiNmZmJlN2UiIGZpbGwtb3BhY2l0eT0iLjI3IiBzdHJva2U9IiNmZmQyOTQiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWRhc2hhcnJheT0iOSA3Ii8+CiAgPHBhdGggZD0iTTU1OCAxNzIgUTYwOSAxNTYgNjUxIDE3MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmMGJjIiBzdHJva2Utd2lkdGg9IjYiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CiAgPHRleHQgeD0iNjEyIiB5PSIyNTciIGZpbGw9IiNmZmVkYmQiIGZvbnQtc2l6ZT0iMTciIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj5FWElUIEZST05UIEFSQzwvdGV4dD4KPC9zdmc+Cg=='},
   {kind:'mini1',name:'小 Boss · 瓶蓋收藏家',move:'投擲會反彈的瓶蓋，5 秒後消失。',tip:'利用掩護，但留意反彈路線。'},
   {kind:'mini2',name:'小 Boss · 雙人單車隊',move:'一人衝撞，一人丟輪胎。',tip:'兩人血量獨立，兩人都倒下才結束。'},
-  {kind:'final',name:'最終 Boss · 程式老師',move:'先預告再發射程式碼；衝刺後散出錯誤碼彈幕，半血時擴大範圍。',tip:'側移避開程式碼射線，利用桌子擋下子彈；衝刺後留意周圍彈幕。'}
+  {kind:'final',name:'最終 Boss · 程式老師',move:'先預告再發射程式碼；衝刺後散出錯誤碼彈幕。半血時會重新鎖定玩家，連續施放兩輪程式碼。',tip:'看準每輪預告線側移，利用桌子擋下程式碼；衝刺結束後立刻離開彈幕。'},
+  {kind:'jiahao',name:'操場 Boss · 嘉豪',move:'足球扇形射門與跑道直線衝刺，半血後射門增加。',tip:'看準射門與衝刺預告，向側面移動。'},
+  {kind:'yellowdog',name:'操場 Boss · 小黃狗',move:'先蓄力吠出環形聲波，再直線撲擊；半血後聲波變密。',tip:'穿過聲波間隙，側移避開撲擊路線。'}
 ];
 // The diagrams use the same classroom silhouettes and attack language as the game.
 // Enemy 19 and 20 keep their dedicated SVG illustrations.
@@ -478,7 +541,9 @@ const MOVE_ART_SCENES = {
   heavykick:['前方扇形蓄力','命中踢向牆壁','wallkick','#ffb28f'],
   mini1:['瓶蓋扇形蓄力','瓶蓋碰牆與桌會反彈','caps','#f6d395'],
   mini2:['衝撞與輪胎分工','單車衝鋒、輪胎齊飛','cycling','#ffc18d'],
-  final:['程式射線先畫出','程式碼與錯誤碼彈幕','code','#91eee4']
+  final:['程式射線先畫出','程式碼與錯誤碼彈幕','code','#91eee4'],
+  jiahao:['足球路線先亮起','扇形射門與跑道衝刺','soccer','#f6d88b'],
+  yellowdog:['吠叫圈與撲擊線預告','環形聲波後直線撲擊','dogboss','#f3d079']
 };
 function moveArtAttack(shape,color) {
   const line=(path,width=6,dash='')=>`<path d="${path}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" ${dash?`stroke-dasharray="${dash}"`:''} marker-end="url(#arrow)"/>`;
@@ -505,18 +570,22 @@ function moveArtAttack(shape,color) {
     case 'caps':return line('M543 162 L608 118 L650 212 L698 169',5)+[[607,118],[650,212],[694,169]].map(([x,y])=>orb(x,y,8,'#f4dfbd')).join('');
     case 'cycling':return [572,634].map(x=>`<circle cx="${x}" cy="203" r="20" fill="none" stroke="${color}" stroke-width="5"/>`).join('')+line('M585 178 H695',6)+orb(674,142,18,'#354c5c');
     case 'code':return [-1,0,1].map(i=>line(`M541 ${175+i*15} L696 ${175+i*21}`,4,'8 7')).join('')+`<text x="609" y="130" fill="${color}" font-family="monospace" font-size="31" font-weight="900">{ }</text>`;
+    case 'soccer':return [-1,0,1].map((i)=>orb(650,175+i*34,12,'#fff4d6')).join('')+line('M541 175 H697',5,'9 6');
+    case 'dogboss':return `<circle cx="611" cy="175" r="43" fill="none" stroke="${color}" stroke-width="5" stroke-dasharray="8 6"/>${line('M620 175 H697',11)}`;
   }
   return '';
 }
 function moveArtActor(kind,x,y,color) {
   if(kind==='player')return `<g transform="translate(${x} ${y})"><circle cy="-23" r="18" fill="#f4c9a5"/><path d="M-18 -29q18 -22 36 0" fill="#394c67"/><rect x="-18" y="-7" width="36" height="38" rx="7" fill="#6797b7"/><path d="M-8 -24h3m10 0h3" stroke="#344651" stroke-width="3"/></g>`;
+  if(kind==='yellowdog')return `<g transform="translate(${x} ${y})"><path d="M-26 10l-19 -15m6 13l-5 24m23 -9l-4 19m34 -18l4 19" fill="none" stroke="#9d713f" stroke-width="8" stroke-linecap="round"/><ellipse cx="-6" cy="10" rx="36" ry="22" fill="#e8bb62" stroke="#8f693f" stroke-width="4"/><circle cx="31" cy="-5" r="23" fill="#f4cf79" stroke="#8f693f" stroke-width="4"/><path d="M16 -22l-9 -21 22 13m18 7l10 -21 3 29" fill="#b8814e"/><circle cx="40" cy="-10" r="3" fill="#3c423c"/><circle cx="55" cy="3" r="4" fill="#3c423c"/></g>`;
+  if(kind==='jiahao')return `<g transform="translate(${x} ${y})"><rect x="-20" y="-8" width="40" height="38" rx="7" fill="#d99669" stroke="#734f45" stroke-width="4"/><circle cy="-29" r="20" fill="#f2c4a0"/><path d="M-20 -32q20 -24 40 0" fill="#394258"/><text x="0" y="16" text-anchor="middle" font-size="15" font-weight="900" fill="#fff5d5">35</text><circle cx="32" cy="20" r="12" fill="#fff9e8" stroke="#465b56" stroke-width="3"/></g>`;
   return `<g transform="translate(${x} ${y})"><rect x="-22" y="-48" width="44" height="38" rx="5" fill="${color}" stroke="#173946" stroke-width="4"/><rect x="-17" y="-43" width="34" height="8" rx="3" fill="#f8edc5"/><rect x="-19" y="-8" width="38" height="36" rx="5" fill="#4a7981" stroke="#183946" stroke-width="4"/><path d="M-12 -24h5m14 0h5" stroke="#203d4a" stroke-width="4"/><path d="M-13 29v14m26 -14v14" stroke="#2c4854" stroke-width="9"/></g>`;
 }
 function moveArtDataUri(entry) {
   const [cue,attack,shape,color]=MOVE_ART_SCENES[entry.kind];
   const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" role="img" aria-label="${entry.name}招式示意：${cue}，${attack}"><defs><linearGradient id="bg" x2="0" y2="1"><stop stop-color="#244d56"/><stop offset="1" stop-color="#152f3c"/></linearGradient><marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10" fill="${color}"/></marker><g id="enemy"><rect x="-22" y="-48" width="44" height="38" rx="5" fill="${color}" stroke="#173946" stroke-width="4"/><rect x="-17" y="-43" width="34" height="8" rx="3" fill="#f8edc5"/><rect x="-19" y="-8" width="38" height="36" rx="5" fill="#4a7981" stroke="#183946" stroke-width="4"/><path d="M-12 -24h5m14 0h5" stroke="#203d4a" stroke-width="4"/><path d="M-13 29v14m26 -14v14" stroke="#2c4854" stroke-width="9"/></g><g id="player"><circle cy="-23" r="18" fill="#f4c9a5"/><path d="M-18 -29q18 -22 36 0" fill="#394c67"/><rect x="-18" y="-7" width="36" height="38" rx="7" fill="#6797b7"/><path d="M-8 -24h3m10 0h3" stroke="#344651" stroke-width="3"/></g></defs><rect width="800" height="280" rx="18" fill="url(#bg)"/><path d="M400 16v248" stroke="#638c86" stroke-width="2" stroke-dasharray="7 8"/><text x="26" y="39" fill="#f1fff0" font-family="sans-serif" font-size="22" font-weight="900">${entry.name}</text><text x="28" y="76" fill="#d4eee5" font-family="sans-serif" font-size="17" font-weight="800">01 預告 · ${cue}</text><text x="429" y="76" fill="#d4eee5" font-family="sans-serif" font-size="17" font-weight="800">02 招式 · ${attack}</text><ellipse cx="145" cy="220" rx="52" ry="10" fill="#112c37"/><use href="#enemy" x="145" y="175"/><use href="#player" x="324" y="175"/><path d="M185 170 H294" fill="none" stroke="${color}" stroke-width="5" stroke-dasharray="10 8" marker-end="url(#arrow)"/><circle cx="325" cy="176" r="37" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="8 7"/><ellipse cx="526" cy="220" rx="52" ry="10" fill="#112c37"/><use href="#enemy" x="526" y="175"/><use href="#player" x="725" y="175"/>${moveArtAttack(shape,color)}<rect x="26" y="238" width="748" height="32" rx="7" fill="#11363d"/><text x="400" y="260" text-anchor="middle" fill="#fff1c4" font-family="sans-serif" font-size="17" font-weight="800">避法：${entry.tip}</text></svg>`;
-  const illustrated=svg.replaceAll('<use href="#enemy" x="145" y="175"/>',moveArtActor('enemy',145,175,color))
-    .replaceAll('<use href="#enemy" x="526" y="175"/>',moveArtActor('enemy',526,175,color))
+  const illustrated=svg.replaceAll('<use href="#enemy" x="145" y="175"/>',moveArtActor(entry.kind,145,175,color))
+    .replaceAll('<use href="#enemy" x="526" y="175"/>',moveArtActor(entry.kind,526,175,color))
     .replaceAll('<use href="#player" x="324" y="175"/>',moveArtActor('player',324,175,color))
     .replaceAll('<use href="#player" x="725" y="175"/>',moveArtActor('player',725,175,color))
     .replaceAll('font-family="sans-serif"','font-family="Microsoft JhengHei,Noto Sans TC,sans-serif"');
@@ -527,7 +596,7 @@ const EMOTION_LABELS={calm:'平靜',surprised:'驚訝',nervous:'緊張',relieved
 const $ = id => document.getElementById(id);
 const canvas = $("game");
 const ctx = canvas.getContext("2d");
-const screens = ["start-screen", "story-screen", "tutorial-done-screen", "upgrade-screen", "pause-screen", "reward-screen", "bestiary-screen", "end-screen"];
+const screens = ["start-screen", "story-screen", "tutorial-done-screen", "upgrade-screen", "pause-screen", "reward-screen", "bestiary-screen", "skin-screen", "end-screen"];
 const keys = new Set();
 const pointer = { active: false, id: null, x: 0, y: 0 };
 const MAP = { w: 1800, h: 1200 };
@@ -555,21 +624,36 @@ const DIFFICULTIES = {
 };
 const PRACTICE_DIFFICULTY={hp:PLAYER_MAX_HP,regen:2,enemyHealth:1,enemyDamage:1,enemySpeed:1,spawnCount:1,spawnInterval:1,spawnCap:1};
 CONTENT.talents = [
-  {id: "harvest", toolId: "blueberry", name: "豐收之力", icon: "♧", description: "藍莓與西瓜傷害增加 10%", bonus: {damage: 1.1}},
-  {id: "focus", toolId: "pistol", name: "精準瞄準", icon: "◎", description: "手槍與加特林射程增加 15%", bonus: {range: 1.15}},
-  {id: "blast", toolId: "firecracker", name: "爆破專家", icon: "✹", description: "甩炮與核彈爆炸範圍增加 12%", bonus: {blastRadius: 1.12}},
-  {id: "trajectory", toolId: "bow", name: "穿雲之眼", icon: "➶", description: "弓箭傷害增加 10%", bonus: {damage: 1.1}},
-  {id: "return", toolId: "eraser", name: "回旋巧手", icon: "↻", description: "橡皮擦回程速度增加 15%", bonus: {returnSpeed: 1.15}},
-  {id: "geometry", toolId: "ruler", name: "幾何大師", icon: "△", description: "三角尺命中間隔縮短 10%", bonus: {hitCooldown: .9}}
+  {id: "harvest", toolId: "blueberry", name: "豐收之力", icon: "♧", description: "藍莓與西瓜傷害增加 10%", passive:"生命上限 +5，拾取時回復 5 點", bonus: {damage: 1.1}},
+  {id: "focus", toolId: "pistol", name: "精準瞄準", icon: "◎", description: "手槍與加特林射程增加 15%", passive:"鉛筆揮砍距離 +12", bonus: {range: 1.15}},
+  {id: "blast", toolId: "firecracker", name: "爆破專家", icon: "✹", description: "甩炮與核彈爆炸範圍增加 12%", passive:"鉛筆傷害 +3", bonus: {blastRadius: 1.12}},
+  {id: "trajectory", toolId: "bow", name: "穿雲之眼", icon: "➶", description: "弓箭傷害增加 10%", passive:"移動速度 +5%", bonus: {damage: 1.1}},
+  {id: "return", toolId: "eraser", name: "回旋巧手", icon: "↻", description: "橡皮擦回程速度增加 15%", passive:"受到的傷害減少 5%", bonus: {returnSpeed: 1.15}},
+  {id: "geometry", toolId: "ruler", name: "幾何大師", icon: "△", description: "三角尺命中間隔縮短 10%", passive:"取得經驗增加 8%", bonus: {hitCooldown: .9}}
 ];
 CONTENT.talents.push(
-  {id:"athlete", toolId:"football", name:"體育健將", icon:"⚽", description:"足球傷害增加 10%", bonus:{damage:1.1}},
-  {id:"origami", toolId:"plane", name:"折紙高手", icon:"➤", description:"紙飛機飛行速度增加 15%", bonus:{speed:1.15}},
-  {id:"blackboard", toolId:"chalk", name:"板書達人", icon:"▯", description:"粉筆雲持續時間增加 15%", bonus:{zoneDuration:1.15}},
-  {id:"binding", toolId:"stapler", name:"裝訂達人", icon:"⊏", description:"書針定身時間增加 15%", bonus:{stunDuration:1.15}},
-  {id:"reading", toolId:"book", name:"閱讀專注", icon:"▤", description:"課本重拍傷害增加 10%", bonus:{damage:1.1}},
-  {id:"rhythm", toolId:"bell", name:"音樂節奏", icon:"♬", description:"校鈴攻擊間隔縮短 10%", bonus:{cooldown:.9}}
+  {id:"athlete", toolId:"football", name:"體育健將", icon:"⚽", description:"足球傷害增加 10%", passive:"減速持續時間縮短 20%", bonus:{damage:1.1}},
+  {id:"origami", toolId:"plane", name:"折紙高手", icon:"➤", description:"紙飛機飛行速度增加 15%", passive:"經驗光點吸引距離 +25", bonus:{speed:1.15}},
+  {id:"blackboard", toolId:"chalk", name:"板書達人", icon:"▯", description:"粉筆雲持續時間增加 15%", passive:"每秒自動回血 +0.25", bonus:{zoneDuration:1.15}},
+  {id:"binding", toolId:"stapler", name:"裝訂達人", icon:"⊏", description:"書針定身時間增加 15%", passive:"眩暈持續時間縮短 20%", bonus:{stunDuration:1.15}},
+  {id:"reading", toolId:"book", name:"閱讀專注", icon:"▤", description:"課本重拍傷害增加 10%", passive:"受傷後無敵時間 +0.1 秒", bonus:{damage:1.1}},
+  {id:"rhythm", toolId:"bell", name:"音樂節奏", icon:"♬", description:"校鈴攻擊間隔縮短 10%", passive:"鉛筆攻擊間隔縮短 10%", bonus:{cooldown:.9}}
 );
+const TOOL_SKINS=[
+  {toolId:'blueberry',name:'星雲莓果',hue:115,color:'#a0b8ff'},
+  {toolId:'pistol',name:'極光手槍',hue:80,color:'#9df8e9'},
+  {toolId:'firecracker',name:'彩虹甩炮',hue:205,color:'#d3a1ff'},
+  {toolId:'bow',name:'月光長弓',hue:185,color:'#b4d4ff'},
+  {toolId:'eraser',name:'薄荷橡皮擦',hue:115,color:'#a9f5cc'},
+  {toolId:'ruler',name:'星圖三角尺',hue:205,color:'#d3b3ff'},
+  {toolId:'football',name:'流星足球',hue:65,color:'#a9e5ff'},
+  {toolId:'plane',name:'晚霞紙飛機',hue:245,color:'#ffc4b1'},
+  {toolId:'chalk',name:'銀河粉筆',hue:150,color:'#a9bbff'},
+  {toolId:'stapler',name:'閃電釘書機',hue:70,color:'#ffe58d'},
+  {toolId:'book',name:'祕密日記',hue:195,color:'#d2b7ff'},
+  {toolId:'bell',name:'星光校鈴',hue:130,color:'#9aebf6'}
+];
+const TOOL_SKIN_BY_ID=Object.fromEntries(TOOL_SKINS.map(skin=>[skin.toolId,skin]));
 const SUPER_TOOLS = {
   blueberry: {name: "星耀西瓜雨", damage: 62, count: 5, cooldown: 1.2, splashRadius: 92, knockback: 110, upgrade: "五顆西瓜齊砸，震波與擊退大幅增強"},
   pistol: {name: "星耀加特林", damage: 45, cooldown: .16, range: 850, speed: 1200, upgrade: "高速自動單發，傷害與射程提升"},
@@ -589,7 +673,9 @@ Object.assign(SUPER_TOOLS, {
 const BOSS_SCHEDULE = [
   { id: "mini1", name: "瓶蓋收藏家", lesson: 10, hp: 5000, r: 34, damage: 24, color: "#688c94" },
   { id: "mini2", name: "雙人單車隊", lesson: 20, hp: 7000, members: 2, r: 32, damage: 40, color: "#be8363" },
-  { id: "final", name: "程式老師", lesson: 30, hp: 20000, r: 48, damage: 40, color: "#597895" }
+  { id: "final", name: "程式老師", lesson: 30, hp: 20000, r: 48, damage: 40, color: "#597895" },
+  { id: "jiahao", name: "嘉豪", lesson: 35, hp: 12000, r: 38, damage: 30, color: "#c18462" },
+  { id: "yellowdog", name: "小黃狗", lesson: 40, hp: 17000, r: 37, damage: 32, color: "#e2bb67" }
 ];
 const TOOL_APPEARANCES = {
   blueberry: ["單顆藍莓", "巨型藍莓", "小西瓜", "雙顆西瓜組", "金色西瓜組"],
@@ -712,6 +798,9 @@ function toolStats(id, level, withTalents = true) {
 let mode = "menu";
 let selectedDifficulty='hard';
 let selectedGender='boy';
+const JOYSTICK_SIZE_KEY='classroom-survivor-joystick-size';
+const JOYSTICK_SIZES=['small','standard','large'];
+let joystickSize=(()=>{try {const saved=window.localStorage?.getItem(JOYSTICK_SIZE_KEY);return JOYSTICK_SIZES.includes(saved)?saved:'standard';}catch(_){return 'standard';}})();
 let runDifficulty='hard';
 let pauseReturnMode = "playing";
 let storyIndex = 0;
@@ -745,7 +834,7 @@ let tutorialControls = {paused:false,resumed:false,speed:false};
 let tutorialWaypoint = null;
 let tutorialSpeedTime = 0;
 const TUTORIAL_STEPS = [
-  {title:"先熟悉移動",text:"用 WASD、方向鍵或左下角搖桿移動。教學有體力保護，放心練習。",goal:"移動一小段距離，熟悉轉向。"},
+  {title:"先熟悉移動",text:"用 WASD、方向鍵或畫面中央偏下的搖桿移動。搖桿大小可在主選單或暫停時調整。教學有體力保護，放心練習。",goal:"移動一小段距離，熟悉轉向。"},
   {title:"鉛筆會自動揮砍",text:"鉛筆是開局武器，不占道具欄。靠近標記的練習方塊人，角色會自動攻擊。",goal:"靠近並用鉛筆擊敗練習目標。"},
   {title:"收集經驗升級",text:"走近綠色經驗光點會自動吸取。下方經驗條填滿，就能升級並三選一。",goal:"走向標記，收集這份經驗。"},
   {title:"第一次三選一",text:"讀一讀卡片的攻擊與升級效果。點選卡片或按 1、2、3；選擇時戰鬥暫停。",goal:"從藍莓、手槍、甩炮中選一種。"},
@@ -760,7 +849,7 @@ const TUTORIAL_STEPS = [
   {title:"體驗溼衛生紙減速",text:"敵人 4 丟的溼衛生紙直接命中會減速 3 秒；沒命中的球留地 3 秒，碰到也會減速。",goal:"碰一下標記的溼衛生紙，再等減速結束。"},
   {title:"體力會自動回復",text:"遊玩時每秒回復 2 點體力，最高 200 點。暫停與選擇升級時會停止回血。",goal:"觀察體力條，等它從 85 回復到 95。"},
   {title:"練習暫停與加速",text:"按 P、Esc 或右上角 Ⅱ 暫停，再繼續遊戲。按 F 或倍速按鈕切換 1×、2×、3×；此步可以試用加速。",goal:"暫停並繼續一次，切到 2× 或 3× 後移動。"},
-  {title:"準備迎接 30 節課",text:"每節課 30 秒。撐過 30 節可領飲料，再選擇是否加碼 10 節挑戰茶葉蛋兌換券。Boss 出場時會暫停課節計時與生成小怪。",goal:"閱讀首領、裝備與獎勵規則，準備好後完成教學。"}
+  {title:"準備迎接 30 節課",text:"每節課 30 秒，完成一節可得 1 張皮膚券。撐過 30 節可領飲料，再選擇是否加碼 10 節挑戰茶葉蛋兌換券。Boss 出場時會暫停課節計時與生成小怪。",goal:"閱讀首領、裝備與獎勵規則，準備好後完成教學。"}
 ];
 let player;
 let enemies = [];
@@ -773,6 +862,11 @@ let upgradeRerolls = 0;
 let spawnedBosses = new Set();
 let defeatedBosses = new Set();
 let gameTime = 0;
+let skinTickets=(()=>{try{const saved=Number(window.localStorage?.getItem('classroom-survivor-skin-tickets'));return Number.isSafeInteger(saved)&&saved>=0?saved:0;}catch(_){return 0;}})();
+let runSkinTickets=0;
+let rewardedLessons=new Set();
+let ownedSkins=(()=>{try{const saved=JSON.parse(window.localStorage?.getItem('classroom-survivor-tool-skins')||'[]');return new Set(Array.isArray(saved)?saved.filter(id=>TOOL_SKIN_BY_ID[id]):[]);}catch(_){return new Set();}})();
+let skinsReturnMode='menu';
 let bonusAccepted = false;
 let drinkEarned = false;
 let bestiaryReturnMode = 'menu';
@@ -794,13 +888,14 @@ let camera = { x: 0, y: 0 };
 
 function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
 function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+function activeSolidTables() { return bonusAccepted?[]:SOLID_TABLES; }
 function clearOfTables(point,r=0) {
-  return !SOLID_TABLES.some(t=>point.x>t.left-r&&point.x<t.right+r&&point.y>t.top-r&&point.y<t.bottom+r);
+  return !activeSolidTables().some(t=>point.x>t.left-r&&point.x<t.right+r&&point.y>t.top-r&&point.y<t.bottom+r);
 }
 function freePosition(entity) {
   const r=entity.r||0;
   for(let pass=0;pass<8;pass++) {
-    const t=SOLID_TABLES.find(t=>entity.x>t.left-r&&entity.x<t.right+r&&entity.y>t.top-r&&entity.y<t.bottom+r);
+    const t=activeSolidTables().find(t=>entity.x>t.left-r&&entity.x<t.right+r&&entity.y>t.top-r&&entity.y<t.bottom+r);
     if(!t)break;
     const options=[{x:t.left-r-.1,y:entity.y},{x:t.right+r+.1,y:entity.y},{x:entity.x,y:t.top-r-.1},{x:entity.x,y:t.bottom+r+.1}];
     options.sort((a,b)=>distance(a,entity)-distance(b,entity));
@@ -810,7 +905,7 @@ function freePosition(entity) {
 }
 function tableHit(from,to,r=0) {
   let first=null;
-  for(const table of SOLID_TABLES) {
+  for(const table of activeSolidTables()) {
     let enter=0,leave=1,nx=0,ny=0,valid=true;
     for(const [axis,low,high] of [['x',table.left-r,table.right+r],['y',table.top-r,table.bottom+r]]) {
       const delta=to[axis]-from[axis];
@@ -876,7 +971,23 @@ function moveActor(entity,x,y,route=false) {
 function random(min, max) { return min + Math.random() * (max - min); }
 function activeLessons() { return bonusAccepted ? TOTAL_LESSONS : CORE_LESSONS; }
 function activeGameLength() { return bonusAccepted ? GAME_LENGTH : CORE_GAME_LENGTH; }
+function coreBossesDefeated() { return BOSS_SCHEDULE.filter(b=>b.lesson<=CORE_LESSONS).every(b=>defeatedBosses.has(b.id)); }
+function bonusBossesDefeated() { return BOSS_SCHEDULE.filter(b=>b.lesson>CORE_LESSONS).every(b=>defeatedBosses.has(b.id)); }
 function currentLesson() { return Math.min(activeLessons(), Math.floor(gameTime / LESSON_LENGTH) + 1); }
+function awardCompletedLessons(previousTime,currentTime) {
+  let earned=0;
+  const first=Math.floor(previousTime/LESSON_LENGTH)+1;
+  const last=Math.min(activeLessons(),Math.floor(currentTime/LESSON_LENGTH));
+  for(let lesson=first;lesson<=last;lesson++)if(!rewardedLessons.has(lesson)){
+    rewardedLessons.add(lesson);earned++;
+  }
+  if(earned){
+    runSkinTickets+=earned;
+    skinTickets+=earned;
+    try{window.localStorage?.setItem('classroom-survivor-skin-tickets',String(skinTickets));}catch(_){}
+  }
+  return earned;
+}
 function spawnSettings() {
   const lesson = currentLesson();
   const settings=difficultySettings();
@@ -907,6 +1018,22 @@ function renderCharacterPicker() {
 function chooseCharacter(id) {
   if(mode!=='menu'||!['boy','girl'].includes(id))return;
   selectedGender=id;player.gender=id;renderCharacterPicker();
+}
+function renderJoystickSizePicker() {
+  for(const size of JOYSTICK_SIZES) {
+    $('game-shell').classList.toggle(`joystick-${size}`,joystickSize===size);
+    for(const prefix of ['','pause-']) {
+      const button=$(`${prefix}joystick-size-${size}`);
+      button.classList.toggle('selected',joystickSize===size);
+      button.setAttribute('aria-pressed',String(joystickSize===size));
+    }
+  }
+}
+function chooseJoystickSize(size) {
+  if(!JOYSTICK_SIZES.includes(size))return;
+  joystickSize=size;
+  renderJoystickSizePicker();
+  try {window.localStorage?.setItem(JOYSTICK_SIZE_KEY,size);}catch(_){}
 }
 function resetInput() {
   keys.clear();
@@ -952,6 +1079,51 @@ function closeBestiary() {
   if(mode!=='bestiary')return;
   mode=bestiaryReturnMode;
   showScreen(mode==='menu'?'start-screen':mode==='paused'?'pause-screen':mode==='ended'?'end-screen':null);
+}
+function renderSkinCollection() {
+  $('skin-balance').textContent=`皮膚券 ${skinTickets} 張 · 已收藏 ${ownedSkins.size} / ${TOOL_SKINS.length}`;
+  const available=TOOL_SKINS.length-ownedSkins.size;
+  $('skin-draw-btn').disabled=skinTickets<1||available===0;
+  $('skin-draw-btn').textContent=available===0?'全部皮膚已收藏':skinTickets<1?'皮膚券不足':'🎟️ 花 1 張抽一款皮膚';
+  const list=$('skin-list');list.replaceChildren();
+  for(const skin of TOOL_SKINS){
+    const tool=CONTENT.weapons.find(weapon=>weapon.id===skin.toolId);
+    const owned=ownedSkins.has(skin.toolId);
+    const card=document.createElement('article');card.className=`skin-entry${owned?' owned':' locked'}`;
+    const preview=document.createElement('canvas');preview.width=90;preview.height=80;
+    preview.setAttribute('aria-label',`${skin.name}外觀預覽`);
+    drawTool(preview.getContext('2d'),skin.toolId,3,45,40,1,0,false,true);
+    const label=document.createElement('div');
+    const heading=document.createElement('strong');heading.textContent=skin.name;
+    const detail=document.createElement('small');detail.textContent=`${tool.name} · ${owned?'已套用':'尚未抽到'}`;
+    label.append(heading);label.append(detail);card.append(preview);card.append(label);list.append(card);
+  }
+}
+function openSkinCollection() {
+  if(mode==='skins'||!['menu','paused','reward','ended'].includes(mode))return;
+  skinsReturnMode=mode;mode='skins';
+  $('skin-result').textContent='抽到的皮膚會自動套用，能力維持不變。';
+  renderSkinCollection();showScreen('skin-screen');
+}
+function closeSkinCollection() {
+  if(mode!=='skins')return;
+  mode=skinsReturnMode;
+  showScreen({menu:'start-screen',paused:'pause-screen',reward:'reward-screen',ended:'end-screen'}[mode]);
+}
+function drawRandomToolSkin() {
+  if(mode!=='skins'||skinTickets<1)return;
+  const available=TOOL_SKINS.filter(skin=>!ownedSkins.has(skin.toolId));
+  if(!available.length)return;
+  const skin=available[Math.floor(Math.random()*available.length)];
+  skinTickets--;
+  ownedSkins.add(skin.toolId);
+  try{
+    window.localStorage?.setItem('classroom-survivor-skin-tickets',String(skinTickets));
+    window.localStorage?.setItem('classroom-survivor-tool-skins',JSON.stringify([...ownedSkins]));
+  }catch(_){}
+  $('skin-result').textContent=`抽到了「${skin.name}」！${CONTENT.weapons.find(tool=>tool.id===skin.toolId).name}已換上新外觀。`;
+  playSound(880,.22,'triangle',.04);
+  renderSkinCollection();updateHud();
 }
 function bindButtonAction(button, action) {
   let touch=null,suppressClickUntil=0;
@@ -1007,7 +1179,7 @@ function makePlayer() {
   return {
     gender:selectedGender,
     x: MAP.w / 2, y: MAP.h / 2 + 135, r: 21,
-    hp: difficultySettings().hp, maxHp: difficultySettings().hp, healthRegen: difficultySettings().regen, speed: 225, invulnerable: 0, damageFlash:0, slowTime: 0, stunTime:0, visionTime:0, visionSide:null, wallLaunch:null,
+    hp: difficultySettings().hp, maxHp: difficultySettings().hp, talentHpBonus:0, healthRegen: difficultySettings().regen, speed: 225, invulnerable: 0, damageFlash:0, slowTime: 0, stunTime:0, visionTime:0, visionSide:null, wallLaunch:null,
     facing: 0, moving: false, level: 1, xp: 0, xpNeed: 6,
     pencilCooldown: 0, swingTime: 0, swingAngle: 0,
     blueberryCooldown: 0, pistolCooldown: 0, firecrackerCooldown: 0,
@@ -1017,6 +1189,14 @@ function makePlayer() {
     talents: Object.fromEntries(CONTENT.talents.map(t => [t.id, false])),
     evolvedTools: new Set()
   };
+}
+
+function syncTalentBonuses() {
+  const bonus=player.talents.harvest?5:0;
+  const delta=bonus-player.talentHpBonus;
+  player.talentHpBonus=bonus;
+  player.maxHp+=delta;
+  player.hp=clamp(player.hp+delta,0,player.maxHp);
 }
 
 function resetWorld() {
@@ -1039,7 +1219,11 @@ function resetWorld() {
   spawnedBosses = new Set();
   defeatedBosses = new Set();
   gameTime = 0;
+  runSkinTickets=0;
+  rewardedLessons=new Set();
   bonusAccepted = false;
+  $('game-shell').classList.remove('playground-stage');
+  canvas.setAttribute('aria-label','教室生存遊戲畫面');
   drinkEarned = false;
   gameSpeed = 1;
   updateSpeedButton();
@@ -1113,20 +1297,15 @@ function storyStudent(c,x,y,time,walking,leader=false,emotion='calm',gender=null
 function storyTeacher(c,x,y,time,emotion='happy') {
   c.save();c.translate(x,y+Math.sin(time*2)*1.5);
   c.fillStyle='#425a5b33';c.beginPath();c.ellipse(0,29,24,6,0,0,Math.PI*2);c.fill();
-  c.fillStyle='#d7d2bc';c.beginPath();c.ellipse(25,-23,9,20,-.25,0,Math.PI*2);c.fill();
+  c.fillStyle='#384b5c';c.beginPath();c.ellipse(25,-23,9,20,-.25,0,Math.PI*2);c.fill();
   c.fillStyle='#e9bd72';c.beginPath();c.arc(19,-34,5,0,Math.PI*2);c.fill();
   storyBox(c,-14,19,11,13,'#4b535f','#374450');storyBox(c,3,19,11,13,'#4b535f','#374450');
   storyBox(c,-19,-7,38,30,'#70a091','#4f6b6b',6);
   c.fillStyle='#537c78';c.beginPath();c.moveTo(-17,17);c.lineTo(17,17);c.lineTo(23,31);c.lineTo(-23,31);c.closePath();c.fill();
   storyBox(c,-25,-4,7,23,'#edc6a5','#ad836b');storyBox(c,18,-4,7,23,'#edc6a5','#ad836b');
   c.fillStyle='#edc6a5';c.beginPath();c.arc(0,-25,18,0,Math.PI*2);c.fill();
-  c.fillStyle='#d7d2bc';c.beginPath();c.arc(0,-32,19,Math.PI,Math.PI*2);c.lineTo(18,-23);c.lineTo(-18,-22);c.fill();
-  c.strokeStyle='#435258';c.lineWidth=2;c.strokeRect(-13,-29,10,9);c.strokeRect(3,-29,10,9);c.beginPath();c.moveTo(-3,-25);c.lineTo(3,-25);c.stroke();
-  c.fillStyle='#354858';for(const eye of [-8,8]){c.beginPath();c.arc(eye,-24,1.7,0,Math.PI*2);c.fill();}
-  c.strokeStyle='#965d50';c.lineWidth=1.8;c.beginPath();
-  if(emotion==='surprised')c.ellipse(0,-13,3,4,0,0,Math.PI*2);
-  else if(emotion==='determined'){c.moveTo(-4,-12);c.lineTo(4,-12);}
-  else {c.moveTo(-5,-14);c.quadraticCurveTo(0,-7,5,-14);}c.stroke();
+  c.fillStyle='#384b5c';c.beginPath();c.arc(0,-32,19,Math.PI,Math.PI*2);c.lineTo(18,-23);c.lineTo(8,-33);c.lineTo(-18,-22);c.fill();
+  drawStoryFace(c,emotion,time);
   storyBox(c,22,-12,19,25,'#f8e0a5','#937a58',3);
   c.restore();
 }
@@ -1152,8 +1331,9 @@ function drawStoryFace(c,emotion,time) {
   if(emotion==='happy') {c.fillStyle='#de9b8899';c.fillRect(-13,-16,5,3);c.fillRect(8,-16,5,3);}
 }
 function classmateGender(speaker) {
+  if(speaker==='嘉豪')return 'boy';
   const number=Number(/^([0-9]+) 號同學$/.exec(speaker)?.[1]);
-  if(number>=1&&number<=6||number>=8&&number<=16)return 'boy';
+  if(number>=1&&number<=16)return 'boy';
   if(number>=21&&number<=33)return 'girl';
   return null;
 }
@@ -1209,6 +1389,20 @@ function drawBossStoryFrame(c,dialogue,time,reduced=false) {
 }
 function drawDialogueStoryFrame(c,dialogue,time,reduced=false) {
   if(dialogue.id.includes('mini2')){drawBossStoryFrame(c,dialogue,time,reduced);return;}
+  if(dialogue.audience==='real-player') {
+    const sway=reduced?0:Math.sin(time*3)*3;
+    c.save();c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,440,120);
+    c.fillStyle='#87bd84';c.fillRect(0,0,440,120);
+    c.fillStyle='#c97767';c.fillRect(0,88,440,32);
+    c.strokeStyle='#f8e5c4';c.lineWidth=2;c.beginPath();c.moveTo(0,102);c.lineTo(440,102);c.stroke();
+    storyBox(c,13,9,414,28,'#315f5c','#d9edcf',7);
+    c.fillStyle='#f7ffe7';c.textAlign='center';c.font="900 15px 'Noto Sans TC',sans-serif";
+    c.fillText('7 號同學正在對螢幕前的你說話',220,29);
+    storyStudent(c,220,86+sway,time,false,false,dialogue.emotion||'happy','boy');
+    c.strokeStyle='#fff4c8';c.lineWidth=3;
+    for(const side of [-1,1]){c.beginPath();c.moveTo(220+side*36,56);c.lineTo(220+side*51,47);c.stroke();}
+    c.restore();return;
+  }
   const t=reduced?2.4:time,progress=clamp(t/1.8,0,1);
   const firstBoss=dialogue.id.includes('mini1'),lastBoss=dialogue.id.includes('final');
   const victory=dialogue.id.startsWith('boss-defeat-');
@@ -1297,7 +1491,7 @@ function drawStoryFrame(c,page,elapsed,reduced=false) {
     }
     c.strokeStyle="#ceb888";c.lineWidth=2;c.setLineDash([4,5]);c.beginPath();c.moveTo(270,186);c.lineTo(628,186);c.stroke();c.setLineDash([]);
   } else if(page===5) {
-    c.fillStyle="#f2e8c8";c.font="900 29px 'Noto Sans TC',sans-serif";c.fillText("一起撐到放學！",458,113);
+    c.fillStyle="#f2e8c8";c.font="900 29px 'Noto Sans TC',sans-serif";c.fillText("轉學生的 102 班挑戰",458,113);
     c.save();c.translate(heroX+18,heroY);c.rotate(-.55+clamp(t/1.2,0,1)*.9);storyBox(c,0,-3,40,6,"#edc66c","#a97f43",2);c.fillStyle="#405264";c.beginPath();c.moveTo(40,-3);c.lineTo(47,0);c.lineTo(40,3);c.fill();c.restore();
     c.strokeStyle="#fff0bf";c.lineWidth=4;c.beginPath();c.arc(heroX,heroY,48,-1.2,-1.2+clamp(t/1.3,0,1)*2);c.stroke();
   } else if(page===6) {
@@ -1321,7 +1515,7 @@ function renderStoryJournal() {
     if(!narrativeHistory.length){const p=document.createElement("p");p.textContent="正式挑戰開始後，這裡會記下 102 班的故事。";log.append(p);}
     for(const entry of narrativeHistory) {
       const item=document.createElement("article"),heading=document.createElement("strong"),text=document.createElement("p");
-      heading.textContent=`第 ${entry.lesson} 節 · ${entry.title} · ${entry.speaker}`;text.textContent=entry.text;
+      heading.textContent=`第 ${entry.lesson} 節 · ${entry.title} · ${entry.speaker}${entry.audience==='real-player'?'（對玩家）':''}`;text.textContent=entry.text;
       item.append(heading);item.append(text);log.append(item);
     }
   }
@@ -1338,7 +1532,7 @@ function nextDialogue() {
     const hasPortrait=['班長','轉學生','老師'].includes(activeDialogue.speaker)||!!classmateGender(activeDialogue.speaker);
     $("dialogue-portrait").hidden=!hasPortrait;
     $("dialogue-story-canvas").hidden=false;
-    $("dialogue-speaker").textContent=activeDialogue.speaker+(activeDialogue.emotion?` · ${EMOTION_LABELS[activeDialogue.emotion]}`:'');
+    $("dialogue-speaker").textContent=activeDialogue.speaker+(activeDialogue.audience==='real-player'?' · 對螢幕前的你說':'')+(activeDialogue.emotion?` · ${EMOTION_LABELS[activeDialogue.emotion]}`:'');
     $("dialogue-title").textContent=activeDialogue.title;
     $("dialogue-text").textContent=activeDialogue.text;
     $("dialogue-next").textContent=narrativeQueue.length?"下一段 →":"收起對話 ×";
@@ -1521,7 +1715,7 @@ function makeEnemy(x, y, kind = "basic") {
   const baseHealth = 37 + (currentLesson() - 1) * 5;
   const health = boss ? boss.hp : practice ? 20 : kind === "deepblue" ? Math.round(baseHealth * 1.8) : kind === "spider" || kind === "dog" ? Math.round(baseHealth * .45) : ["weilong","bit","handler","shepherd","boxer","striker","medic","commander","beam","heavykick","stepboxer","flyfighter"].includes(kind) ? Math.round(baseHealth * 1.6) : kind === "water" ? Math.round(baseHealth * 1.25) : baseHealth;
   const scaledHealth=practice?health:Math.max(1,Math.round(health*(MELEE_ENEMY_KINDS.has(kind)?2:1)*difficultySettings().enemyHealth));
-  return freePosition({ x, y, kind, boss, hp: scaledHealth, maxHp: scaledHealth, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "deepblue" ? 65 : kind === "mini2" ? 110 : boss ? 77 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), healClock:2.4, windup: 0, codeCooldown:kind==='final'?2.8:0, codeWindup:0, codeAngle:0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) });
+  return freePosition({ x, y, kind, boss, hp: scaledHealth, maxHp: scaledHealth, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "yellowdog" ? 185 : kind === "jiahao" ? 135 : kind === "deepblue" ? 65 : kind === "mini2" ? 110 : boss ? 77 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), attackMove:kind==='yellowdog'?'bark':'shot', healClock:2.4, windup: 0, codeCooldown:kind==='final'?2.5:0, codeWindup:0, codeAngle:0, codeBurstRemaining:0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) });
 }
 function spawnEnemy(kind) {
   if((kind==='medic'||kind==='commander')&&enemies.filter(enemy=>enemy.kind===kind&&enemy.hp>0).length>=3)kind='basic';
@@ -1541,6 +1735,7 @@ function spawnEnemy(kind) {
 }
 function spawnScheduledBosses() {
   for (const boss of BOSS_SCHEDULE) {
+    if(boss.lesson>CORE_LESSONS&&!bonusAccepted)continue;
     if (currentLesson() >= boss.lesson && !spawnedBosses.has(boss.id)) {
       for(const enemy of enemies) if(!enemy.boss) enemy.hp=0;
       enemies=enemies.filter(enemy=>enemy.boss&&enemy.hp>0);
@@ -1687,6 +1882,7 @@ function applyCheat(rawCode) {
       player.weapons[weapon.id]=5;
       player.talents[matchingTalent(weapon.id).id]=true;
     }
+    syncTalentBonuses();
     pickups=pickups.filter(p=>p.type==='xp');
     if(currentLesson()<30){
       enemies=[];projectiles=[];enemyProjectiles=[];effects=[];
@@ -1705,18 +1901,19 @@ function applyCheat(rawCode) {
   return true;
 }
 function pencilAttack() {
-  const target = nearestEnemy(105);
+  const reach=105+(player.talents.focus?12:0);
+  const target = nearestEnemy(reach);
   if (!target || player.pencilCooldown > 0) return;
   const angle = Math.atan2(target.y - player.y, target.x - player.x);
   player.facing = angle;
   player.swingAngle = angle;
   player.swingTime = .22;
-  player.pencilCooldown = .48;
+  player.pencilCooldown = .48*(player.talents.rhythm?.9:1);
   playSound(510, .055, "triangle", .025);
   for (const enemy of [...enemies]) {
     const d = distance(player, enemy);
     const delta = Math.atan2(Math.sin(Math.atan2(enemy.y - player.y, enemy.x - player.x) - angle), Math.cos(Math.atan2(enemy.y - player.y, enemy.x - player.x) - angle));
-    if (d < 105 + enemy.r * .5 && Math.abs(delta) < 1.05) damageEnemy(enemy, 28, "pencil");
+    if (d < reach + enemy.r * .5 && Math.abs(delta) < 1.05) damageEnemy(enemy, 28+(player.talents.blast?3:0), "pencil");
   }
 }
 function shootAt(target, type, speed, damage, offset = 0) {
@@ -1912,7 +2109,12 @@ function gainExperience(value) {
     player.level++;
     player.xpNeed = Math.floor(6 + player.level * 3.5);
     if (!upgradePool().some(canChooseUpgrade)) {
-      showToast("工具與天賦已選滿！撿起剩下的強化，繼續撐到放學！");
+      if(fullyUpgradedLoadout()) {
+        player.maxHp+=2;
+        player.hp=Math.min(player.maxHp,player.hp+2);
+        showToast("道具與天賦全滿！生命上限 +2，體力 +2");
+        addEffect(player.x,player.y-player.r,'number',{text:'生命 +2',color:'#a7f0bb'});
+      } else showToast("先撿起地上的強化，再繼續升級！");
       continue;
     }
     mode = "upgrade";
@@ -1929,6 +2131,11 @@ function reservedToolSlots() {
   return new Set([...Object.keys(player.weapons).filter(id => player.weapons[id] > 0), ...pickups.filter(p => p.type === "weapon" && !p.collected).map(p => p.weaponId)]).size;
 }
 function equippedToolCount() {return Object.values(player.weapons).filter(level=>level>0).length;}
+function fullyUpgradedLoadout() {
+  return equippedToolCount()===MAX_EQUIPPED_TOOLS
+    && Object.values(player.weapons).filter(level=>level>0).every(level=>level===MAX_TOOL_LEVEL)
+    && Object.values(player.talents).filter(Boolean).length===MAX_EQUIPPED_TALENTS;
+}
 function canUpgradeTool(id) {
   const level = reservedToolLevel(id);
   return level < MAX_TOOL_LEVEL && (level > 0 || reservedToolSlots() < MAX_EQUIPPED_TOOLS);
@@ -1985,8 +2192,9 @@ function renderTalentCard(talent, index) {
   const evolution = document.createElement("small"); evolution.className = "evolution-hint";
   evolution.textContent = `${tool.name}滿 5 級＋此天賦 → ${SUPER_TOOLS[talent.toolId].name}`;
   const effect = document.createElement("small"); effect.className = "upgrade-stats"; effect.textContent = "超級進化：" + SUPER_TOOLS[talent.toolId].upgrade;
-  button.append(icon); button.append(title); button.append(role); button.append(description); button.append(evolution); button.append(effect);
-  button.setAttribute("aria-label", `${index + 1}，天賦${talent.name}，${description.textContent}，${evolution.textContent}`);
+  const passive=document.createElement("small");passive.className="talent-passive";passive.textContent=`常駐效果：${talent.passive}`;
+  button.append(icon); button.append(title); button.append(role); button.append(description); button.append(passive); button.append(evolution); button.append(effect);
+  button.setAttribute("aria-label", `${index + 1}，天賦${talent.name}，${description.textContent}，${passive.textContent}，${evolution.textContent}`);
   bindButtonAction(button, () => chooseUpgrade(talent.id));
   $("upgrade-options").append(button);
 }
@@ -2097,7 +2305,7 @@ function updatePickups(dt) {
     if(pickup.age===0)freePosition(pickup);
     pickup.age += dt;
     const d = distance(pickup, player);
-    if (d < (pickup.type === "xp" ? 135 : 55) && d > 1) {
+    if (d < (pickup.type === "xp" ? 135+(player.talents.origami?25:0) : 55) && d > 1) {
       const pull = Math.min(1, 320 * dt / d);
       pickup.x += (player.x - pickup.x) * pull;
       pickup.y += (player.y - pickup.y) * pull;
@@ -2119,12 +2327,13 @@ function updatePickups(dt) {
         const talent = CONTENT.talents.find(t => t.id === pickup.talentId);
         if (talent && equippedToolCount()===MAX_EQUIPPED_TOOLS && (player.talents[talent.id] || Object.values(player.talents).filter(Boolean).length < MAX_EQUIPPED_TALENTS)) {
           player.talents[talent.id] = true;
+          syncTalentBonuses();
           showToast(`已裝備天賦：${talent.name}`);
           checkEvolutions();
           if(mode==='tutorial'&&tutorialStep===8&&pickup.tutorial&&isEvolved(tutorialToolId)) tutorialAdvance();
         }
       } else if (mode === "tutorial" && pickup.tutorial) gainExperience(pickup.value);
-      else if (mode === "playing") gainExperience(pickup.value);
+      else if (mode === "playing") gainExperience(pickup.value*(player.talents.geometry?1.08:1));
     }
   }
   pickups = pickups.filter(p => !p.collected);
@@ -2143,9 +2352,9 @@ function checkEvolutions() {
 function damagePlayer(amount,origin=null,ignoreCover=false) {
   if ((mode !== "playing" && mode !== "tutorial") || player.hp <= 0 || player.invulnerable > 0 || player.wallLaunch) return false;
   if(origin&&!ignoreCover&&tableHit(origin,player))return false;
-  amount=Math.max(0,Math.round(amount*(origin?.rallyBoost?1.25:1)*difficultySettings().enemyDamage));
+  amount=Math.max(0,Math.round(amount*(origin?.rallyBoost?1.25:1)*difficultySettings().enemyDamage*(player.talents.return?.95:1)));
   player.hp = Math.max(mode==='tutorial'?30:0, player.hp - amount);
-  player.invulnerable = .68;
+  player.invulnerable = .68+(player.talents.reading?.1:0);
   player.damageFlash = .18;
   addEffect(player.x, player.y - 28, "number", { text: `-${amount}`, color: "#ff806e" });
   playSound(160, .18, "sawtooth", .055);
@@ -2169,9 +2378,9 @@ function slowPlayer(duration) {
   if ((mode !== "playing" && mode !== "tutorial") || player.hp <= 0) return;
   if (player.slowTime <= 0) {
     addEffect(player.x,player.y-35,"number",{text:"減速",color:"#9bd9ed"});
-    showToast("碰到溼衛生紙！減速 3 秒");
+    showToast(`碰到溼衛生紙！減速 ${duration*(player.talents.athlete?.8:1)} 秒`);
   }
-  player.slowTime = Math.max(player.slowTime,duration);
+  player.slowTime = Math.max(player.slowTime,duration*(player.talents.athlete?.8:1));
   if(mode==='tutorial'&&tutorialStep===12) tutorialWetHit=true;
 }
 function obscureVision() {
@@ -2183,9 +2392,9 @@ function stunPlayer(duration) {
   if((mode!=="playing"&&mode!=="tutorial")||player.hp<=0) return;
   if(player.stunTime<=0) {
     addEffect(player.x,player.y-40,"number",{text:"眩暈",color:"#f5d484"});
-    showToast("被音波擊中！眩暈 1 秒");
+    showToast(`被音波擊中！眩暈 ${duration*(player.talents.binding?.8:1)} 秒`);
   }
-  player.stunTime=Math.max(player.stunTime,duration);
+  player.stunTime=Math.max(player.stunTime,duration*(player.talents.binding?.8:1));
   player.swingTime=0;
 }
 function fireEnemySoundWave(enemy) {
@@ -2226,25 +2435,80 @@ function throwTire(enemy) {
   playSound(230, .12, "triangle", .04);
 }
 function bossShockwave(enemy) {
-  const rage=enemy.hp<=enemy.maxHp/2,count=rage?12:7;
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?16:9;
   const direction=Math.atan2(enemy.lungeVY,enemy.lungeVX);
   for(let i=0;i<count;i++) {
-    const angle=rage?i*Math.PI*2/count:direction+(i-(count-1)/2)*.28,speed=rage?285:240;
+    const angle=rage?i*Math.PI*2/count:direction+(i-(count-1)/2)*.25,speed=rage?315:265;
     enemyShot(enemy,{type:"boss-wave",x:enemy.x,y:enemy.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
-      r:12,damage:26,life:2.6,angle});
+      r:12,damage:28,life:2.6,angle});
   }
   addEffect(enemy.x,enemy.y,"boss-enrage",{radius:100,duration:.45,color:'#7ce9ed'});
   playSound(150,.18,"triangle",.04);
 }
 function castTeacherCode(enemy) {
-  const rage=enemy.hp<=enemy.maxHp/2,count=rage?5:3;
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?7:5;
   for(let i=0;i<count;i++) {
     const angle=enemy.codeAngle+(i-(count-1)/2)*.19;
     enemyShot(enemy,{type:'code-glyph',x:enemy.x+Math.cos(angle)*enemy.r*.65,y:enemy.y+Math.sin(angle)*enemy.r*.65,
-      vx:Math.cos(angle)*(rage?410:350),vy:Math.sin(angle)*(rage?410:350),r:12,damage:20,life:3.2,angle});
+      vx:Math.cos(angle)*(rage?430:370),vy:Math.sin(angle)*(rage?430:370),r:12,damage:22,life:3.2,angle});
   }
   addEffect(enemy.x,enemy.y,'burst',{color:'#83f0e8',duration:.4});
   playSound(640,.18,'square',.035);
+  if(enemy.codeBurstRemaining>0) {
+    enemy.codeBurstRemaining--;
+    enemy.codeAngle=Math.atan2(player.y-enemy.y,player.x-enemy.x);
+    enemy.codeWindup=.48;
+  }
+}
+function fireJiahaoSoccerBalls(enemy) {
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?5:3,speed=rage?430:365;
+  for(let i=0;i<count;i++) {
+    const angle=enemy.throwAngle+(i-(count-1)/2)*.18;
+    enemyShot(enemy,{type:'soccer-ball',x:enemy.x+Math.cos(angle)*enemy.r,y:enemy.y+Math.sin(angle)*enemy.r,
+      vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:14,damage:rage?25:20,life:3,angle});
+  }
+  playSound(320,.14,'triangle',.04);
+}
+function barkYellowDog(enemy) {
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?12:8;
+  for(let i=0;i<count;i++) {
+    const angle=i*Math.PI*2/count+(rage?0:Math.PI/count);
+    enemyShot(enemy,{type:'bark-wave',x:enemy.x+Math.cos(angle)*enemy.r,y:enemy.y+Math.sin(angle)*enemy.r,
+      vx:Math.cos(angle)*310,vy:Math.sin(angle)*310,r:13,damage:rage?18:15,life:2.2,angle});
+  }
+  playSound(210,.2,'triangle',.045);
+}
+function updatePlaygroundBoss(enemy,dt,movementSpeed,d,dx,dy,rage) {
+  if(enemy.windup>0) {
+    enemy.windup=Math.max(0,enemy.windup-dt);
+    if(enemy.windup>0)return;
+    if(enemy.attackMove==='shot') {
+      fireJiahaoSoccerBalls(enemy);enemy.attackMove='dash';enemy.attackClock=rage?1.15:1.55;
+    } else if(enemy.attackMove==='bark') {
+      barkYellowDog(enemy);enemy.attackMove='pounce';enemy.attackClock=rage?1.15:1.5;
+    } else {
+      const speed=enemy.kind==='jiahao'?(rage?880:720):(rage?930:780);
+      enemy.lungeVX=Math.cos(enemy.throwAngle)*speed;enemy.lungeVY=Math.sin(enemy.throwAngle)*speed;
+      enemy.lungeTime=enemy.kind==='jiahao'?.52:.43;
+      enemy.hitPlayer=false;
+      enemy.attackMove=enemy.kind==='jiahao'?'shot':'bark';
+      enemy.attackClock=rage?1.45:1.85;
+    }
+    return;
+  }
+  if(enemy.lungeTime>0) {
+    enemy.lungeTime=Math.max(0,enemy.lungeTime-dt);
+    moveActor(enemy,enemy.x+enemy.lungeVX*dt,enemy.y+enemy.lungeVY*dt);
+    if(!enemy.hitPlayer&&distance(enemy,player)<enemy.r+player.r&&damagePlayer(enemy.damage,enemy))enemy.hitPlayer=true;
+    return;
+  }
+  const wanted=enemy.attackMove==='shot'||enemy.attackMove==='bark'?290:190;
+  if(d>wanted+25)moveActor(enemy,enemy.x+dx/d*movementSpeed*dt,enemy.y+dy/d*movementSpeed*dt,true);
+  else if(d<wanted-50)moveActor(enemy,enemy.x-dx/d*movementSpeed*dt*.6,enemy.y-dy/d*movementSpeed*dt*.6,true);
+  if(enemy.attackClock<=0&&d<610) {
+    enemy.throwAngle=Math.atan2(dy,dx);
+    enemy.windup=enemy.attackMove==='shot'?(rage?.55:.75):enemy.attackMove==='bark'?(rage?.5:.7):(rage?.55:.72);
+  }
 }
 function waterBottleAttack(enemy) {
   const angle = enemy.throwAngle;
@@ -2525,6 +2789,9 @@ function updateEnemies(dt) {
     const rage=!!enemy.boss&&enemy.hp<=enemy.maxHp/2;
     const movementSpeed = enemy.speed * (enemy.slowTime > 0 ? .55 : 1) * (rage?1.15:1) * (enemy.rallyBoost?1.5:1) * (enemy.kind==='practice'?1:difficultySettings().enemySpeed);
     enemy.attackClock -= dt*(enemy.rallyBoost?2:1);
+    if(enemy.kind==='jiahao'||enemy.kind==='yellowdog') {
+      updatePlaygroundBoss(enemy,dt,movementSpeed,d,dx,dy,rage);continue;
+    }
     if(enemy.kind==='final') {
       if(enemy.codeWindup>0) {
         enemy.codeWindup=Math.max(0,enemy.codeWindup-dt);
@@ -2534,8 +2801,9 @@ function updateEnemies(dt) {
       enemy.codeCooldown=Math.max(0,enemy.codeCooldown-dt);
       if(enemy.codeCooldown===0&&enemy.windup<=0&&enemy.lungeTime<=0&&d<650) {
         enemy.codeAngle=Math.atan2(dy,dx);
-        enemy.codeWindup=rage?.6:.85;
-        enemy.codeCooldown=rage?2.6:3.7;
+        enemy.codeWindup=rage?.55:.75;
+        enemy.codeBurstRemaining=rage?1:0;
+        enemy.codeCooldown=rage?2.8:3.3;
         continue;
       }
     }
@@ -2780,7 +3048,7 @@ function updateEnemies(dt) {
     if (enemy.windup > 0) {
       enemy.windup -= dt;
       if (enemy.windup <= 0) {
-        enemy.lungeTime = enemy.trainingThreat ? .5 : enemy.kind === "mini2" ? (rage?.63:.56) : enemy.kind==="final"?(rage?.5:.42):.32;
+        enemy.lungeTime = enemy.trainingThreat ? .5 : enemy.kind === "mini2" ? (rage?.63:.56) : enemy.kind==="final"?(rage?.52:.44):.32;
         enemy.hitPlayer = false;
       }
     } else if (enemy.lungeTime > 0) {
@@ -2791,9 +3059,9 @@ function updateEnemies(dt) {
         moveActor(enemy,enemy.x+dx/d*movementSpeed*dt,enemy.y+dy/d*movementSpeed*dt,true);
       }
       if (d < (enemy.kind === "mini2" ? 450 : enemy.kind==="final"?460:235) && enemy.attackClock <= 0) {
-        enemy.windup = enemy.trainingThreat ? .9 : enemy.kind === "mini2" ? (rage?.55:.65) : enemy.kind==="final"?(rage?.65:.8):.45;
-        enemy.attackClock = enemy.kind==='mini2'?(rage?1.1:1.5):enemy.boss?(rage?1.4:1.9):random(2.2, 2.8);
-        const lungeSpeed = enemy.trainingThreat ? 260 : enemy.kind === "mini2" ? (rage?980:820) : enemy.kind==="final"?(rage?780:640):520;
+        enemy.windup = enemy.trainingThreat ? .9 : enemy.kind === "mini2" ? (rage?.55:.65) : enemy.kind==="final"?(rage?.58:.72):.45;
+        enemy.attackClock = enemy.kind==='mini2'?(rage?1.1:1.5):enemy.kind==='final'?(rage?1.2:1.65):enemy.boss?(rage?1.4:1.9):random(2.2, 2.8);
+        const lungeSpeed = enemy.trainingThreat ? 260 : enemy.kind === "mini2" ? (rage?980:820) : enemy.kind==="final"?(rage?850:700):520;
         enemy.lungeVX = dx / d * lungeSpeed;
         enemy.lungeVY = dy / d * lungeSpeed;
       }
@@ -2817,14 +3085,14 @@ function updateEnemies(dt) {
 function update(dt) {
   if (mode !== "playing" && mode !== "tutorial") return;
   if(mode==='tutorial'&&tutorialStep===14&&gameSpeed>1)tutorialSpeedTime+=dt;
-  if (player.hp > 0) player.hp = Math.min(player.maxHp, player.hp + player.healthRegen * dt);
+  if (player.hp > 0) player.hp = Math.min(player.maxHp, player.hp + (player.healthRegen+(player.talents.blackboard?.25:0)) * dt);
   const v = inputVector();
   player.slowTime = Math.max(0,player.slowTime-dt);
   player.visionTime=Math.max(0,player.visionTime-dt);
   if(player.visionTime<=0) player.visionSide=null;
   const movementDt=Math.max(0,dt-player.stunTime);
   player.stunTime=Math.max(0,player.stunTime-dt);
-  const speed = player.speed * (player.slowTime>0?.5:1) * movementDt;
+  const speed = player.speed * (player.talents.trajectory?1.05:1) * (player.slowTime>0?.5:1) * movementDt;
   const previousX=player.x,previousY=player.y;
   if(player.wallLaunch) {
     const nextX=player.x+player.wallLaunch.vx*dt,nextY=player.y+player.wallLaunch.vy*dt;
@@ -2853,17 +3121,19 @@ function update(dt) {
     const previousTime = gameTime;
     spawnScheduledBosses();
     if(!hasActiveBoss()) {
-      const nextBossTime=BOSS_SCHEDULE.filter(b=>!spawnedBosses.has(b.id)).reduce((next,b)=>Math.min(next,(b.lesson-1)*LESSON_LENGTH),Infinity);
+      const nextBossTime=BOSS_SCHEDULE.filter(b=>b.lesson<=activeLessons()&&!spawnedBosses.has(b.id)).reduce((next,b)=>Math.min(next,(b.lesson-1)*LESSON_LENGTH),Infinity);
       gameTime=Math.min(gameTime+dt,nextBossTime,activeGameLength());
     }
+    const earnedTickets=awardCompletedLessons(previousTime,gameTime);
     if (currentLesson() !== previousLesson) {
       const firstAppearances={2:"水壺方塊人登場！",3:"橡皮筋方塊人登場！",4:"溼衛生紙方塊人登場！",5:"威龍登場！小心噴射衝刺與爆炸物！",6:"比特登場！小心機械蜘蛛！",7:"深藍登場！繞到盾牌側面或背後！",8:"訓犬員登場！小心追咬的狗！",9:"戳眼方塊人登場！別讓他靠近眼睛！",10:"牧羊人登場！避開陷阱與手雷！",11:"大聲公方塊人登場！音波命中會眩暈！",12:"飛踢方塊人登場！小心被踢飛的倒楣蛋！",13:"瞬移拳手登場！小心旁邊的瞬移落點！",14:"三球召喚者登場！側移閃避三顆球！",15:"保健股長登場！會幫周圍敵人回血！",16:"助威方塊人登場！會強化周圍敵人！",17:"氣功方塊人登場！蓄力光束會穿透課桌！",18:"重踢方塊人登場！蓄力後會把你踢到牆邊！",19:"閃身拳手登場！小心側移後的昇龍拳！",20:"飛踢重擊手登場！避開飛踢和蓄力重擊！"};
       const announcement = hasActiveBoss() ? "Boss 戰持續中！" : firstAppearances[currentLesson()] || "更多方塊人來了！";
-      showToast(`第 ${currentLesson()} / ${activeLessons()} 節課！${announcement}`);
+      showToast(`第 ${currentLesson()} / ${activeLessons()} 節課！${announcement}${earnedTickets?` 🎟️ 皮膚券 +${earnedTickets}`:''}`);
       if (!hasActiveBoss()) spawnClock = 0;
-    }
+    } else if(earnedTickets)showToast(`第 ${activeLessons()} 節課完成！🎟️ 皮膚券 +${earnedTickets}`);
     spawnScheduledBosses();
-    if (previousTime < CORE_GAME_LENGTH && gameTime >= CORE_GAME_LENGTH && defeatedBosses.size < BOSS_SCHEDULE.length) showToast("第三十節鐘響了！擊敗剩下的 Boss 才能領飲料！");
+    if (previousTime < CORE_GAME_LENGTH && gameTime >= CORE_GAME_LENGTH && !coreBossesDefeated()) showToast("第三十節鐘響了！擊敗剩下的 Boss 才能領飲料！");
+    if (bonusAccepted && previousTime < GAME_LENGTH && gameTime >= GAME_LENGTH && !bonusBossesDefeated()) showToast("第四十節鐘響了！擊敗操場 Boss 才能領茶葉蛋券！");
     if (!hasActiveBoss()) {
       spawnClock -= dt;
       const spawn = spawnSettings();
@@ -2885,8 +3155,8 @@ function update(dt) {
   if(mode!=="playing"&&mode!=="tutorial"){updateHud();return;}
   tutorialTick();
   if(mode==="playing") updateNarrative(dt);
-  if (mode === "playing" && !bonusAccepted && gameTime >= CORE_GAME_LENGTH && defeatedBosses.size === BOSS_SCHEDULE.length) offerBonusLessons();
-  else if (mode === "playing" && bonusAccepted && gameTime >= GAME_LENGTH) finishGame(true);
+  if (mode === "playing" && !bonusAccepted && gameTime >= CORE_GAME_LENGTH && coreBossesDefeated()) offerBonusLessons();
+  else if (mode === "playing" && bonusAccepted && gameTime >= GAME_LENGTH && bonusBossesDefeated()) finishGame(true);
   updateHud();
 }
 function regularEnemyKind() {
@@ -2916,8 +3186,9 @@ function regularEnemyKind() {
   return "basic";
 }
 function offerBonusLessons() {
-  if(mode !== 'playing' || bonusAccepted || defeatedBosses.size !== BOSS_SCHEDULE.length)return;
+  if(mode !== 'playing' || bonusAccepted || !coreBossesDefeated())return;
   drinkEarned=true;
+  $('reward-skin-tickets').textContent=`🎟️ 本局獲得 ${runSkinTickets} 張皮膚券`;
   mode='reward';
   showScreen('reward-screen');
   playSound(780,.4,'triangle',.05);
@@ -2929,10 +3200,17 @@ function claimDrink() {
 function acceptBonusLessons() {
   if(mode!=='reward')return;
   bonusAccepted=true;
+  $('game-shell').classList.add('playground-stage');
+  canvas.setAttribute('aria-label','操場加碼挑戰遊戲畫面');
+  navigationFields.clear();
+  enemies=[];enemyProjectiles=[];projectiles=[];effects=[];
+  narrativeQueue=[];activeDialogue=null;dialogueEntrance?.cancel();dialogueEntrance=null;
+  $('chapter-dialogue').hidden=true;
+  for(const beat of STORY_BEATS)if(beat.lesson<=CORE_LESSONS)narrativeSeen.add(beat.id);
   mode='playing';
   spawnClock=0;
   showScreen(null);
-  showToast('飲料已領取！加碼 10 節，挑戰茶葉蛋兌換券！');
+  showToast('操場加碼賽開始！再撐 10 節，挑戰茶葉蛋兌換券！');
   updateNarrative(0);
   updateHud();
 }
@@ -2946,6 +3224,7 @@ function finishGame(won) {
   $("result-time").textContent = formatTime(Math.floor(gameTime));
   $("result-kills").textContent = kills;
   $("result-level").textContent = player.level;
+  $('end-skin-tickets').textContent=`🎟️ 本局獲得 ${runSkinTickets} 張皮膚券 · 累積 ${skinTickets} 張`;
   $("end-epilogue").textContent=won?bonusAccepted?'老師把茶葉蛋兌換券放進你手裡，同學們拍手歡呼。你拿著飲料，班長笑著說：「歡迎加入 102 班！」':'老師把飲料遞給你，同學們歡呼。班長笑著說：「歡迎加入 102 班！」你決定今天先放學。':drinkEarned?'老師替你保管著已贏得的飲料，班長說：「茶葉蛋兌換券下次再挑戰！」':'班長扶著你退回講台後：「先休息，102 班還在等你。」那本筆記沒有合上。下次，你會更清楚該怎麼走出這間教室。';
   $("chapter-dialogue").hidden=true;
   narrativeQueue=[];activeDialogue=null;
@@ -2962,17 +3241,20 @@ function updateHud() {
   $("hp-text").textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
   $("hp-fill").style.width = `${player.hp / player.maxHp * 100}%`;
   $("level-text").textContent = `Lv. ${player.level}`;
-  $("xp-text").textContent = `${player.xp} / ${player.xpNeed}`;
+  $('skin-ticket-count').textContent=`${skinTickets}（本局 +${runSkinTickets}）`;
+  $("xp-text").textContent = `${Number(player.xp.toFixed(1))} / ${player.xpNeed}`;
   $("xp-fill").style.width = `${clamp(player.xp/player.xpNeed*100,0,100)}%`;
   $("lesson-fill").style.width = `${gameTime>=activeGameLength()?100:(gameTime%LESSON_LENGTH)/LESSON_LENGTH*100}%`;
   $("hp-warning").hidden=player.hp<=0||player.hp>player.maxHp*.25;
   $("lesson-label").textContent = `第 ${currentLesson()} / ${activeLessons()} 節`;
+  if(bonusAccepted)$("lesson-label").textContent+=' · 操場';
   if(hasActiveBoss()) $("lesson-label").textContent += " · Boss 戰，計時暫停";
   $("timer").textContent = formatTime(gameTime >= activeGameLength() ? 0 : Math.ceil(LESSON_LENGTH - gameTime % LESSON_LENGTH));
   $("wave").textContent = formatTime(Math.max(0, Math.ceil(activeGameLength() - gameTime)));
   $('wave-label').textContent=bonusAccepted?'距離茶葉蛋券':'距離領飲料';
   if(isTutorialSession()) {$("lesson-label").textContent="教學練習";$("timer").textContent="--:--";$("wave").textContent="30 節課";}
   $("loadout-label").textContent = `✎ 鉛筆揮砍 · 道具 ${Object.values(player.weapons).filter(level => level > 0).length} / 6`;
+  $("hp-text").setAttribute("title",`每秒自動回復 ${player.healthRegen+(player.talents.blackboard?.25:0)} 點體力`);
   $('secret-tool').hidden=!unityTool;
   $("kill-count").textContent = `擊退 ${kills}`;
   $("slow-label").hidden = player.slowTime <= 0;
@@ -3019,7 +3301,7 @@ function renderLoadoutGuide() {
     const title=`${tool.icon} ${tool.name} · ${evolved?'超級進化':level?`Lv.${level} / 5`:'尚未裝備'}`;
     const effect=level?toolStats(tool.id,level).upgrade:hasTalent?talent.description:'這組裝備正在地上等你拾取。';
     const progress=evolved?`已進化：${SUPER_TOOLS[tool.id].name}`:`進化條件：${level>=5?'✓':'○'} 工具 Lv.5 ＋ ${hasTalent?'✓':'○'} ${talent.name}`;
-    add(title,`${effect} ${progress}${waiting?'。附近有這組的待拾取裝備。':''}`);
+    add(title,`${effect} ${progress}${hasTalent?`。${talent.name}常駐：${talent.passive}`:''}${waiting?'。附近有這組的待拾取裝備。':''}`);
   }
 }
 function renderTalentHud() {
@@ -3042,7 +3324,7 @@ function renderTalentHud() {
     const evolved = isEvolved(talent.toolId);
     badge.className = `talent-slot${active ? " equipped" : ""}${evolved ? " evolved" : ""}`;
     badge.textContent = `${talent.icon} ${active ? talent.name : "空位"}`;
-    badge.setAttribute("title", `${talent.name}：${talent.description}。${evolved ? "已超級進化：" : "對應進化："}${SUPER_TOOLS[talent.toolId].name}`);
+    badge.setAttribute("title", `${talent.name}：${talent.description}。常駐：${talent.passive}。${evolved ? "已超級進化：" : "對應進化："}${SUPER_TOOLS[talent.toolId].name}`);
     $("talent-slots").append(badge);
   }
 }
@@ -3052,12 +3334,14 @@ function roundedRect(x, y, w, h, radius, fill, stroke, lineWidth = 1) {
   if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineWidth; ctx.stroke(); }
 }
-function drawTool(c, id, level, x, y, size = 1, angle = 0, evolved = false) {
+function drawTool(c, id, level, x, y, size = 1, angle = 0, evolved = false, previewSkin = false) {
   level = clamp(level, 1, 5);
   const gold = level === 5;
+  const skin=(previewSkin||ownedSkins.has(id))&&TOOL_SKIN_BY_ID[id];
   const accents = {blueberry: "#a1df7c", pistol: "#b8d7f8", firecracker: "#ffb995", bow: "#ddbb83", eraser: "#f7c6e0", ruler: "#93e8dc",football:"#c4ead7",plane:"#a5d9f4",chalk:"#e2bfdc",stapler:"#edaf93",book:"#91c6ab",bell:"#efd494"};
   const accent = gold ? "#ffda73" : accents[id];
   c.save(); c.translate(x, y); c.rotate(angle); c.scale(size, size);
+  if(skin){c.filter=`hue-rotate(${skin.hue}deg) saturate(1.3)`;c.shadowColor=skin.color;c.shadowBlur=9;}
   if (evolved) {
     c.fillStyle = "#a27bf036"; c.strokeStyle = "#d7bdff"; c.lineWidth = 2;
     c.beginPath();
@@ -3252,6 +3536,12 @@ function drawTool(c, id, level, x, y, size = 1, angle = 0, evolved = false) {
     c.beginPath(); c.moveTo(0, -9); c.lineTo(6, -2); c.lineTo(0, 5); c.lineTo(-6, -2); c.closePath(); c.fill(); c.stroke();
     c.beginPath(); c.moveTo(-11, -29); c.lineTo(-10, -36); c.lineTo(-4, -32); c.lineTo(0, -39); c.lineTo(4, -32); c.lineTo(10, -36); c.lineTo(11, -29); c.closePath(); c.fillStyle = "#ffe694"; c.fill(); c.stroke();
   }
+  if(skin){
+    c.filter='none';c.shadowBlur=0;c.strokeStyle=skin.color;c.lineWidth=2;
+    for(const [sx,sy] of [[-27,-22],[26,-24],[28,23]]){
+      c.beginPath();c.moveTo(sx-4,sy);c.lineTo(sx+4,sy);c.moveTo(sx,sy-4);c.lineTo(sx,sy+4);c.stroke();
+    }
+  }
   c.restore();
 }
 function drawTalent(c, talent, x, y, size = 1) {
@@ -3305,6 +3595,33 @@ function drawDesk(x, y) {
   roundedRect(x+22,y-11,30,6,2,'#e7bf74','#9e7147',1);
   ctx.fillStyle='#d26766';ctx.fillRect(x+22,y-12,5,8);
 }
+function drawPlayground() {
+  const grass=ctx.createLinearGradient(0,0,MAP.w,MAP.h);
+  grass.addColorStop(0,'#b5d992');grass.addColorStop(1,'#7cba79');
+  ctx.fillStyle=grass;ctx.fillRect(0,0,MAP.w,MAP.h);
+  ctx.fillStyle='#e9d9ac';ctx.fillRect(0,0,MAP.w,90);ctx.fillRect(0,MAP.h-88,MAP.w,88);
+  ctx.fillStyle='#d47867';ctx.beginPath();ctx.ellipse(900,600,830,525,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#f8e7c5';ctx.lineWidth=4;
+  for(let lane=0;lane<4;lane++){ctx.beginPath();ctx.ellipse(900,600,800-lane*46,496-lane*44,0,0,Math.PI*2);ctx.stroke();}
+  ctx.fillStyle='#79b977';ctx.beginPath();ctx.ellipse(900,600,622,335,0,0,Math.PI*2);ctx.fill();
+  ctx.save();ctx.beginPath();ctx.ellipse(900,600,622,335,0,0,Math.PI*2);ctx.clip();
+  ctx.fillStyle='#ffffff13';for(let x=270;x<1530;x+=100)ctx.fillRect(x,260,50,680);
+  ctx.restore();
+  ctx.strokeStyle='#ecf8d8';ctx.lineWidth=5;ctx.strokeRect(500,390,800,420);
+  ctx.beginPath();ctx.moveTo(900,390);ctx.lineTo(900,810);ctx.moveTo(900,600);ctx.arc(900,600,105,0,Math.PI*2);ctx.stroke();
+  ctx.strokeRect(500,485,115,230);ctx.strokeRect(1185,485,115,230);
+  ctx.strokeRect(476,545,24,110);ctx.strokeRect(1300,545,24,110);
+  for(const [x,y] of [[195,265],[1605,265],[195,935],[1605,935]]){
+    ctx.fillStyle='#fff0bd';ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#e9a267';ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fill();
+  }
+  roundedRect(655,17,490,58,12,'#3d786b','#f6e8bc',4);
+  ctx.fillStyle='#fff9d8';ctx.textAlign='center';ctx.font="900 29px 'Noto Sans TC',sans-serif";
+  ctx.fillText('國中 102 班 · 操場加碼賽',900,56);
+  ctx.font="900 21px 'Noto Sans TC',sans-serif";ctx.fillStyle='#ffffffa8';
+  ctx.fillText('再撐 10 節，茶葉蛋兌換券等著你！',900,905);
+  ctx.textAlign='left';
+}
 function drawClassroom() {
   const floor=ctx.createLinearGradient(0,0,MAP.w,MAP.h);
   floor.addColorStop(0,'#efe0bf');floor.addColorStop(.5,'#ddcdaa');floor.addColorStop(1,'#c8b797');
@@ -3322,15 +3639,15 @@ function drawClassroom() {
   roundedRect(551, 52, 698, 143, 4, board, "#d4c6a2", 5);
   ctx.strokeStyle='#d6e1c333';ctx.lineWidth=2;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(600+i*130,62);ctx.lineTo(548+i*130,180);ctx.stroke();}
   ctx.fillStyle = "#e1edcf"; ctx.textAlign = "center"; ctx.font = "900 23px 'Noto Sans TC',sans-serif"; ctx.fillText("國中 102 班", 900, 91);
-  ctx.font = "900 37px 'Noto Sans TC',sans-serif"; ctx.fillText("一起撐到放學！", 900, 142);
-  ctx.font = "14px 'Noto Sans TC',sans-serif";ctx.fillText("值日生：班長、轉學生",900,174);
+  ctx.font = "900 37px 'Noto Sans TC',sans-serif"; ctx.fillText("歡迎轉學生！", 900, 142);
+  ctx.font = "16px 'Noto Sans TC',sans-serif";ctx.fillText("老師的挑戰：30 節換飲料 · 操場加碼茶葉蛋券",900,174);
   roundedRect(97,55,240,151,4,"#e8dbb9","#9c7954",5);
   ctx.fillStyle="#586953";ctx.font="900 20px 'Noto Sans TC',sans-serif";ctx.fillText("102 班課表",217,84);
   ctx.font="13px 'Noto Sans TC',sans-serif";
   for(const [i,text] of ["國文　英文　數學","自然　社會　體育","班會：一起平安放學"].entries())ctx.fillText(text,217,115+i*25);
   roundedRect(1395,55,290,151,4,"#b18b5d","#7e6145",5);
   ctx.fillStyle="#fff4da";ctx.font="900 19px 'Noto Sans TC',sans-serif";ctx.fillText("102 班公布欄",1540,84);
-  for(const [x,label] of [[1410,"歡迎新同學"],[1547,"值日生輪值"]]){roundedRect(x,96,119,91,2,"#fff4da");ctx.fillStyle="#698278";ctx.font="12px 'Noto Sans TC',sans-serif";ctx.fillText(label,x+59,117);ctx.fillRect(x+14,130,88,3);ctx.fillRect(x+14,144,70,3);ctx.fillRect(x+14,158,80,3);}
+  for(const [x,label] of [[1410,"歡迎新同學"],[1547,"獎勵：飲料＋茶葉蛋"]]){roundedRect(x,96,119,91,2,"#fff4da");ctx.fillStyle="#698278";ctx.font="12px 'Noto Sans TC',sans-serif";ctx.fillText(label,x+59,117);ctx.fillRect(x+14,130,88,3);ctx.fillRect(x+14,144,70,3);ctx.fillRect(x+14,158,80,3);}
   roundedRect(800, 250, 200, 78, 8, "#b98553", "#7f5b3e", 4);
   roundedRect(810, 321, 180, 16, 5, "#8a6345");
   roundedRect(844,259,71,46,3,'#f0e3c6','#9b856d',2);roundedRect(910,269,20,25,2,'#7396a8','#466878',2);
@@ -3366,6 +3683,28 @@ function warningEndpoint(enemy,dx,dy) {
   return {x:enemy.x+(target.x-enemy.x)*safe,y:enemy.y+(target.y-enemy.y)*safe};
 }
 function drawEnemy(enemy, time) {
+  if(enemy.kind==='yellowdog') {
+    const x=enemy.x,y=enemy.y,angle=Math.atan2(player.y-y,player.x-x);
+    ctx.save();ctx.translate(x,y);ctx.rotate(angle);
+    ctx.fillStyle='#5e503d44';ctx.beginPath();ctx.ellipse(0,24,43,11,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#9d713f';ctx.lineWidth=8;
+    for(const side of [-1,1])for(const xx of [-17,16]){ctx.beginPath();ctx.moveTo(xx,side*15);ctx.lineTo(xx+Math.sin(time*10+xx)*5,side*28);ctx.stroke();}
+    roundedRect(-31,-20,58,40,15,enemy.hitFlash?'#fff4df':'#e8bb62','#8f693f',3);
+    roundedRect(15,-21,34,42,13,enemy.hitFlash?'#fff4df':'#f4cf79','#8f693f',3);
+    ctx.fillStyle='#b8814e';ctx.beginPath();ctx.moveTo(20,-19);ctx.lineTo(15,-38);ctx.lineTo(34,-24);ctx.moveTo(40,-18);ctx.lineTo(49,-35);ctx.lineTo(48,-8);ctx.fill();
+    ctx.fillStyle='#3c423c';ctx.beginPath();ctx.arc(35,-7,3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(50,3,4,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#eab35a';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(-29,0);ctx.quadraticCurveTo(-56,-27,-50,-34+Math.sin(time*9)*7);ctx.stroke();
+    roundedRect(12,13,15,5,2,'#d56c57');ctx.restore();
+    ctx.fillStyle='#244947dd';ctx.textAlign='center';ctx.font="900 13px 'Noto Sans TC',sans-serif";ctx.fillText('小黃狗',x,y-55);
+    if(enemy.windup>0){
+      ctx.save();ctx.strokeStyle='#ffe6a5';ctx.lineWidth=4;ctx.setLineDash([9,7]);ctx.beginPath();
+      if(enemy.attackMove==='bark')ctx.arc(x,y,125,0,Math.PI*2);
+      else {const target=warningEndpoint(enemy,Math.cos(enemy.throwAngle)*400,Math.sin(enemy.throwAngle)*400);ctx.moveTo(x,y);ctx.lineTo(target.x,target.y);}
+      ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    }
+    if(enemy.hp<enemy.maxHp){roundedRect(x-45,y-92,90,7,3,'#284246');roundedRect(x-45,y-92,90*Math.max(0,enemy.hp/enemy.maxHp),7,3,'#f0a184');}
+    return;
+  }
   if(enemy.kind==="dog") {
     ctx.save();ctx.translate(enemy.x,enemy.y);ctx.rotate(Math.atan2(player.y-enemy.y,player.x-enemy.x));
     ctx.strokeStyle="#644d3b";ctx.lineWidth=4;
@@ -3558,12 +3897,15 @@ function drawEnemy(enemy, time) {
     ctx.strokeStyle = enemy.memberIndex === 1 ? "#c4e6ec" : "#f6be6e";
     ctx.beginPath(); ctx.moveTo(-23, 30); ctx.lineTo(-10, 12); ctx.lineTo(0, 30); ctx.closePath(); ctx.moveTo(-10, 12); ctx.lineTo(13, 12); ctx.lineTo(23, 30); ctx.lineTo(0, 30); ctx.lineTo(13, 12); ctx.stroke();
     ctx.strokeStyle = "#304b5a"; ctx.beginPath(); ctx.moveTo(13, 12); ctx.lineTo(16, 6); ctx.lineTo(24, 6); ctx.stroke();
+  } else if (enemy.kind === "jiahao") {
+    roundedRect(-19,-33,38,9,3,'#f8dfa3','#8e674d',2);
+    roundedRect(-14,5,28,19,3,'#f0c582','#8e674d',2);
+    ctx.fillStyle='#805443';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('35',0,18);
+    drawSoccerBall(ctx,28,16,10);
   } else if (enemy.kind === "final") {
-    ctx.fillStyle='#d9d5c4';ctx.beginPath();ctx.ellipse(20,-26,5,11,-.3,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#f3c478';ctx.beginPath();ctx.arc(17,-34,3,0,Math.PI*2);ctx.fill();
-    roundedRect(-20,-35,40,9,3,'#d9d5c4','#556878',2);
-    ctx.strokeStyle='#d5f5ec';ctx.lineWidth=2;ctx.strokeRect(-13,-17,11,9);ctx.strokeRect(2,-17,11,9);
-    ctx.beginPath();ctx.moveTo(-2,-13);ctx.lineTo(2,-13);ctx.stroke();
+    ctx.fillStyle='#394d5f';ctx.beginPath();ctx.ellipse(22,-24,7,17,-.25,0,Math.PI*2);ctx.fill();
+    roundedRect(-20,-35,40,9,3,'#394d5f','#243c4a',2);
+    ctx.fillStyle='#f3c478';ctx.beginPath();ctx.arc(18,-35,3,0,Math.PI*2);ctx.fill();
     roundedRect(-15,5,30,20,3,'#7b6574','#4f4d62',2);
     roundedRect(16,-3,27,29,3,'#294954','#9ae4d7',2);
     ctx.fillStyle='#baf9d9';ctx.font='900 13px monospace';ctx.textAlign='center';ctx.fillText('</>',30,16);
@@ -3583,11 +3925,19 @@ function drawEnemy(enemy, time) {
   if(enemy.rallyBoost){ctx.strokeStyle='#f6d070';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,enemy.r+5,0,Math.PI*2);ctx.stroke();}
   if(enemy.kind==='final'&&enemy.codeWindup>0) {
     ctx.save();ctx.strokeStyle='#92f5e5';ctx.lineWidth=3;ctx.setLineDash([9,7]);
-    for(let i=-1;i<=1;i++) {
-      const angle=enemy.codeAngle+i*.22,target=warningEndpoint(enemy,Math.cos(angle)*650,Math.sin(angle)*650);
+    const spread=enemy.hp<=enemy.maxHp/2?.57:.38;
+    for(const offset of [-spread,-spread/2,0,spread/2,spread]) {
+      const angle=enemy.codeAngle+offset,target=warningEndpoint(enemy,Math.cos(angle)*650,Math.sin(angle)*650);
       ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(target.x,target.y);ctx.stroke();
     }
     ctx.setLineDash([]);ctx.fillStyle='#d4fff1';ctx.textAlign='center';ctx.font='900 17px monospace';ctx.fillText('RUN { }',x,y-enemy.r-50);ctx.restore();
+  }
+  if(enemy.kind==='jiahao'&&enemy.windup>0) {
+    ctx.save();ctx.strokeStyle='#ffe5ab';ctx.lineWidth=4;ctx.setLineDash([9,7]);
+    const angle=enemy.throwAngle,target=warningEndpoint(enemy,Math.cos(angle)*570,Math.sin(angle)*570);
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(target.x,target.y);ctx.stroke();
+    if(enemy.attackMove==='shot')for(const offset of [-.18,.18]){const side=warningEndpoint(enemy,Math.cos(angle+offset)*570,Math.sin(angle+offset)*570);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(side.x,side.y);ctx.stroke();}
+    ctx.setLineDash([]);ctx.restore();
   }
   if(enemy.kind==="kicker"&&enemy.windup>0) {
     drawUnlucky(ctx,x+Math.cos(enemy.throwAngle)*45,y+Math.sin(enemy.throwAngle)*45,0,.7);
@@ -3648,7 +3998,7 @@ function drawEnemy(enemy, time) {
     if (["mini1","mini2","final","water","rubber","tissue","weilong","shepherd","megaphone","kicker"].includes(enemy.kind)) {
       ctx.strokeStyle = "#f0b46cb0"; ctx.lineWidth = 3; ctx.setLineDash([7, 8]);
       const angle = enemy.kind === "final" || (enemy.kind === "mini2" && enemy.memberIndex === 0) ? Math.atan2(enemy.lungeVY, enemy.lungeVX) : enemy.throwAngle;
-      const length=enemy.kind==="final"?(enemy.hp<=enemy.maxHp/2?390:269):enemy.kind==="weilong"&&enemy.jetAttack==="dash"?338:170;
+      const length=enemy.kind==="final"?(enemy.hp<=enemy.maxHp/2?450:310):enemy.kind==="weilong"&&enemy.jetAttack==="dash"?338:170;
       ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(angle) * length, y + Math.sin(angle) * length); ctx.stroke(); ctx.setLineDash([]);
     }
   }
@@ -3759,7 +4109,25 @@ function drawSummonedBall(c,x,y,r,angle=0) {
   c.strokeStyle='#6c4c9e';c.beginPath();c.ellipse(0,0,r*.8,r*.3,.6,0,Math.PI*2);c.stroke();
   c.fillStyle='#fff2ff';c.beginPath();c.arc(-r*.25,-r*.3,r*.22,0,Math.PI*2);c.fill();c.restore();
 }
+function drawSoccerBall(c,x,y,r) {
+  c.save();c.translate(x,y);
+  c.fillStyle='#fff9e8';c.strokeStyle='#4b5a56';c.lineWidth=2;
+  c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.fill();c.stroke();
+  c.fillStyle='#465b56';c.beginPath();
+  for(let i=0;i<5;i++){const angle=-Math.PI/2+i*Math.PI*2/5;c.lineTo(Math.cos(angle)*r*.43,Math.sin(angle)*r*.43);}
+  c.closePath();c.fill();c.restore();
+}
 function drawEnemyProjectile(cap) {
+  if(cap.type==='soccer-ball') {
+    ctx.strokeStyle='#fff5cc88';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(cap.x-cap.vx*.05,cap.y-cap.vy*.05);ctx.lineTo(cap.x,cap.y);ctx.stroke();
+    drawSoccerBall(ctx,cap.x,cap.y,cap.r);return;
+  }
+  if(cap.type==='bark-wave') {
+    ctx.save();ctx.translate(cap.x,cap.y);ctx.rotate(Math.atan2(cap.vy,cap.vx));
+    ctx.strokeStyle='#f8e39d';ctx.lineWidth=4;
+    for(const radius of [11,20,29]){ctx.beginPath();ctx.arc(-11,0,radius,-.9,.9);ctx.stroke();}
+    ctx.restore();return;
+  }
   if(cap.type==='beam') {
     ctx.save();ctx.strokeStyle='#61d7f0aa';ctx.lineWidth=30;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cap.x-cap.vx*.11,cap.y-cap.vy*.11);ctx.lineTo(cap.x,cap.y);ctx.stroke();
     ctx.strokeStyle='#ecffff';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(cap.x-cap.vx*.11,cap.y-cap.vy*.11);ctx.lineTo(cap.x,cap.y);ctx.stroke();
@@ -3928,7 +4296,7 @@ function render(timestamp) {
   camera.x = clamp(player.x - viewW / 2, 0, Math.max(0, MAP.w - viewW));
   camera.y = clamp(player.y - viewH * (isTutorialSession()&&ch<550?.68:.5), 0, Math.max(0, MAP.h - viewH));
   ctx.save(); ctx.scale(scale, scale); ctx.translate(-camera.x, -camera.y);
-  drawClassroom();
+  if(bonusAccepted)drawPlayground();else drawClassroom();
   const visible=(entity,margin=100)=>entity.x>=camera.x-margin&&entity.x<=camera.x+viewW+margin&&entity.y>=camera.y-margin&&entity.y<=camera.y+viewH+margin;
   for (const pickup of pickups) if(visible(pickup))drawPickup(pickup, timestamp);
   for (const enemy of enemies) if(enemy.windup>0||visible(enemy))drawEnemy(enemy, timestamp);
@@ -4050,11 +4418,16 @@ for(const id of Object.keys(DIFFICULTIES))bindButtonAction($(`difficulty-${id}`)
 renderDifficultyPicker();
 for(const id of ['boy','girl'])bindButtonAction($(`character-${id}`),()=>chooseCharacter(id));
 renderCharacterPicker();
+for(const size of JOYSTICK_SIZES)for(const prefix of ['','pause-'])bindButtonAction($(`${prefix}joystick-size-${size}`),()=>chooseJoystickSize(size));
+renderJoystickSizePicker();
 bindButtonAction($("pause-menu-btn"),returnToMenu);
 bindButtonAction($("end-menu-btn"),returnToMenu);
 bindButtonAction($('bestiary-btn'),openBestiary);
 bindButtonAction($('start-bestiary-btn'),openBestiary);
 bindButtonAction($('pause-bestiary-btn'),openBestiary);
+for(const id of ['start-skins-btn','pause-skins-btn','reward-skins-btn','end-skins-btn'])bindButtonAction($(id),openSkinCollection);
+bindButtonAction($('skin-close-btn'),closeSkinCollection);
+bindButtonAction($('skin-draw-btn'),drawRandomToolSkin);
 bindButtonAction($('cheat-submit'),()=>applyCheat($('cheat-input').value));
 $('cheat-input').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();applyCheat($('cheat-input').value);}});
 bindButtonAction($('bestiary-close-btn'),closeBestiary);
@@ -4111,10 +4484,11 @@ function moveStick(event) {
   const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
   const dx = event.clientX - cx, dy = event.clientY - cy;
   const length = Math.hypot(dx, dy) || 1;
-  const strength = Math.min(length / 42, 1);
+  const strength = Math.min(length / (rect.width * .36), 1);
   pointer.x = dx / length * strength;
   pointer.y = dy / length * strength;
-  $("stick").style.transform = `translate(${pointer.x * 39}px,${pointer.y * 39}px)`;
+  const reach = rect.width * .32;
+  $("stick").style.transform = `translate(${pointer.x * reach}px,${pointer.y * reach}px)`;
 }
 joystick.addEventListener("pointerdown", event => {
   if(pointer.active||(mode!=="playing"&&mode!=="tutorial"))return;

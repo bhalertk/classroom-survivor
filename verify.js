@@ -11,12 +11,12 @@ for (const id of referenced) assert(ids.includes(id), `Missing HTML element: ${i
 
 function element() {
   return {
-    style: {}, children: [], listeners: {}, textContent: "", innerHTML: "", hidden: false,
+    style: {}, children: [], listeners: {}, attributes: {}, textContent: "", innerHTML: "", hidden: false,
     classList: { toggle() {}, add() {}, remove() {} },
     addEventListener(name, callback) { this.listeners[name] = callback; },
     append(child) { this.children.push(child); },
     replaceChildren() { this.children = []; },
-    setAttribute() {},
+    setAttribute(name, value) { this.attributes[name] = value; },
     getBoundingClientRect() { return { left: 0, top: 0, width: 116, height: 116 }; },
     setPointerCapture() {},
     getContext() { return drawing; }
@@ -30,7 +30,7 @@ const drawing = new Proxy({}, { get(_target, key) {
 } });
 elements.game.getContext = () => drawing;
 const document = { getElementById: id => elements[id], createElement: element, listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; } };
-const savedBestiary = new Map();
+const savedBestiary = new Map([['classroom-survivor-joystick-size','small']]);
 const window = { innerWidth: 1280, innerHeight: 720, devicePixelRatio: 1, listeners:{}, localStorage:{getItem(key){return savedBestiary.get(key)||null;},setItem(key,value){savedBestiary.set(key,value);}}, addEventListener(name,callback) {this.listeners[name]=callback;} };
 const math = Object.create(Math);
 math.random = () => .999;
@@ -39,6 +39,13 @@ vm.runInContext(source, context, { filename: "game.js" });
 
 function evalGame(expression) { return vm.runInContext(expression, context); }
 function click(id) { assert(elements[id].listeners.click, `${id} has no click listener`); elements[id].listeners.click(); }
+assert.equal(evalGame('joystickSize'),'small','Saved touch size loads before play');
+assert.equal(elements['joystick-size-small'].attributes['aria-pressed'],'true');
+click('joystick-size-large');
+assert.equal(savedBestiary.get('classroom-survivor-joystick-size'),'large');
+assert.equal(elements['pause-joystick-size-large'].attributes['aria-pressed'],'true');
+click('joystick-size-standard');
+assert.equal(elements['joystick-size-standard'].attributes['aria-pressed'],'true');
 click("start-btn");
 assert.equal(evalGame("mode"), "story");
 assert.equal(elements['story-progress'].textContent,'01 / 06');
@@ -190,8 +197,19 @@ for (const id of toolIds) {
 evalGame("gainExperience(player.xpNeed)");
 assert.equal(evalGame("mode"), "upgrade", "Maxed tools still allow acquiring talents");
 assert.equal(evalGame("upgradeChoices.every(c => c.kind === 'talent')"), true);
-evalGame("for (const t of CONTENT.talents.slice(0,6)) player.talents[t.id] = true; mode = 'playing'; gainExperience(player.xpNeed)");
+evalGame("for (const t of CONTENT.talents.slice(0,6)) player.talents[t.id] = true; mode = 'playing'; player.hp=100; gainExperience(player.xpNeed)");
 assert.equal(evalGame("mode"), "playing", "All maxed tools and all equipped talents never trap the player in upgrade selection");
+assert.equal(evalGame('player.maxHp'),202,'A full loadout adds two maximum health at the next level');
+assert.equal(evalGame('player.hp'),102,'The full-loadout reward also heals two health');
+evalGame('gainExperience(player.xpNeed)');
+assert.equal(evalGame('player.maxHp'),204,'Each later level repeats the health reward');
+assert.equal(evalGame('player.hp'),104);
+evalGame("startGame();for(const w of CONTENT.weapons.slice(0,6))player.weapons[w.id]=5;for(const t of CONTENT.talents.slice(0,5))player.talents[t.id]=true;pickups=[{type:'talent',talentId:CONTENT.talents[5].id,x:player.x+300,y:player.y,r:15,age:0}];player.hp=100;gainExperience(player.xpNeed)");
+assert.equal(evalGame('player.maxHp'),200,'A talent on the floor does not count as full equipment');
+assert.equal(evalGame('player.hp'),100);
+evalGame('player.x=pickups[0].x;player.y=pickups[0].y;updatePickups(.02);gainExperience(player.xpNeed)');
+assert.equal(evalGame('player.maxHp'),207,'The harvest talent grants five health before later full-loadout rewards');
+assert.equal(evalGame('player.hp'),107);
 evalGame("startGame(); player.weapons.blueberry = 4; gainExperience(player.xpNeed); chooseUpgrade('blueberry'); gainExperience(player.xpNeed)");
 assert.equal(evalGame("upgradeChoices.some(w => w.id === 'blueberry')"), false, "Pending level-5 pickup reserves the cap and is excluded from choices");
 evalGame("chooseUpgrade('blueberry')");
@@ -335,15 +353,50 @@ assert.equal(elements['wave-label'].textContent,'距離領飲料');
 click('accept-bonus-btn');
 assert.equal(evalGame('mode'),'playing');
 assert.equal(evalGame('currentLesson()'),31);
-assert.equal(elements['lesson-label'].textContent,'第 31 / 40 節');
+assert.equal(elements['lesson-label'].textContent,'第 31 / 40 節 · 操場');
 assert.equal(elements['wave-label'].textContent,'距離茶葉蛋券');
-evalGame('gameTime = GAME_LENGTH - .02; spawnClock=100; update(.02)');
+assert.equal(elements.game.attributes['aria-label'],'操場加碼挑戰遊戲畫面');
+assert.equal(evalGame('activeSolidTables().length'),0,'The playground has no invisible classroom desks');
+assert.equal(evalGame('clearOfTables({x:290,y:415})'),true);
+assert.equal(evalGame('tableHit({x:200,y:415},{x:400,y:415},20)'),null);
+assert.equal(evalGame('enemies.length+enemyProjectiles.length+projectiles.length+effects.length'),0,'The venue change clears lingering classroom combat');
+const playgroundTexts=[];drawing.fillText=text=>playgroundTexts.push(text);evalGame('render(0)');delete drawing.fillText;
+assert(playgroundTexts.includes('國中 102 班 · 操場加碼賽'),'Bonus gameplay renders the playground');
+assert.equal(evalGame('activeDialogue.speaker'),'7 號同學');
+assert.equal(evalGame('activeDialogue.audience'),'real-player');
+assert(elements['dialogue-speaker'].textContent.includes('對螢幕前的你說'));
+assert.equal(elements['dialogue-portrait'].hidden,false,'Number seven has a portrait');
+const playerFacingTexts=[];drawing.fillText=text=>playerFacingTexts.push(text);evalGame("drawDialogueStoryFrame($('dialogue-story-canvas').getContext('2d'),activeDialogue,1)");delete drawing.fillText;
+assert(playerFacingTexts.includes('7 號同學正在對螢幕前的你說話'));
+evalGame('gameTime=34*LESSON_LENGTH;spawnClock=0;update(.02)');
+assert.equal(evalGame("enemies.filter(e=>e.kind==='jiahao').length"),1,'Jiahao enters in playground lesson 35');
+const jiahaoFrozenTime=evalGame('gameTime');evalGame('update(.1)');
+assert.equal(evalGame('gameTime'),jiahaoFrozenTime,'Jiahao pauses the lesson clock');
+assert.equal(evalGame('enemies.filter(e=>!e.boss).length'),0);
+evalGame("const jiahao=enemies.find(e=>e.kind==='jiahao');jiahao.attackMove='shot';jiahao.windup=.01;jiahao.throwAngle=0;updateEnemies(.02)");
+assert.equal(evalGame("enemyProjectiles.filter(p=>p.type==='soccer-ball').length"),3,'Jiahao fires three aimed soccer balls');
+evalGame("enemyProjectiles=[];jiahao.attackMove='dash';jiahao.windup=.01;updateEnemies(.02)");
+assert(evalGame('jiahao.lungeTime>0'),'Jiahao also dashes');
+evalGame("damageEnemy(enemies.find(e=>e.kind==='jiahao'),999999,'pistol')");
+assert.equal(evalGame("defeatedBosses.has('jiahao')"),true);
+evalGame('gameTime=39*LESSON_LENGTH;spawnClock=0;update(.02)');
+assert.equal(evalGame("enemies.filter(e=>e.kind==='yellowdog').length"),1,'The yellow dog enters in playground lesson 40');
+evalGame("const yellowdog=enemies.find(e=>e.kind==='yellowdog');yellowdog.attackMove='bark';yellowdog.windup=.01;updateEnemies(.02)");
+assert.equal(evalGame("enemyProjectiles.filter(p=>p.type==='bark-wave').length"),8,'The yellow dog barks an eight-way warning wave');
+evalGame("enemyProjectiles=[];yellowdog.attackMove='pounce';yellowdog.windup=.01;yellowdog.throwAngle=0;updateEnemies(.02)");
+assert(evalGame('yellowdog.lungeTime>0'),'The yellow dog follows with a pounce');
+evalGame('gameTime=GAME_LENGTH;update(.02)');
+assert.equal(evalGame('mode'),'playing','The bonus cannot end while the yellow dog survives');
+evalGame("damageEnemy(enemies.find(e=>e.kind==='yellowdog'),999999,'pistol');update(.02)");
 assert.equal(evalGame('mode'),'ended','Bonus victory requires lesson forty');
 assert(elements['end-description'].textContent.includes('茶葉蛋兌換券'));
 evalGame("startGame();spawnedBosses=new Set(BOSS_SCHEDULE.map(b=>b.id));defeatedBosses=new Set(BOSS_SCHEDULE.map(b=>b.id));gameTime=CORE_GAME_LENGTH-.02;spawnClock=100;update(.02)");
 assert.equal(evalGame('mode'),'reward');
 click('claim-drink-btn');
 assert.equal(evalGame('mode'),'ended');
+assert.equal(evalGame('bonusAccepted'),false,'Going home keeps the classroom route');
+assert.equal(elements.game.attributes['aria-label'],'教室生存遊戲畫面');
+assert.equal(evalGame('clearOfTables({x:290,y:415})'),false,'Classroom desks remain solid when restarting');
 assert.equal(elements["end-title"].textContent, "放學了！");
 assert(elements['end-description'].textContent.includes('一杯飲料'));
 evalGame("startGame();spawnedBosses=new Set(BOSS_SCHEDULE.map(b=>b.id));defeatedBosses=new Set(BOSS_SCHEDULE.map(b=>b.id));gameTime=CORE_GAME_LENGTH-.02;spawnClock=100;update(.02)");
@@ -810,25 +863,30 @@ assert.equal(evalGame('enemyProjectiles.length'),4);assert.equal(evalGame('enemi
 evalGame("startGame();enemies=[makeEnemy(player.x+300,player.y,'mini2')];enemies[0].memberIndex=0;enemies[0].hp=enemies[0].maxHp/2;enemies[0].attackClock=0;updateEnemies(.01)");
 assert.equal(evalGame('enemies[0].windup'),.55);
 assert(Math.abs(evalGame('Math.hypot(enemies[0].lungeVX,enemies[0].lungeVY)')-980)<1e-8);
-for(const [rage,count] of [[false,7],[true,12]]) {
+for(const [rage,count] of [[false,9],[true,16]]) {
   evalGame(`startGame();enemies=[makeEnemy(player.x+250,player.y,'final')];enemies[0].hp=${rage?'enemies[0].maxHp/2':'enemies[0].maxHp'};enemies[0].lungeTime=.01;enemies[0].attackClock=10;updateEnemies(.02)`);
   assert.equal(evalGame("enemyProjectiles.filter(p=>p.type==='boss-wave').length"),count);
   assert.equal(evalGame('enemies[0].maxHp'),20000);
   evalGame('updateEnemies(.02)');assert.equal(evalGame('enemyProjectiles.length'),count,'A charge emits its shockwave only once');
   evalGame('enemyProjectiles[0].x=player.x;enemyProjectiles[0].y=player.y;enemyProjectiles[0].vx=0;enemyProjectiles[0].vy=0;updateEnemyProjectiles(.001)');
-  assert.equal(evalGame('player.hp'),174);
+  assert.equal(evalGame('player.hp'),172);
   evalGame('drawEnemyProjectile({type:"boss-wave",x:player.x,y:player.y,vx:1,vy:0});for(const e of effects)drawEffect(e)');
 }
-for(const [rage,count] of [[false,3],[true,5]]) {
+for(const [rage,count] of [[false,5],[true,7]]) {
   evalGame(`startGame();enemies=[makeEnemy(player.x+250,player.y,'final')];enemies[0].hp=${rage?'enemies[0].maxHp/2':'enemies[0].maxHp'};enemies[0].codeCooldown=.01;updateEnemies(.02)`);
-  assert.equal(evalGame('enemies[0].codeWindup'),rage?.6:.85,'Teacher shows a code warning before firing');
+  assert.equal(evalGame('enemies[0].codeWindup'),rage?.55:.75,'Teacher shows a code warning before firing');
   assert.equal(evalGame("enemyProjectiles.filter(p=>p.type==='code-glyph').length"),0);
-  evalGame(`updateEnemies(${rage?.61:.86})`);
+  evalGame(`updateEnemies(${rage?.56:.76})`);
   assert.equal(evalGame("enemyProjectiles.filter(p=>p.type==='code-glyph').length"),count,'Teacher casts a spread of code projectiles');
-  evalGame('updateEnemies(.02)');assert.equal(evalGame("enemyProjectiles.filter(p=>p.type==='code-glyph').length"),count,'One warning fires once');
+  if(rage) {
+    assert.equal(evalGame('enemies[0].codeWindup'),.48,'Half-health teacher warns before the second volley');
+    evalGame('updateEnemies(.49)');
+    assert.equal(evalGame("enemyProjectiles.filter(p=>p.type==='code-glyph').length"),count*2,'Second warning fires a fresh volley');
+  }
+  evalGame('updateEnemies(.02)');assert.equal(evalGame("enemyProjectiles.filter(p=>p.type==='code-glyph').length"),count*(rage?2:1),'The code burst ends after the intended volleys');
   evalGame('drawEnemy(enemies[0],1);drawEnemyProjectile(enemyProjectiles[0])');
   evalGame('enemyProjectiles[0].x=player.x;enemyProjectiles[0].y=player.y;enemyProjectiles[0].vx=0;enemyProjectiles[0].vy=0;updateEnemyProjectiles(.001)');
-  assert.equal(evalGame('player.hp'),180,'A code projectile can hit the player');
+  assert.equal(evalGame('player.hp'),178,'A code projectile can hit the player');
 }
 // Every encounter clears ordinary enemies and hazards while retaining equipment and drops.
 for(const boss of ['mini1','mini2','final']) {
@@ -951,6 +1009,19 @@ evalGame("startGame();spawnClock=100;player.xp=player.xpNeed;addEffect(player.x,
 assert.equal(evalGame('mode'),'upgrade');assert.equal(evalGame('effects[0].age'),0,'Effects freeze as soon as the upgrade opens');
 // Touch ownership and app lifecycle never leave a stuck movement vector.
 click('quick-start-btn');
+click('pause-btn');click('pause-joystick-size-large');
+assert.equal(evalGame('joystickSize'),'large','Touch size can change while paused');
+assert.equal(elements['joystick-size-large'].attributes['aria-pressed'],'true');
+click('resume-btn');
+const originalStickRect=elements.joystick.getBoundingClientRect;
+elements.joystick.getBoundingClientRect=()=>({left:0,top:0,width:164,height:164});
+elements.joystick.listeners.pointerdown({pointerId:90,clientX:164,clientY:82});
+assert.equal(evalGame('pointer.x'),1);
+assert(Math.abs(parseFloat(elements.stick.style.transform.slice('translate('.length))-164*.32)<.01,'Large stick travel scales with its visible radius');
+elements.joystick.listeners.pointermove({pointerId:90,clientX:82,clientY:82});
+assert.equal(evalGame('pointer.x'),0,'The stick rests at its center');
+elements.joystick.listeners.pointerup({pointerId:90});
+elements.joystick.getBoundingClientRect=originalStickRect;
 elements.joystick.listeners.pointerdown({pointerId:1,clientX:115,clientY:58});
 assert(evalGame('pointer.x>0'));
 elements.joystick.listeners.pointerdown({pointerId:2,clientX:0,clientY:58});
@@ -1265,7 +1336,7 @@ evalGame("for(const kind of ['medic','commander','beam','heavykick']){var e=make
 evalGame("unlockedEnemies.clear();startGame()");
 click('bestiary-btn');
 assert.equal(evalGame('mode'),'bestiary');
-assert.equal(elements['bestiary-progress'].textContent,'已解鎖 0 / 23');
+assert.equal(elements['bestiary-progress'].textContent,'已解鎖 0 / 25');
 assert(elements['bestiary-list'].children[18].children[0].textContent.includes('尚未解鎖'));
 click('bestiary-close-btn');
 assert.equal(evalGame('mode'),'playing');
@@ -1279,13 +1350,13 @@ assert(elements['bestiary-list'].children[19].children[0].textContent.includes('
 click('bestiary-close-btn');
 evalGame("enemies=[makeEnemy(player.x+150,player.y,'flyfighter')];damageEnemy(enemies[0],99999,'pencil')");
 click('bestiary-btn');
-assert.equal(elements['bestiary-progress'].textContent,'已解鎖 2 / 23');
+assert.equal(elements['bestiary-progress'].textContent,'已解鎖 2 / 25');
 assert.equal(elements['bestiary-list'].children[19].children[3].children[0].src,'enemy20-moves.svg');
 click('bestiary-close-btn');
 assert.equal(evalGame('mode'),'playing');
 evalGame('startGame()');click('pause-btn');click('pause-bestiary-btn');
 assert.equal(evalGame('mode'),'bestiary');
-assert.equal(elements['bestiary-progress'].textContent,'已解鎖 2 / 23','Unlocks survive a new run');
+assert.equal(elements['bestiary-progress'].textContent,'已解鎖 2 / 25','Unlocks survive a new run');
 click('bestiary-close-btn');assert.equal(evalGame('mode'),'paused');
 click('resume-btn');
 assert.equal(evalGame('STORY_BEATS.length'),40,'Every main and bonus lesson has a chat');
@@ -1295,9 +1366,12 @@ assert.equal(evalGame("classmateGender('1 號同學')"),'boy');
 assert.equal(evalGame("classmateGender('16 號同學')"),'boy');
 assert.equal(evalGame("classmateGender('21 號同學')"),'girl');
 assert.equal(evalGame("classmateGender('33 號同學')"),'girl');
-assert.equal(evalGame("classmateGender('7 號同學')"),null);
+assert.equal(evalGame("classmateGender('7 號同學')"),'boy');
+assert.equal(evalGame("classmateGender('嘉豪')"),'boy');
 assert.equal(evalGame("STORY_BEATS[15].speaker"),'班長');
 assert.equal(evalGame("STORY_BEATS[29].speaker"),'老師');
+assert.equal(evalGame("STORY_BEATS.slice(30).every(beat=>beat.speaker==='7 號同學'&&beat.audience==='real-player')"),true,'All ten playground chats address the human player');
+assert.equal(evalGame('new Set(STORY_BEATS.slice(30).map(beat=>beat.lesson)).size'),10);
 evalGame("startGame()");click('pause-btn');
 elements['cheat-input'].value='two突飛猛竟';click('cheat-submit');
 assert.equal(evalGame('unityTool'),true);
@@ -1324,15 +1398,17 @@ click('resume-btn');
 evalGame("damageEnemy(enemies.find(enemy=>enemy.kind==='final'),999999,'unity',enemies.find(enemy=>enemy.kind==='final'));gameTime=CORE_GAME_LENGTH;updateNarrative(0);offerBonusLessons()");
 assert.equal(evalGame('mode'),'reward','Cheat skip can still complete lesson thirty');
 assert(require('node:fs').readFileSync('polish.css','utf8').includes('top: calc(50% + 12vh)'),'Touch joystick sits below screen center');
-assert.equal(evalGame('BESTIARY.length'),23);
+assert.equal(evalGame('BESTIARY.length'),25);
 assert.equal(evalGame('BESTIARY.every(entry=>entry.art||MOVE_ART_SCENES[entry.kind])'),true,'Every enemy and boss has a move diagram');
 evalGame('unlockedEnemies=new Set(BESTIARY.map(entry=>entry.kind));renderBestiary()');
 const moveArtSources=elements['bestiary-list'].children.map(card=>card.children[3].children[0].src);
-assert.equal(moveArtSources.length,23,'Every unlocked entry renders its move art');
-assert.equal(moveArtSources.filter(src=>src.startsWith('data:image/svg+xml')).length,21);
-assert.equal(new Set(moveArtSources).size,23,'Each entry has its own diagram');
+assert.equal(moveArtSources.length,25,'Every unlocked entry renders its move art');
+assert.equal(moveArtSources.filter(src=>src.startsWith('data:image/svg+xml')).length,23);
+assert.equal(new Set(moveArtSources).size,25,'Each entry has its own diagram');
 assert(decodeURIComponent(moveArtSources[0].split(',')[1]).includes('突刺後可能召喚同伴'));
 assert(decodeURIComponent(moveArtSources[22].split(',')[1]).includes('程式碼與錯誤碼彈幕'));
+assert(decodeURIComponent(moveArtSources[23].split(',')[1]).includes('扇形射門與跑道衝刺'));
+assert(decodeURIComponent(moveArtSources[24].split(',')[1]).includes('環形聲波後直線撲擊'));
 assert.equal(evalGame('CONTENT.talents.every(t=>Object.keys(t.bonus).every(key=>key in TOOL_LEVELS[t.toolId][4]))'),true,'Every talent modifies an existing stat');
 assert.equal(evalGame('CONTENT.talents.some(t=>t.id===\'geometry\'&&t.bonus.hitCooldown<1)'),true,'Ruler talent improves actual hit rate');
 const offense=evalGame("['blueberry','pistol','bow','eraser'].map(id=>{const s=SUPER_TOOLS[id];return s.damage*(s.count||1)*(id==='eraser'?1+s.returnMultiplier:1)/s.cooldown})");
@@ -1345,4 +1421,58 @@ evalGame("startGame();enemyProjectiles=[];const rider=makeEnemy(player.x+300,pla
 assert.equal(evalGame('enemyProjectiles[0].damage'),28,'Thrown tires are less damaging than a direct bicycle hit');
 evalGame("enemyProjectiles=[];rider.hp=rider.maxHp/2;throwTire(rider)");
 assert.equal(evalGame('enemyProjectiles[0].damage'),32,'Enraged tire damage is still readable and dodgeable');
-console.log("PASS: gameplay, rewards, bonus lessons, enemy bestiary, move art, Boss stories, difficulty, solid desks, tutorial and standalone build");
+// Distinct talent passives activate on pickup and affect the matching player mechanics.
+assert.equal(evalGame('CONTENT.talents.length'),12);
+assert.equal(evalGame('new Set(CONTENT.talents.map(t=>t.passive)).size'),12,'Every talent describes a different permanent bonus');
+evalGame("startGame();for(const w of CONTENT.weapons.slice(0,6))player.weapons[w.id]=5;player.hp=100;pickups=[{type:'talent',talentId:'harvest',x:player.x,y:player.y,r:15,age:0}];updatePickups(.01)");
+assert.equal(evalGame('player.maxHp'),205);assert.equal(evalGame('player.hp'),105);
+evalGame('updatePickups(.01)');assert.equal(evalGame('player.maxHp'),205,'Talent pickup cannot add health twice');
+evalGame("startGame();player.talents.focus=true;player.talents.blast=true;player.talents.rhythm=true;enemies=[makeEnemy(player.x+110,player.y,'basic')];enemies[0].hp=100;pencilAttack()");
+assert.equal(evalGame('enemies[0].hp'),69,'Focus extends pencil reach and blast adds three damage');
+assert.equal(evalGame('player.pencilCooldown'),.432,'Rhythm shortens pencil cooldown');
+evalGame('startGame();player.talents.return=true;player.talents.reading=true;damagePlayer(20)');
+assert.equal(evalGame('player.hp'),181,'Return reduces incoming damage');
+assert.equal(evalGame('player.invulnerable'),.78,'Reading lengthens post-hit protection');
+evalGame('startGame();player.talents.athlete=true;player.talents.binding=true;slowPlayer(3);stunPlayer(1)');
+assert(Math.abs(evalGame('player.slowTime')-2.4)<1e-8);assert.equal(evalGame('player.stunTime'),.8);
+evalGame("startGame();player.talents.geometry=true;pickups=[{type:'xp',value:1,x:player.x,y:player.y,r:8,age:0}];updatePickups(.01)");
+assert.equal(evalGame('player.xp'),1.08,'Geometry adds experience from a collected point');
+evalGame("startGame();player.talents.origami=true;pickups=[{type:'xp',value:1,x:player.x+150,y:player.y,r:8,age:0}];var distantXp=pickups[0].x;updatePickups(.1)");
+assert(evalGame('pickups[0].x')<evalGame('distantXp'),'Origami pulls in farther experience points');
+evalGame('startGame();spawnClock=100;player.talents.blackboard=true;player.hp=100;update(.2)');
+assert(Math.abs(evalGame('player.hp')-100.45)<1e-8,'Blackboard increases automatic healing');
+evalGame("startGame();spawnClock=100;player.talents.trajectory=true;keys.add('d');var moveStart=player.x;update(.1);keys.delete('d')");
+assert(Math.abs(evalGame('player.x-moveStart')-23.625)<1e-8,'Trajectory increases movement speed');
+// Tickets are awarded at completed lesson boundaries and persist between runs.
+const ticketBaseline=evalGame('skinTickets');
+evalGame('startGame();spawnClock=100;gameTime=LESSON_LENGTH-.02;update(.02)');
+assert.equal(evalGame('runSkinTickets'),1);assert.equal(evalGame('skinTickets'),ticketBaseline+1);
+assert.equal(savedBestiary.get('classroom-survivor-skin-tickets'),String(ticketBaseline+1));
+evalGame('update(.1)');assert.equal(evalGame('runSkinTickets'),1,'A lesson cannot pay twice');
+evalGame("startGame();gameTime=9*LESSON_LENGTH;spawnScheduledBosses();var ticketsBeforeBoss=skinTickets;update(.5)");
+assert.equal(evalGame('skinTickets'),evalGame('ticketsBeforeBoss'),'Frozen boss time does not award tickets');
+evalGame('startGame();var savedTicketTotal=skinTickets;awardCompletedLessons(0,CORE_GAME_LENGTH)');
+assert.equal(evalGame('runSkinTickets'),30,'Classroom can award thirty tickets');
+evalGame('bonusAccepted=true;awardCompletedLessons(CORE_GAME_LENGTH,GAME_LENGTH)');
+assert.equal(evalGame('runSkinTickets'),40,'Optional playground adds ten tickets');
+assert.equal(evalGame('awardCompletedLessons(CORE_GAME_LENGTH,GAME_LENGTH)'),0);
+assert.equal(evalGame('skinTickets'),evalGame('savedTicketTotal+40'));
+evalGame('startGame()');assert.equal(evalGame('runSkinTickets'),0);assert.equal(evalGame('skinTickets'),evalGame('savedTicketTotal+40'),'Total tickets survive a new run');
+// Drawing costs one ticket, avoids duplicates, and applies the unlocked cosmetic.
+evalGame('returnToMenu();ownedSkins=new Set();skinTickets=1');
+click('start-skins-btn');assert.equal(evalGame('mode'),'skins');
+assert.equal(elements['skin-list'].children.length,12);assert.equal(elements['skin-draw-btn'].disabled,false);
+click('skin-draw-btn');assert.equal(evalGame('skinTickets'),0);assert.equal(evalGame('ownedSkins.size'),1);
+assert.equal(savedBestiary.get('classroom-survivor-tool-skins'),JSON.stringify(['bell']));
+assert(elements['skin-result'].textContent.includes('星光校鈴'));
+click('skin-draw-btn');assert.equal(evalGame('ownedSkins.size'),1,'Empty balance cannot draw again');
+click('skin-close-btn');assert.equal(evalGame('mode'),'menu');
+drawing.filter='untouched';evalGame("drawTool(ctx,'bell',3,100,100)");assert.equal(drawing.filter,'none','Owned skin applies to the live tool art');
+evalGame('startGame()');assert.equal(evalGame('ownedSkins.has("bell")'),true,'Skin collection survives restarting');
+evalGame('togglePause()');click('pause-skins-btn');assert.equal(evalGame('mode'),'skins');click('skin-close-btn');assert.equal(evalGame('mode'),'paused');
+evalGame('ownedSkins=new Set(TOOL_SKINS.map(s=>s.toolId));skinTickets=2;renderSkinCollection()');
+assert.equal(elements['skin-draw-btn'].disabled,true,'Completed collection does not spend more tickets');
+evalGame('startGame();defeatedBosses=new Set(BOSS_SCHEDULE.filter(b=>b.lesson<=30).map(b=>b.id));gameTime=CORE_GAME_LENGTH;offerBonusLessons()');
+click('reward-skins-btn');assert.equal(evalGame('mode'),'skins');click('skin-close-btn');assert.equal(evalGame('mode'),'reward');
+click('claim-drink-btn');click('end-skins-btn');assert.equal(evalGame('mode'),'skins');click('skin-close-btn');assert.equal(evalGame('mode'),'ended');
+console.log("PASS: gameplay, talents, skin tickets and drawing, rewards, bonus lessons, enemy bestiary, Boss stories, difficulty, solid desks, tutorial and standalone build");
