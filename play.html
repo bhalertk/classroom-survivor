@@ -111,7 +111,11 @@ button.touch-pressed { filter: brightness(1.12); }
 @media (pointer: coarse) {
   .icon-btn, .speed-btn { min-width: 44px; min-height: 44px; }
   .secondary-btn, .text-btn, .chapter-dialogue button, .tutorial-panel button { min-height: 44px; }
-  .joystick { left: 50%; top: calc(50% + 12vh); bottom: auto; transform: translate(-50%, -50%); }
+  .joystick { left: max(16px, env(safe-area-inset-left)); top: auto; bottom: max(20px, env(safe-area-inset-bottom)); transform: none; }
+}
+@media (pointer: coarse) and (max-width: 520px) {
+  .joystick { max-width: 40vw; max-height: 40vw; }
+  .status-panel { width: min(38vw, 150px); }
 }
 @media (max-width: 650px) {
   .dialogue-story-canvas { max-height: 78px; }
@@ -200,8 +204,37 @@ button.touch-pressed { filter: brightness(1.12); }
 .skin-entry strong { color: #274d52; font-size: 13px; }
 .skin-entry small { color: #698079; font-size: 11px; }
 .skin-entry .skin-rarity { color: #8b639b; font-weight: 900; }
+.skin-draw-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+.skin-draw-actions button:disabled, .shop-card button:disabled { opacity: .55; cursor: default; }
+.skin-draw-results { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 6px; margin: 12px 0; }
+.skin-draw-results:empty { display: none; }
+.skin-draw-result { min-width: 0; padding: 5px; border: 2px solid #b9d1c6; border-radius: 9px; background: #f4f8ed; animation: skin-ten-reveal .45s ease-out both; }
+.skin-draw-result.rarity-rare { border-color: #8fc5e4; }.skin-draw-result.rarity-epic { border-color: #b99cdd; }.skin-draw-result.rarity-legendary { border-color: #e4bb63; }.skin-draw-result.rarity-mythic { border-color: #e99fc8; box-shadow: 0 0 12px #e99fc880; }
+.skin-draw-result canvas { display: block; width: min(100%,72px); height: 58px; margin: auto; }
+.skin-draw-result strong, .skin-draw-result small { display: block; overflow-wrap: anywhere; font-size: 11px; }
+.skin-draw-result small { color: #725c80; font-weight: 900; }
+@keyframes skin-ten-reveal { from { opacity: 0; transform: translateY(18px) rotateY(85deg) scale(.8); } to { opacity: 1; transform: translateY(0) rotateY(0) scale(1); } }
+.shop-modal { width: min(850px,96vw); max-height: 92dvh; overflow-y: auto; text-align: center; }
+.shop-modal #shop-clerk { display: block; width: 105px; height: 91px; margin: 2px auto -2px; border-radius: 50%; background: radial-gradient(circle,#f8eed8,#d9ebe0); }
+.shop-modal h3 { margin: 18px 0 9px; color: #315c55; text-align: left; }
+.shop-modal > p { line-height: 1.55; }
+.shop-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; text-align: left; }
+.shop-card { display: grid; justify-items: start; align-content: start; gap: 6px; min-width: 0; padding: 10px; border: 2px solid #c5d2bf; border-radius: 11px; background: #f3f5e9; }
+.shop-card canvas { width: 82px; height: 70px; justify-self: center; }
+.shop-card strong { color: #315951; font-size: 15px; }.shop-card small { color: #627b70; font-size: 12px; line-height: 1.4; }
+.shop-card button { width: 100%; margin-top: auto; padding: 7px; border: 0; border-radius: 8px; background: #4e9787; color: white; font-weight: 900; }
+.shop-card.rarity-epic { border-color: #b99cdd; }.shop-card.rarity-legendary { border-color: #e4bb63; }.shop-card.rarity-mythic { border-color: #e99fc8; }
+.shop-modal > #shop-close-btn { width: 100%; margin-top: 15px; }
 @media (max-width: 650px) { .skin-list { grid-template-columns: 1fr; } .skin-draw-stage { min-height: 160px; } }
-@media (prefers-reduced-motion: reduce) { .skin-draw-stage.drawing, .skin-draw-stage.drawing .skin-draw-orbit, .skin-draw-stage.drawing canvas { animation: none; } }
+@media (max-width: 650px) { .skin-draw-results { grid-template-columns: repeat(2,minmax(0,1fr)); }.shop-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.skin-draw-actions { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .skin-draw-stage.drawing, .skin-draw-stage.drawing .skin-draw-orbit, .skin-draw-stage.drawing canvas, .skin-draw-result { animation: none; } }
+.victory-message { margin: 12px 0; padding: 13px 16px; border: 2px solid #d6ae62; border-radius: 12px; background: linear-gradient(135deg,#fff7db,#e8f2df); box-shadow: 0 4px 0 #b9905b55; text-align: center; animation: story-heading-in .55s ease-out; }
+.victory-message[hidden] { display: none; }
+.victory-message strong { display: block; color: #805a31; font-size: 15px; }
+.victory-message p { margin: 7px 0; color: #315955; font-size: 18px; font-weight: 900; line-height: 1.55; }
+.victory-message span { display: block; color: #a46b3f; font-size: 19px; font-weight: 900; letter-spacing: 2px; }
+@media (max-width: 650px) { .victory-message { padding: 10px 12px; } .victory-message p { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { .victory-message { animation: none; } }
 
 </style>
 </head>
@@ -299,6 +332,7 @@ button.touch-pressed { filter: brightness(1.12); }
         <button id="practice-btn" class="secondary-btn">直接練習新手教學</button>
         <button id="start-bestiary-btn" class="secondary-btn">敵人圖鑑 · 擊敗後解鎖</button>
         <button id="start-skins-btn" class="secondary-btn">皮膚收藏室 · 使用皮膚券</button>
+        <button id="start-shop-btn" class="secondary-btn">🏪 102 班福利社</button>
         <button id="quick-start-btn" class="secondary-btn">已熟悉操作，直接挑戰</button>
         <p class="microcopy">30 節領飲料 · 可加碼 10 節 · 每節 30 秒 · 支援倍速</p>
       </div>
@@ -349,6 +383,7 @@ button.touch-pressed { filter: brightness(1.12); }
         <div class="joystick-size-picker" role="group" aria-label="觸控搖桿大小"><span>移動搖桿</span><div><button id="pause-joystick-size-small" type="button" aria-pressed="false">小手</button><button id="pause-joystick-size-standard" type="button" class="selected" aria-pressed="true">標準</button><button id="pause-joystick-size-large" type="button" aria-pressed="false">大手</button></div></div>
         <button id="pause-bestiary-btn" class="secondary-btn">查看敵人圖鑑</button>
         <button id="pause-skins-btn" class="secondary-btn">皮膚收藏室 · 抽道具皮膚</button>
+        <button id="pause-shop-btn" class="secondary-btn">🏪 福利社 · 補給與皮膚</button>
         <button id="resume-btn" class="primary-btn">繼續遊戲 <span>→</span></button>
         <button id="pause-restart-btn" class="secondary-btn">重新開始</button>
         <button id="pause-menu-btn" class="secondary-btn">結束本局，回主選單</button>
@@ -362,6 +397,7 @@ button.touch-pressed { filter: brightness(1.12); }
         <p>老師把一杯飲料遞給你，同學們齊聲歡呼。你可以今天放學，或自己選擇到操場加碼 10 節；操場沒有課桌掩護，撐過第 40 節就能拿到茶葉蛋兌換券！</p>
         <div class="reward-prizes"><span>🥤 飲料：已獲得</span><span>🥚 茶葉蛋兌換券：再撐 10 節</span><span id="reward-skin-tickets">🎟️ 本局獲得 30 張皮膚券</span></div>
         <button id="reward-skins-btn" class="secondary-btn">到皮膚收藏室抽獎</button>
+        <button id="reward-shop-btn" class="secondary-btn">到福利社逛逛</button>
         <button id="claim-drink-btn" class="primary-btn">領飲料，今天放學 <span>→</span></button>
         <button id="accept-bonus-btn" class="secondary-btn">去操場加碼 10 節，挑戰茶葉蛋兌換券</button>
       </div>
@@ -383,14 +419,33 @@ button.touch-pressed { filter: brightness(1.12); }
         <div class="modal-kicker">CLASS 102 COLLECTION</div>
         <h2 id="skin-title">道具皮膚收藏室</h2>
         <p id="skin-balance" role="status">皮膚券 0 張 · 已收藏 0 / 60</p>
-        <p>每個道具各有 5 款皮膚。每次使用 1 張皮膚券，隨機抽到一款尚未擁有的皮膚；抽到後自動套用，也能在下方切換已收藏外觀。皮膚不影響攻擊能力。</p>
+        <p>每個道具各有 5 款皮膚。單抽花 1 張，十連抽花 10 張，且不會抽到重複皮膚；抽到後自動套用，也能切換收藏。皮膚會改變道具與攻擊特效，不影響傷害數值。皮膚收藏只在這次開啟遊戲期間有效，重新開啟會清空。</p>
         <p class="skin-odds">抽取機率：普通 55% · 稀有 28% · 史詩 12% · 傳說 4% · 神話 1%。某稀有度抽齊後，機率會在其他尚有皮膚的稀有度中重新分配。</p>
         <div id="skin-draw-stage" class="skin-draw-stage" aria-live="polite"><div class="skin-draw-orbit" aria-hidden="true">✦　✧　✦</div><canvas id="skin-reveal-canvas" width="130" height="110" aria-label="抽取結果預覽"></canvas><strong id="skin-reveal-title">等待抽取</strong><small id="skin-reveal-rarity">每張券抽一款新外觀</small></div>
-        <button id="skin-draw-btn" type="button" class="primary-btn">🎟️ 抽一款皮膚</button>
+        <div class="skin-draw-actions"><button id="skin-draw-btn" type="button" class="primary-btn">🎟️ 抽一款皮膚</button><button id="skin-draw-ten-btn" type="button" class="secondary-btn">🎟️ 10 張十連抽</button></div>
+        <div id="skin-draw-results" class="skin-draw-results" aria-live="polite"></div>
         <p id="skin-result" class="skin-result" role="status">完成課節就能獲得皮膚券。</p>
         <div id="skin-tool-tabs" class="skin-tool-tabs" role="tablist" aria-label="選擇道具查看皮膚"></div>
         <div id="skin-list" class="skin-list"></div>
         <button id="skin-close-btn" class="secondary-btn">返回遊戲</button>
+      </div>
+    </section>
+
+    <section id="shop-screen" class="overlay" aria-labelledby="shop-title">
+      <div class="modal-card shop-modal">
+        <div class="modal-kicker">102 班 · 課間福利社</div>
+        <canvas id="shop-clerk" width="150" height="130" aria-label="綁金色緞帶並拿著班級筆記的女班長"></canvas>
+        <h2 id="shop-title">班長的福利社 🏪</h2>
+        <p id="shop-balance" role="status">皮膚券 0 張</p>
+        <p>每完成一節課可拿到一張皮膚券。暫停時可買麵包、飯糰等補給，或直接選購道具皮膚。第 30 節的飲料與加碼獎勵仍要靠挑戰取得。直購皮膚重新開啟遊戲後也會清空。</p>
+        <p id="shop-message" class="skin-result" role="status">班長：歡迎光臨，慢慢挑！</p>
+        <h3>課間補給 · 僅在遊戲暫停時使用</h3>
+        <div id="shop-supplies" class="shop-grid"></div>
+        <h3>指定皮膚直購</h3>
+        <p class="skin-odds">普通 4 張 · 稀有 8 張 · 史詩 16 張 · 傳說 30 張 · 神話 55 張。購買後立即收藏並套用。</p>
+        <div id="shop-tool-tabs" class="skin-tool-tabs" role="tablist" aria-label="選擇要購買皮膚的道具"></div>
+        <div id="shop-skins" class="shop-grid"></div>
+        <button id="shop-close-btn" class="secondary-btn">返回</button>
       </div>
     </section>
 
@@ -399,6 +454,11 @@ button.touch-pressed { filter: brightness(1.12); }
         <div id="end-kicker" class="modal-kicker">GAME OVER</div>
         <h2 id="end-title">再試一次！</h2>
         <p id="end-description"></p>
+        <div id="victory-message" class="victory-message" role="note" hidden>
+          <strong>學號 151040 的同學</strong>
+          <p>「我們班號拿下所有比賽的冠軍，謝謝我們班的同學和老師。」</p>
+          <span>【感謝遊玩】</span>
+        </div>
         <div class="ending-art" aria-hidden="true"><canvas id="ending-canvas" width="900" height="300"></canvas></div>
         <p id="end-epilogue" class="end-epilogue"></p>
         <p id="end-skin-tickets" class="end-skin-tickets">🎟️ 本局獲得 0 張皮膚券</p>
@@ -406,6 +466,7 @@ button.touch-pressed { filter: brightness(1.12); }
         <div class="result-stats"><div><strong id="result-time">00:00</strong><span>課程進度</span></div><div><strong id="result-kills">0</strong><span>擊退敵人</span></div><div><strong id="result-level">1</strong><span>達到等級</span></div></div>
         <button id="restart-btn" class="primary-btn">再玩一局 <span>↻</span></button>
         <button id="end-skins-btn" class="secondary-btn">到皮膚收藏室抽獎</button>
+        <button id="end-shop-btn" class="secondary-btn">到福利社逛逛</button>
         <button id="end-menu-btn" class="secondary-btn">回主選單選擇難度</button>
       </div>
     </section>
@@ -444,55 +505,56 @@ const STORY = [
   { title: "飲料，還有茶葉蛋", scene:3, text: "你握緊鉛筆：「既然是同學們的挑戰，那我就接下了！先闖過三十節打敗老師，領我的飲料；到時再決定要不要加碼十節！」" }
 ];
 const LESSON_CHATS = [
-  ["1 號同學","第一節：迎新開跑","嗨，新同學！老師說這是迎新活動，放心，我們的方塊裝備只會把你打得想喝飲料！"],
-  ["2 號同學","第二節：水壺出場","我的水壺裝的是白開水，不是祕密藥水！小心它會飛，還會灑出三顆水珠。"],
-  ["3 號同學","第三節：橡皮筋樂隊","我負責彈橡皮筋，你負責閃！要是我彈到黑板，老師又要叫我擦乾淨了。"],
-  ["4 號同學","第四節：紙球大作戰","衛生紙球是溼的，黏在地上也會讓你慢三秒。這招是我打掃時間想出來的！"],
-  ["5 號同學","第五節：走廊太小","威龍把噴射背包帶進教室了！他衝過來時快側身，我可不想再扶正桌子。"],
-  ["6 號同學","第六節：蜘蛛點名","比特的機械蜘蛛又沒寫作業，現在滿地亂跑。先找比特，牠們就不會一直來！"],
-  ["8 號同學","第七節：盾牌練習","深藍說他的盾牌正面無敵。可是他忘了教室有走道，你繞到旁邊就好啦！"],
-  ["9 號同學","第八節：小狗也參加","訓犬員把狗帶來迎新了！別被追著跑，沿著桌邊轉個彎，牠會先跟桌腳打招呼。"],
-  ["10 號同學","第九節：看得見嗎","戳眼那招太壞了，我已經跟他說要輕一點！被碰到會有三秒看不清半邊。"],
-  ["11 號同學","第十節：瓶蓋收藏展","瓶蓋收藏家要來展示藏品了！會反彈的瓶蓋很好看，前提是你別站在它的路上。"],
-  ["12 號同學","第十一節：音量測試","我的大聲公調到迎新音量！看到音波就躲到桌後面，眩暈一秒可不好玩。"],
-  ["13 號同學","第十二節：倒楣蛋飛行","有人把倒楣蛋當球踢過來了！這絕對不是體育課標準動作，快往旁邊閃。"],
-  ["14 號同學","第十三節：突然出現","我會瞬移到你旁邊出拳！別緊張，看到我現身就快轉身，當作在練反應。"],
-  ["15 號同學","第十四節：三球連發","三顆球排隊出發！我本來想拿來打躲避球，結果老師說今天是生存課。"],
-  ["16 號同學","第十五節：半場休息嗎","保健股長在幫大家回血。你也累了吧？可惜這場迎新活動還不能喊暫停！"],
-  ["班長","第十六節：班長報時","已經過半了！我把進度寫在黑板上。加油，我可是特地幫你預留了飲料吸管。"],
-  ["21 號同學","第十七節：粉筆光束","那道氣功光束連課桌都擋不住！我畫了預告線，快移開，別讓筆記變成烤紙。"],
-  ["22 號同學","第十八節：重踢警報","重踢手想把你送到牆邊。這種送貨方式太粗魯了，你從蓄力扇形溜出去！"],
-  ["23 號同學","第十九節：舞步練習","閃身拳手把昇龍拳當舞步了！先躲他側移的落點，再離開拳頭前面。"],
-  ["24 號同學","第二十節：雙人單車","兩個人把腳踏車騎進教室？一個衝撞、一個丟輪胎。我宣布他們要負責整理桌椅！"],
-  ["25 號同學","第二十一節：單車停車場","單車隊的表演結束了！別忘了撿經驗光點，老師的程式關卡還在後面等你。"],
-  ["26 號同學","第二十二節：課桌迷宮","你已經比我們熟悉走道了！桌子會擋住敵人的攻擊，拿它當掩護很聰明。"],
-  ["27 號同學","第二十三節：道具展示","你那六件工具越變越帥！我的鉛筆盒看完都想報名超級進化。"],
-  ["28 號同學","第二十四節：加油團上線","別看大家穿著方塊裝備，我們都在替你加油。只是鼓掌的手還在發射攻擊。"],
-  ["29 號同學","第二十五節：飲料倒數","再五節就有飲料！老師問要不要加冰，我說等你打贏再決定。"],
-  ["30 號同學","第二十六節：轉學生之名","你都快成 102 班的傳說了！明天的座位表，我想坐在你旁邊學走位。"],
-  ["31 號同學","第二十七節：老師備課中","我剛偷看老師的螢幕，滿滿都是 RUN 和括號。看到程式碼的方向線就快躲！"],
-  ["32 號同學","第二十八節：最後兩節","大家把獎品放在講桌上了。老師說她會親自上場，我已經替你把吸管插好了！"],
-  ["33 號同學","第二十九節：全班倒數","三、二、一……等等，還有一節！老師準備用程式碼射擊，衝刺後也會放錯誤碼。"],
-  ["老師","第三十節：程式老師登場","同學們聊得很開心吧？現在換我測試你的走位！避開程式碼，飲料就是你的。"]
+  ["突刺方塊人","第一節：迎新突刺","新同學你好！看到我蓄力就往旁邊閃；要是真打中，我的同伴說不定會整班跑來加油！"],
+  ["水壺方塊人","第二節：水壺出場","我的水壺裝的是白開水！我會丟出去，也會揮一下灑出三顆水珠，記得走位喔。"],
+  ["橡皮筋方塊人","第三節：橡皮筋樂隊","我負責彈橡皮筋，你負責閃；要是我彈到黑板，老師又要叫我擦乾淨。"],
+  ["溼衛生紙方塊人","第四節：紙球大作戰","衛生紙球是溼的！沒丟中也會黏在地上，踩到可會慢三秒。"],
+  ["威龍","第五節：威龍衝刺","今天代號威龍！噴射背包要開啦，快閃開我的衝刺路線，爆炸物也要小心。"],
+  ["比特","第六節：比特點名","比特到！我的機械蜘蛛還沒寫作業，現在滿地亂跑；先來抓我試試看！"],
+  ["深藍","第七節：深藍盾牌","深藍舉盾！正面攻擊我可不怕，不過教室走道那麼多，你也許繞得到側邊。"],
+  ["訓犬員","第八節：小狗也參加","狗狗也想玩迎新！牠們追人很快，沿桌邊轉彎比較安全。"],
+  ["戳眼方塊人","第九節：看得見嗎","我來了！這招會讓你半邊視野暗三秒；放心，是老師程式做的視覺效果啦。"],
+  ["牧羊人","第十節：牧羊人陷阱","地上的圈圈是陷阱提示！瓶蓋收藏家也來了，今天走道特別熱鬧。"],
+  ["大聲公方塊人","第十一節：音量測試","我的大聲公調到迎新音量！看到音波就躲到桌後面，眩暈一秒可不好玩。"],
+  ["飛踢方塊人","第十二節：倒楣蛋飛行","我要把倒楣蛋踢過來當遠程攻擊；這絕對不是體育課標準動作，快往旁邊閃。"],
+  ["瞬移拳手","第十三節：突然出現","我會突然到你旁邊出拳，看到落點再閃還來得及。"],
+  ["三球召喚者","第十四節：三球連發","三顆球排隊出發！原本想玩躲避球，結果老師說今天是生存課。"],
+  ["保健股長","第十五節：保健股長","我來幫同學回血！你要先打我嗎？記得照顧自己的體力。"],
+  ["班長","第十六節：班長助威","今天輪到我替大家助威，附近同學會跑得更快、打得更勤。你也要加油！"],
+  ["氣功方塊人","第十七節：氣功光束","我的氣功光束連課桌都擋不住！我先畫好預告線，你看見就快往旁邊移。"],
+  ["重踢方塊人","第十八節：重踢警報","這一腳會把你送到牆邊；我蓄力時，趕快離開正前方。"],
+  ["閃身拳手","第十九節：閃身舞步","先看我側移，再躲昇龍拳。這是我新練的舞步，腳步別跟丟了！"],
+  ["飛踢重擊手","第二十節：飛踢重擊","我會飛踢，也會重擊；今天雙人單車隊也要上場，教室真的快變體育場。"],
+  ["值日生","第二十一節：輪到後援班底","單車隊退場，我把走道整理好了！後面還有我們這群同學陪你聊，別忘了撿經驗光點。"],
+  ["窗邊同學","第二十二節：窗邊的戰況","我從窗邊看得最清楚：水壺又飛來了！遇到課桌就繞過去，別把自己卡在角落。"],
+  ["圖書角同學","第二十三節：圖書角的祕訣","我把你的工具升級都記在筆記上了。先瞄準會幫大家回血的同學，走道才不會越來越擠！"],
+  ["黑板報同學","第二十四節：黑板報更新","今日頭條：轉學生撐到第二十四節！班長正在助威，黑板報要替你留一個大大的版面。"],
+  ["節拍同學","第二十五節：跟上節奏","還有五節就能拿飲料！聽我打節拍：突刺蓄力、側邊閃開、再往前走！"],
+  ["美術股長","第二十六節：迎新海報","我把你的躲避路線畫成海報了！大聲公聲波來時，往課桌後面一躲，畫面特別帥。"],
+  ["園藝股長","第二十七節：老師備課中","我在窗台照顧小盆栽，剛看見老師螢幕全是程式碼。等她上場，先看預告線再閃。"],
+  ["自然股長","第二十八節：最後的觀察","我的觀察紀錄寫著：你越打越熟練。老師準備親自上場，記得留一條能側移的路。"],
+  ["攝影股長","第二十九節：倒數合照","我替全班準備好合照了！下一節只要撐住老師那關，飲料和迎新紀念照一起給你。"],
+  ["點心股長與文具股長","第三十節：全班替你加油","點心股長：飲料已經冰好了！文具股長：鉛筆也幫你削好了！老師的程式戰開始，我們在旁邊替你加油！"]
 ];
+const LATE_CLASSMATE_NUMBERS={值日生:[1],窗邊同學:[17],圖書角同學:[18],黑板報同學:[19],節拍同學:[20],美術股長:[21],園藝股長:[24],自然股長:[27],攝影股長:[28],點心股長與文具股長:[29,32]};
 const STORY_BEATS = LESSON_CHATS.map(([speaker,title,text],index)=>({id:`lesson-${index+1}`,lesson:index+1,speaker,title,text,emotion:index===29?'determined':index===15?'happy':undefined})).concat([
-  {id:"lesson-31",lesson:31,speaker:"7 號同學",title:"我是在跟你說話",emotion:'happy',text:"嗨，螢幕前的你！我是 7 號。剛剛是你按下加碼的吧？我現在直接跟操作遊戲的你聊天，不是跟畫面裡的轉學生說喔。"},
-  {id:"lesson-32",lesson:32,speaker:"7 號同學",title:"你的手指很忙",text:"你握搖桿的那隻手還好嗎？操場沒有課桌，記得用另一隻手按暫停或倍速。對，我看得到你在操作！"},
-  {id:"lesson-33",lesson:33,speaker:"7 號同學",title:"螢幕外的戰術",emotion:'determined',text:"我有個只告訴玩家的祕訣：別只盯著角色，先看敵人蓄力的方向。你看到預告線，就有時間把手指往旁邊滑。"},
-  {id:"lesson-34",lesson:34,speaker:"7 號同學",title:"下一節小心嘉豪",emotion:'nervous',text:"喂，螢幕前的你，下一節嘉豪要上場！看他射門前的球路，還有衝刺預告。你可別為了聽我說話忘了閃。"},
-  {id:"lesson-35",lesson:35,speaker:"7 號同學",title:"嘉豪登場",emotion:'surprised',text:"嘉豪拿著足球來了！我知道你正在看這行字，但手先別停；看準他蓄力後的方向，往側邊閃就好。"},
-  {id:"lesson-36",lesson:36,speaker:"7 號同學",title:"鏡頭前的喘口氣",emotion:'relieved',text:"剛才那關夠熱鬧吧？螢幕前的你也可以喘口氣。遊戲裡的體力會慢慢回復，你的手可要自己休息喔。"},
-  {id:"lesson-37",lesson:37,speaker:"7 號同學",title:"玩家的視野",text:"從螢幕看過去，跑道邊的敵人會先冒出來。你能同時看整個畫面，這可是畫面裡的轉學生沒有的優勢！"},
-  {id:"lesson-38",lesson:38,speaker:"7 號同學",title:"工具交給你決定",emotion:'happy',text:"你選的六件工具打得很有節奏！升級時慢慢看效果；這裡會暫停，我可以等你選好再繼續說。"},
-  {id:"lesson-39",lesson:39,speaker:"7 號同學",title:"小黃狗要來了",emotion:'nervous',text:"螢幕前的你，再一節就到小黃狗！牠會撲過來，還會汪汪叫出一圈聲波。先留一條能閃的路。"},
-  {id:"lesson-40",lesson:40,speaker:"7 號同學",title:"最後一節交給你",emotion:'determined',text:"最後一節開始！我不跟轉學生喊話，這句是給你的：看小黃狗的預告、躲開撲擊，打贏後茶葉蛋兌換券就是你的！"}
+  {id:"lesson-31",lesson:31,speaker:"瓶蓋收藏家",title:"我是在跟你說話",emotion:'happy',text:"嗨，螢幕前的你！還記得我丟的瓶蓋嗎？剛剛是你按下加碼的吧？我現在直接跟操作遊戲的你聊天，不是跟畫面裡的轉學生說喔。"},
+  {id:"lesson-32",lesson:32,speaker:"瓶蓋收藏家",title:"你的手指很忙",text:"你握搖桿的那隻手還好嗎？操場沒有課桌，記得用另一隻手按暫停或倍速。對，我看得到你在操作！"},
+  {id:"lesson-33",lesson:33,speaker:"瓶蓋收藏家",title:"螢幕外的戰術",emotion:'determined',text:"我有個只告訴玩家的祕訣：別只盯著角色，先看敵人蓄力的方向。你看到預告線，就有時間把手指往旁邊滑。"},
+  {id:"lesson-34",lesson:34,speaker:"瓶蓋收藏家",title:"下一節小心嘉豪",emotion:'nervous',text:"喂，螢幕前的你，下一節嘉豪要上場！看他射門前的球路，還有衝刺預告。你可別為了聽我說話忘了閃。"},
+  {id:"lesson-35",lesson:35,speaker:"瓶蓋收藏家",title:"嘉豪登場",emotion:'surprised',text:"嘉豪拿著足球來了！我知道你正在看這行字，但手先別停；看準他蓄力後的方向，往側邊閃就好。"},
+  {id:"lesson-36",lesson:36,speaker:"瓶蓋收藏家",title:"鏡頭前的喘口氣",emotion:'relieved',text:"剛才那關夠熱鬧吧？螢幕前的你也可以喘口氣。遊戲裡的體力會慢慢回復，你的手可要自己休息喔。"},
+  {id:"lesson-37",lesson:37,speaker:"瓶蓋收藏家",title:"玩家的視野",text:"從螢幕看過去，跑道邊的敵人會先冒出來。你能同時看整個畫面，這可是畫面裡的轉學生沒有的優勢！"},
+  {id:"lesson-38",lesson:38,speaker:"瓶蓋收藏家",title:"工具交給你決定",emotion:'happy',text:"你選的六件工具打得很有節奏！升級時慢慢看效果；這裡會暫停，我可以等你選好再繼續說。"},
+  {id:"lesson-39",lesson:39,speaker:"瓶蓋收藏家",title:"小黃狗要來了",emotion:'nervous',text:"螢幕前的你，再一節就到小黃狗！牠會撲過來，還會汪汪叫出一圈聲波。先留一條能閃的路。"},
+  {id:"lesson-40",lesson:40,speaker:"瓶蓋收藏家",title:"最後一節交給你",emotion:'determined',text:"最後一節開始！我不跟轉學生喊話，這句是給你的：看小黃狗的預告、躲開撲擊，打贏後茶葉蛋兌換券就是你的！"}
 ].map(beat=>({...beat,audience:'real-player'})));
 const BOSS_DIALOGUE = {
   mini1:{arrival:{speaker:"瓶蓋收藏家",title:"第一道關卡",text:"我收集的瓶蓋都派上用場了！新同學，躲得開這一輪才算過關！"},defeat:{speaker:"班長",title:"第一關通過",text:"瓶蓋散開了，時鐘又開始走了！你通過第一關，還有兩道關卡。"}},
   mini2:{arrival:{speaker:"雙人單車隊",title:"第二道關卡",text:"一人封住走道，一人用輪胎攔截。轉學生，這間教室可沒那麼容易通過！"},defeat:{speaker:"轉學生",title:"兩人都倒下了",text:"一個衝撞、一個丟輪胎……現在終於都停下了。班長，把最後一頁給我。下一關是老師吧？"}},
   final:{arrival:{speaker:"老師",title:"最終關卡：程式老師",emotion:'determined',text:"同學們的迎新戰打得不錯！接下來換我。看好黑板上的程式碼，能躲開我的指令，飲料才算贏到手。"},defeat:{speaker:"老師",title:"程式執行完畢",emotion:'relieved',text:"你把我的程式招式都破解了！最後一關通過。撐完第三十節剩下的時間，我就把飲料交給你。"}},
-  jiahao:{arrival:{speaker:"嘉豪",title:"操場第 35 節 · 嘉豪",emotion:'determined',text:"操場借我一圈！看好我的射門路線，再來躲跑道衝刺！"},defeat:{speaker:"7 號同學",audience:'real-player',title:"嘉豪停下來了",emotion:'relieved',text:"螢幕前的你，剛才的側移真漂亮！嘉豪的足球停了，操場加碼賽還有五節。"}},
-  yellowdog:{arrival:{speaker:"7 號同學",audience:'real-player',title:"操場第 40 節 · 小黃狗",emotion:'surprised',text:"螢幕前的你，小黃狗跑進球場了！牠會先吠出聲波，再朝預告方向撲過來。這是最後一關！"},defeat:{speaker:"7 號同學",audience:'real-player',title:"小黃狗跑去喝水了",emotion:'happy',text:"你成功讓小黃狗停下來了！撐完最後這節，我就把茶葉蛋兌換券交給你。"}}
+  jiahao:{arrival:{speaker:"嘉豪",title:"操場第 35 節 · 嘉豪",emotion:'determined',text:"操場借我一圈！看好我的射門路線，再來躲跑道衝刺！"},defeat:{speaker:"瓶蓋收藏家",audience:'real-player',title:"嘉豪停下來了",emotion:'relieved',text:"螢幕前的你，剛才的側移真漂亮！嘉豪的足球停了，操場加碼賽還有五節。"}},
+  yellowdog:{arrival:{speaker:"瓶蓋收藏家",audience:'real-player',title:"操場第 40 節 · 小黃狗",emotion:'surprised',text:"螢幕前的你，小黃狗跑進球場了！牠會先吠出聲波，再朝預告方向撲過來。這是最後一關！"},defeat:{speaker:"瓶蓋收藏家",audience:'real-player',title:"小黃狗跑去喝水了",emotion:'happy',text:"你成功讓小黃狗停下來了！撐完最後這節，我就把茶葉蛋兌換券交給你。"}}
 };
 const BOSS_VICTORY_STORIES = {
   mini1:[
@@ -513,16 +575,19 @@ const BOSS_VICTORY_STORIES = {
   jiahao:[
     BOSS_DIALOGUE.jiahao.defeat,
     {speaker:'嘉豪',title:'球場握手',emotion:'happy',text:'你閃得很準！我先到場邊休息，下一次再比射門。'},
-    {speaker:'7 號同學',audience:'real-player',title:'玩家繼續上場',emotion:'determined',text:'你選的加碼還沒結束喔。看好操場四周，最後一關會更熱鬧！'}
+    {speaker:'瓶蓋收藏家',audience:'real-player',title:'玩家繼續上場',emotion:'determined',text:'你選的加碼還沒結束喔。看好操場四周，最後一關會更熱鬧！'}
   ],
   yellowdog:[
     BOSS_DIALOGUE.yellowdog.defeat,
-    {speaker:'7 號同學',audience:'real-player',title:'最後的倒數',emotion:'relieved',text:'牠只是玩得太開心啦。螢幕前的你，繼續撐到鐘響，獎品就在終點！'},
-    {speaker:'7 號同學',audience:'real-player',title:'茶葉蛋券預備',emotion:'happy',text:'我已經把兌換券準備好了。你親手完成這場操場挑戰，我會替你鼓掌！'}
+    {speaker:'瓶蓋收藏家',audience:'real-player',title:'最後的倒數',emotion:'relieved',text:'牠只是玩得太開心啦。螢幕前的你，繼續撐到鐘響，獎品就在終點！'},
+    {speaker:'瓶蓋收藏家',audience:'real-player',title:'茶葉蛋券預備',emotion:'happy',text:'我已經把兌換券準備好了。你親手完成這場操場挑戰，我會替你鼓掌！'}
   ]
 };
+const ENEMY_CLASSMATES={basic:11,water:25,rubber:26,tissue:2,weilong:8,bit:9,deepblue:12,handler:22,eye:10,shepherd:16,megaphone:30,kicker:23,boxer:6,striker:5,medic:13,commander:34,beam:3,heavykick:4,stepboxer:31,flyfighter:33};
+const BOSS_CLASSMATES={mini1:7,mini2:[15,14]};
+const ENEMY_LABELS={basic:'突刺方塊人',water:'水壺方塊人',rubber:'橡皮筋方塊人',tissue:'溼衛生紙方塊人',weilong:'威龍',bit:'比特',deepblue:'深藍',handler:'訓犬員',eye:'戳眼方塊人',shepherd:'牧羊人',megaphone:'大聲公方塊人',kicker:'飛踢方塊人',boxer:'瞬移拳手',striker:'三球召喚者',medic:'保健股長',commander:'班長',beam:'氣功方塊人',heavykick:'重踢方塊人',stepboxer:'閃身拳手',flyfighter:'飛踢重擊手'};
 const BESTIARY = [
-  {kind:'basic',name:'敵人 1 · 方塊人',move:'突刺；命中時有 1% 機率召喚 100 隻方塊人。',tip:'看到蓄力就向側面移動。'},
+  {kind:'basic',name:'敵人 1 · 突刺方塊人',move:'突刺；命中時有 1% 機率召喚 100 隻方塊人。',tip:'看到蓄力就向側面移動。'},
   {kind:'water',name:'敵人 2 · 水壺方塊人',move:'投擲水壺，或揮擊並射出 3 顆水珠。',tip:'利用課桌掩護，注意近距離的扇形水珠。'},
   {kind:'rubber',name:'敵人 3 · 橡皮筋方塊人',move:'用橡皮筋遠距射擊。',tip:'保持移動，別停在射線上。'},
   {kind:'tissue',name:'敵人 4 · 溼衛生紙方塊人',move:'投出溼衛生紙球，命中或踩到殘留物會減速 3 秒。',tip:'避開地上的溼球。'},
@@ -537,7 +602,7 @@ const BESTIARY = [
   {kind:'boxer',name:'敵人 13 · 瞬移拳手',move:'瞬移到玩家旁邊，再出拳。',tip:'離開落點與拳擊扇形。'},
   {kind:'striker',name:'敵人 14 · 三球召喚者',move:'召喚 3 顆球一同射擊。',tip:'看方向線後側移。'},
   {kind:'medic',name:'敵人 15 · 保健股長',move:'定期治療周圍敵人。',tip:'優先擊倒，防止敵群回血。'},
-  {kind:'commander',name:'敵人 16 · 助威方塊人',move:'強化附近敵人的速度、攻速與傷害。',tip:'先處理助威者。'},
+  {kind:'commander',name:'敵人 16 · 班長',move:'強化附近敵人的速度、攻速與傷害。',tip:'先處理班長，解除敵群強化。'},
   {kind:'beam',name:'敵人 17 · 氣功方塊人',move:'蓄力發射能穿透課桌的光束。',tip:'沿射線側移，課桌不能擋光束。'},
   {kind:'heavykick',name:'敵人 18 · 重踢方塊人',move:'踢飛玩家直到撞上教室邊界。',tip:'離開蓄力扇形。'},
   {kind:'stepboxer',name:'敵人 19 · 閃身拳手',move:'蓄力 0.55 秒側向閃身，接著蓄力 0.48 秒使出昇龍拳。',tip:'先避開閃身落點，再離開昇龍拳扇形。',art:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+5pW15Lq6IDE5IOmWg+i6q+aLs+aJi+aLm+W8j+WcljwvdGl0bGU+CiAgPGRlc2MgaWQ9ImRlc2MiPuW3puWBtOekuuevhOWBtOWQkemWg+i6q+eahOmgkOWRiui3r+e3mu+8m+WPs+WBtOekuuevhOiQvem7nuW+jOeahOaYh+m+jeaLs+aJh+W9ouOAguWFiOmBv+mWi+iQvem7nu+8jOWGjemboumWi+aLs+aTiuevhOWcjeOAgjwvZGVzYz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iIzI0NGQ1NiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzE1MmYzYyIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFya2VyIGlkPSJhcnJvdyIgbWFya2VyV2lkdGg9IjEwIiBtYXJrZXJIZWlnaHQ9IjEwIiByZWZYPSI4IiByZWZZPSI1IiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wIDAgTDEwIDUgTDAgMTAiIGZpbGw9IiM5Y2YwZDciLz48L21hcmtlcj4KICAgIDxnIGlkPSJmaWdodGVyIiBzdHJva2U9IiMyMzRkNTYiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICAgIDxyZWN0IHg9Ii0xOSIgeT0iLTQ3IiB3aWR0aD0iMzgiIGhlaWdodD0iMzEiIHJ4PSI0IiBmaWxsPSIjNjdiNmE5Ii8+CiAgICAgIDxyZWN0IHg9Ii0xNSIgeT0iLTUwIiB3aWR0aD0iMzAiIGhlaWdodD0iOCIgcng9IjMiIGZpbGw9IiNiMWY2ZGYiLz4KICAgICAgPHJlY3QgeD0iLTE3IiB5PSItMTUiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNSIgcng9IjQiIGZpbGw9IiMyZjc3NzciLz4KICAgICAgPHJlY3QgeD0iLTMwIiB5PSItOCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjE5IiByeD0iMyIgZmlsbD0iIzc4ZDhjNyIvPgogICAgICA8cmVjdCB4PSIxNyIgeT0iLTgiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxOSIgcng9IjMiIGZpbGw9IiM3OGQ4YzciLz4KICAgICAgPHJlY3QgeD0iLTE1IiB5PSIxOCIgd2lkdGg9IjExIiBoZWlnaHQ9IjE1IiByeD0iMiIgZmlsbD0iIzM1NGY2MCIvPgogICAgICA8cmVjdCB4PSI0IiB5PSIxOCIgd2lkdGg9IjExIiBoZWlnaHQ9IjE1IiByeD0iMiIgZmlsbD0iIzM1NGY2MCIvPgogICAgICA8cGF0aCBkPSJNLTkgLTMxaDRtMTAgMGg0IiBzdHJva2U9IiMyMjNjNDYiIHN0cm9rZS13aWR0aD0iNSIvPgogICAgPC9nPgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjI4MCIgcng9IjE4IiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxwYXRoIGQ9Ik00MDAgMTZ2MjQ4IiBzdHJva2U9IiM1Yzg4ODciIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA4Ii8+CiAgPHRleHQgeD0iMjQiIHk9IjM2IiBmaWxsPSIjZTRmZmYzIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+RU5FTVkgMTkgfCBTSURFU1RFUCBCT1hFUjwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iNzQiIGZpbGw9IiNiOWU4ZGMiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj4wMSBTSURFU1RFUCB8IDAuNTVzPC90ZXh0PgogIDxlbGxpcHNlIGN4PSIxMzMiIGN5PSIxOTUiIHJ4PSI0MyIgcnk9IjExIiBmaWxsPSIjMTMyOTMzIi8+CiAgPHVzZSBocmVmPSIjZmlnaHRlciIgeGxpbms6aHJlZj0iI2ZpZ2h0ZXIiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIxMzMiIHk9IjE3NCIvPgogIDxwYXRoIGQ9Ik0xODAgMTc3IFEyMzUgMTA0IDMwMCAxNjgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzljZjBkNyIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtZGFzaGFycmF5PSIxMCA4IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgogIDxjaXJjbGUgY3g9IjMyMiIgY3k9IjE3OCIgcj0iMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2MzZmZkZiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtZGFzaGFycmF5PSI4IDciLz4KICA8dGV4dCB4PSIyNTUiIHk9IjIzNiIgZmlsbD0iI2ZmZjBiZCIgZm9udC1zaXplPSIxNyIgZm9udC13ZWlnaHQ9IjcwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPkRPREdFIExBTkRJTkc8L3RleHQ+CiAgPHRleHQgeD0iNDMxIiB5PSI3NCIgZmlsbD0iI2I5ZThkYyIgZm9udC1zaXplPSIxOCIgZm9udC13ZWlnaHQ9IjgwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPjAyIFVQUEVSQ1VUIHwgMC40OHM8L3RleHQ+CiAgPGVsbGlwc2UgY3g9IjU1MiIgY3k9IjIwMiIgcng9IjQzIiByeT0iMTEiIGZpbGw9IiMxMzI5MzMiLz4KICA8dXNlIGhyZWY9IiNmaWdodGVyIiB4bGluazpocmVmPSIjZmlnaHRlciIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjU1MiIgeT0iMTc4Ii8+CiAgPHBhdGggZD0iTTU2MSAxNjUgUTYxMCA4NyA2NjUgMTA5IEw2OTcgMTQ2IFE2MzMgMTMyIDYwOSAyMDMgWiIgZmlsbD0iIzljZjBkNyIgZmlsbC1vcGFjaXR5PSIuMjUiIHN0cm9rZT0iI2E5ZjdkZCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtZGFzaGFycmF5PSI5IDYiLz4KICA8cGF0aCBkPSJNNTc5IDE4MyBRNjIwIDE1MiA2NDYgMTE5IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYwYmQiIHN0cm9rZS13aWR0aD0iNiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KICA8dGV4dCB4PSI2MTAiIHk9IjIzOSIgZmlsbD0iI2ZmZjBiZCIgZm9udC1zaXplPSIxNyIgZm9udC13ZWlnaHQ9IjcwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPkVYSVQgRlJPTlQgQVJDPC90ZXh0Pgo8L3N2Zz4K'},
@@ -548,6 +613,11 @@ const BESTIARY = [
   {kind:'jiahao',name:'操場 Boss · 嘉豪',move:'足球扇形射門與跑道直線衝刺，半血後射門增加。',tip:'看準射門與衝刺預告，向側面移動。'},
   {kind:'yellowdog',name:'操場 Boss · 小黃狗',move:'先蓄力吠出環形聲波，再直線撲擊；半血後聲波變密。',tip:'穿過聲波間隙，側移避開撲擊路線。'}
 ];
+const LESSON_ENEMY_KINDS=Object.fromEntries([
+  ...BESTIARY.slice(0,20).map((entry,index)=>[index+1,entry.kind]),
+  [21,'water'],[22,'rubber'],[23,'medic'],[24,'commander'],[25,'basic'],
+  [26,'megaphone'],[27,'stepboxer'],[28,'kicker'],[29,'flyfighter']
+]);
 // The diagrams use the same classroom silhouettes and attack language as the game.
 // Enemy 19 and 20 keep their dedicated SVG illustrations.
 const MOVE_ART_SCENES = {
@@ -625,15 +695,17 @@ const EMOTION_LABELS={calm:'平靜',surprised:'驚訝',nervous:'緊張',relieved
 
 const $ = id => document.getElementById(id);
 const canvas = $("game");
-const ctx = canvas.getContext("2d");
-const screens = ["start-screen", "story-screen", "tutorial-done-screen", "upgrade-screen", "pause-screen", "reward-screen", "bestiary-screen", "skin-screen", "end-screen"];
+let ctx = canvas.getContext("2d");
+const screens = ["start-screen", "story-screen", "tutorial-done-screen", "upgrade-screen", "pause-screen", "reward-screen", "bestiary-screen", "skin-screen", "shop-screen", "end-screen"];
 const keys = new Set();
 const pointer = { active: false, id: null, x: 0, y: 0 };
 const MAP = { w: 1800, h: 1200 };
 const SUPPORT_RADIUS=280;
 const CLASSROOM_DESKS=Array.from({length:15},(_,i)=>({x:290+i%5*300,y:415+Math.floor(i/5)*230,left:225+i%5*300,top:384+Math.floor(i/5)*230,right:355+i%5*300,bottom:460+Math.floor(i/5)*230}));
 const SOLID_TABLES=[...CLASSROOM_DESKS,{left:800,top:250,right:1000,bottom:337}];
+const NO_TABLES=[];
 const navigationFields=new Map();
+let navigationTick=0;
 const CORE_LESSONS = 30;
 const BONUS_LESSONS = 10;
 const TOTAL_LESSONS = CORE_LESSONS + BONUS_LESSONS;
@@ -698,6 +770,12 @@ const TOOL_SKINS=LEGACY_TOOL_SKINS.flatMap(base=>SKIN_RARITIES.map((rarity,index
   color:rarity.id==='rare'?base.color:rarity.color,glow:rarity.glow
 })));
 const TOOL_SKIN_BY_ID=Object.fromEntries(TOOL_SKINS.map(skin=>[skin.id,skin]));
+const SKIN_SHOP_PRICES={common:4,rare:8,epic:16,legendary:30,mythic:55};
+const SHOP_SUPPLIES=[
+  {id:'bread',name:'小麵包',icon:'🥐',price:2,description:'立刻回復 35 點體力；體力已滿時不能購買。'},
+  {id:'riceball',name:'飯糰',icon:'🍙',price:4,description:'本局生命上限 +8，並回復 8 點；每局最多 3 個。'},
+  {id:'notes',name:'班長筆記',icon:'📒',price:3,description:'獲得 20 點經驗；恢復遊戲後可觸發升級。'}
+];
 const SUPER_TOOLS = {
   blueberry: {name: "星耀西瓜雨", damage: 62, count: 5, cooldown: 1.2, splashRadius: 92, knockback: 110, upgrade: "五顆西瓜齊砸，震波與擊退大幅增強"},
   pistol: {name: "星耀加特林", damage: 45, cooldown: .16, range: 850, speed: 1200, upgrade: "高速自動單發，傷害與射程提升"},
@@ -878,7 +956,7 @@ let tutorialControls = {paused:false,resumed:false,speed:false};
 let tutorialWaypoint = null;
 let tutorialSpeedTime = 0;
 const TUTORIAL_STEPS = [
-  {title:"先熟悉移動",text:"用 WASD、方向鍵或畫面中央偏下的搖桿移動。搖桿大小可在主選單或暫停時調整。教學有體力保護，放心練習。",goal:"移動一小段距離，熟悉轉向。"},
+  {title:"先熟悉移動",text:"用 WASD、方向鍵或畫面左下角的搖桿移動。搖桿大小可在主選單或暫停時調整。教學有體力保護，放心練習。",goal:"移動一小段距離，熟悉轉向。"},
   {title:"鉛筆會自動揮砍",text:"鉛筆是開局武器，不占道具欄。靠近標記的練習方塊人，角色會自動攻擊。",goal:"靠近並用鉛筆擊敗練習目標。"},
   {title:"收集經驗升級",text:"走近綠色經驗光點會自動吸取。下方經驗條填滿，就能升級並三選一。",goal:"走向標記，收集這份經驗。"},
   {title:"第一次三選一",text:"讀一讀卡片的攻擊與升級效果。點選卡片或按 1、2、3；選擇時戰鬥暫停。",goal:"從藍莓、手槍、甩炮中選一種。"},
@@ -906,21 +984,22 @@ let upgradeRerolls = 0;
 let spawnedBosses = new Set();
 let defeatedBosses = new Set();
 let gameTime = 0;
+let introducedLessonEnemies=new Set();
 let skinTickets=(()=>{try{const saved=Number(window.localStorage?.getItem('classroom-survivor-skin-tickets'));return Number.isSafeInteger(saved)&&saved>=0?saved:0;}catch(_){return 0;}})();
 let runSkinTickets=0;
 let rewardedLessons=new Set();
-let ownedSkins=(()=>{try{const saved=JSON.parse(window.localStorage?.getItem('classroom-survivor-tool-skins')||'[]');return new Set(Array.isArray(saved)?saved.map(id=>TOOL_SKIN_BY_ID[id]?id:TOOL_SKIN_BY_ID[`${id}:rare`]?`${id}:rare`:null).filter(Boolean):[]);}catch(_){return new Set();}})();
-let equippedSkins=(()=>{try{
-  const saved=JSON.parse(window.localStorage?.getItem('classroom-survivor-equipped-skins')||'{}');
-  return Object.fromEntries(LEGACY_TOOL_SKINS.map(base=>{
-    const equipped=saved?.[base.toolId],legacy=`${base.toolId}:rare`;
-    return [base.toolId,ownedSkins.has(equipped)&&TOOL_SKIN_BY_ID[equipped]?.toolId===base.toolId?equipped:ownedSkins.has(legacy)?legacy:null];
-  }).filter(([,id])=>id));
-}catch(_){return {};}})();
+let ownedSkins=new Set();
+let equippedSkins={};
+try{
+  window.localStorage?.removeItem?.('classroom-survivor-tool-skins');
+  window.localStorage?.removeItem?.('classroom-survivor-equipped-skins');
+}catch(_){}
 let selectedSkinTool=CONTENT.weapons[0].id;
 let skinDrawing=false;
 let skinAnimationTimer=null;
 let skinsReturnMode='menu';
+let shopReturnMode='menu';
+let shopPurchases={riceball:0};
 let bonusAccepted = false;
 let drinkEarned = false;
 let bestiaryReturnMode = 'menu';
@@ -942,7 +1021,8 @@ let camera = { x: 0, y: 0 };
 
 function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
 function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
-function activeSolidTables() { return bonusAccepted?[]:SOLID_TABLES; }
+function withinReach(a,b,radius) {const dx=a.x-b.x,dy=a.y-b.y;return dx*dx+dy*dy<radius*radius;}
+function activeSolidTables() { return bonusAccepted?NO_TABLES:SOLID_TABLES; }
 function clearOfTables(point,r=0) {
   return !activeSolidTables().some(t=>point.x>t.left-r&&point.x<t.right+r&&point.y>t.top-r&&point.y<t.bottom+r);
 }
@@ -959,15 +1039,24 @@ function freePosition(entity) {
 }
 function tableHit(from,to,r=0) {
   let first=null;
+  const dx=to.x-from.x,dy=to.y-from.y;
   for(const table of activeSolidTables()) {
     let enter=0,leave=1,nx=0,ny=0,valid=true;
-    for(const [axis,low,high] of [['x',table.left-r,table.right+r],['y',table.top-r,table.bottom+r]]) {
-      const delta=to[axis]-from[axis];
-      if(Math.abs(delta)<1e-9){if(from[axis]<=low||from[axis]>=high){valid=false;break;}continue;}
-      const a=(low-from[axis])/delta,b=(high-from[axis])/delta,near=Math.min(a,b),far=Math.max(a,b);
-      if(near>=enter){enter=near;nx=axis==='x'?-Math.sign(delta):0;ny=axis==='y'?-Math.sign(delta):0;}
+    const left=table.left-r,right=table.right+r,top=table.top-r,bottom=table.bottom+r;
+    if(Math.abs(dx)<1e-9){if(from.x<=left||from.x>=right)valid=false;}
+    else {
+      const a=(left-from.x)/dx,b=(right-from.x)/dx,near=Math.min(a,b),far=Math.max(a,b);
+      if(near>=enter){enter=near;nx=-Math.sign(dx);ny=0;}
       leave=Math.min(leave,far);
-      if(enter>leave){valid=false;break;}
+      if(enter>leave)valid=false;
+    }
+    if(!valid)continue;
+    if(Math.abs(dy)<1e-9){if(from.y<=top||from.y>=bottom)valid=false;}
+    else {
+      const a=(top-from.y)/dy,b=(bottom-from.y)/dy,near=Math.min(a,b),far=Math.max(a,b);
+      if(near>=enter){enter=near;nx=0;ny=-Math.sign(dy);}
+      leave=Math.min(leave,far);
+      if(enter>leave)valid=false;
     }
     if(valid&&leave>0&&enter>=0&&enter<=1&&(!first||enter<first.t))first={t:enter,nx,ny};
   }
@@ -975,15 +1064,18 @@ function tableHit(from,to,r=0) {
 }
 function navigationPoint(enemy) {
   const r=enemy.r+2,cols=45,rows=30,step=40;
+  const playerCell=Math.floor(player.y/step)*cols+Math.floor(player.x/step);
+  const enemyCell=Math.floor(enemy.y/step)*cols+Math.floor(enemy.x/step);
+  const cached=enemy.routeCache;
+  if(cached&&cached.playerCell===playerCell&&cached.enemyCell===enemyCell&&navigationTick-cached.tick<6)return cached.waypoint;
   let field=navigationFields.get(r);
   if(!field) {
     const nodes=Array.from({length:cols*rows},(_,i)=>({x:(i%cols+.5)*step,y:(Math.floor(i/cols)+.5)*step}));
     field={nodes,open:nodes.map(p=>p.x>=40&&p.x<=MAP.w-40&&p.y>=85&&p.y<=MAP.h-40&&clearOfTables(p,r)),target:-1};navigationFields.set(r,field);
   }
   let target=-1,best=Infinity;
-  const cellX=Math.floor(player.x/step),cellY=Math.floor(player.y/step),key=cellY*cols+cellX;
-  if(field.playerCell!==key) {
-    field.playerCell=key;
+  if(field.playerCell!==playerCell) {
+    field.playerCell=playerCell;
     for(let i=0;i<field.nodes.length;i++)if(field.open[i]){const d=distance(player,field.nodes[i]);if(d<best){best=d;target=i;}}
     field.target=target;field.cost=new Int32Array(cols*rows).fill(-1);
     const queue=[target];if(target>=0)field.cost[target]=0;
@@ -1004,6 +1096,7 @@ function navigationPoint(enemy) {
     const cost=field.cost[i]*step+distance(enemy,p)*.8;
     if(cost<score){score=cost;waypoint=p;}
   }
+  enemy.routeCache={playerCell,enemyCell,tick:navigationTick,waypoint};
   return waypoint;
 }
 function moveActor(entity,x,y,route=false) {
@@ -1138,8 +1231,10 @@ function renderSkinCollection() {
   $('skin-balance').textContent=`皮膚券 ${skinTickets} 張 · 已收藏 ${ownedSkins.size} / ${TOOL_SKINS.length}`;
   const available=TOOL_SKINS.length-ownedSkins.size;
   $('skin-draw-btn').disabled=skinDrawing||skinTickets<1||available===0;
+  $('skin-draw-ten-btn').disabled=skinDrawing||skinTickets<10||available<10;
   $('skin-close-btn').disabled=skinDrawing;
   $('skin-draw-btn').textContent=skinDrawing?'抽取中…':available===0?'全部皮膚已收藏':skinTickets<1?'皮膚券不足':'🎟️ 花 1 張抽一款皮膚';
+  $('skin-draw-ten-btn').textContent=skinDrawing?'抽取中…':available<10?'剩餘皮膚不足 10 款':skinTickets<10?'需要 10 張皮膚券':'🎟️ 花 10 張十連抽';
   const tabs=$('skin-tool-tabs');tabs.replaceChildren();
   for(const tool of CONTENT.weapons){
     const button=document.createElement('button');button.type='button';button.className=`skin-tool-tab${selectedSkinTool===tool.id?' selected':''}`;
@@ -1174,6 +1269,7 @@ function openSkinCollection() {
   $('skin-reveal-canvas').getContext('2d').clearRect(0,0,130,110);
   $('skin-reveal-title').textContent='等待抽取';
   $('skin-reveal-rarity').textContent='每張券抽一款新外觀';
+  $('skin-draw-results').replaceChildren();
   renderSkinCollection();showScreen('skin-screen');
 }
 function closeSkinCollection() {
@@ -1181,11 +1277,9 @@ function closeSkinCollection() {
   mode=skinsReturnMode;
   showScreen({menu:'start-screen',paused:'pause-screen',reward:'reward-screen',ended:'end-screen'}[mode]);
 }
-function saveSkinCollection() {
+function saveSkinTickets() {
   try{
     window.localStorage?.setItem('classroom-survivor-skin-tickets',String(skinTickets));
-    window.localStorage?.setItem('classroom-survivor-tool-skins',JSON.stringify([...ownedSkins]));
-    window.localStorage?.setItem('classroom-survivor-equipped-skins',JSON.stringify(equippedSkins));
   }catch(_){}
 }
 function equipToolSkin(id) {
@@ -1193,7 +1287,7 @@ function equipToolSkin(id) {
   if(mode!=='skins'||skinDrawing||!skin||!ownedSkins.has(id))return;
   equippedSkins[skin.toolId]=id;
   $('skin-result').textContent=`已套用「${skin.name}」；遊戲數值不變。`;
-  saveSkinCollection();renderSkinCollection();
+  renderSkinCollection();
 }
 function pickRandomToolSkin() {
   const groups=SKIN_RARITIES.map(rarity=>({rarity,skins:TOOL_SKINS.filter(skin=>skin.rarity===rarity.id&&!ownedSkins.has(skin.id))})).filter(group=>group.skins.length);
@@ -1223,10 +1317,11 @@ function drawRandomToolSkin() {
   ownedSkins.add(skin.id);
   equippedSkins[skin.toolId]=skin.id;
   selectedSkinTool=skin.toolId;
-  saveSkinCollection();
+  saveSkinTickets();
   skinDrawing=true;
   const stage=$('skin-draw-stage');
   stage.className='skin-draw-stage drawing';
+  $('skin-draw-results').replaceChildren();
   const preview=$('skin-reveal-canvas').getContext('2d');preview.clearRect(0,0,130,110);
   drawTool(preview,skin.toolId,5,65,55,1.4,0,false,skin.id);
   $('skin-reveal-title').textContent='翻開皮膚卡片…';
@@ -1236,6 +1331,109 @@ function drawRandomToolSkin() {
   renderSkinCollection();updateHud();
   if(storyReducedMotion)finishSkinReveal(skin);
   else skinAnimationTimer=setTimeout(()=>finishSkinReveal(skin),1400);
+}
+function finishTenSkinReveal(skins) {
+  skinDrawing=false;skinAnimationTimer=null;
+  const best=skins.reduce((highest,skin)=>skin.rarityIndex>highest.rarityIndex?skin:highest,skins[0]);
+  $('skin-draw-stage').className=`skin-draw-stage revealed rarity-${best.rarity}`;
+  $('skin-reveal-title').textContent='十連抽完成！';
+  $('skin-reveal-rarity').textContent=`本次最高：${best.rarityLabel} · ${best.name}`;
+  $('skin-result').textContent=`一次收藏 ${skins.length} 款新皮膚！全部已自動套用，可在收藏室自由切換。`;
+  renderSkinCollection();
+}
+function drawTenToolSkins() {
+  if(mode!=='skins'||skinDrawing||skinTickets<10||TOOL_SKINS.length-ownedSkins.size<10)return;
+  const skins=[];
+  for(let i=0;i<10;i++) {
+    const skin=pickRandomToolSkin();
+    if(!skin)return;
+    skins.push(skin);ownedSkins.add(skin.id);
+    equippedSkins[skin.toolId]=skin.id;
+  }
+  skinTickets-=10;
+  selectedSkinTool=skins.at(-1).toolId;
+  saveSkinTickets();skinDrawing=true;
+  $('skin-draw-stage').className='skin-draw-stage drawing';
+  $('skin-reveal-canvas').getContext('2d').clearRect(0,0,130,110);
+  $('skin-reveal-title').textContent='十張皮膚卡片翻開中…';
+  $('skin-reveal-rarity').textContent='稀有度揭曉中';
+  $('skin-result').textContent='班長正在拆開十張皮膚卡！';
+  const results=$('skin-draw-results');results.replaceChildren();
+  for(const [index,skin] of skins.entries()) {
+    const card=document.createElement('div');card.className=`skin-draw-result rarity-${skin.rarity}`;
+    card.style.animationDelay=`${index*.12}s`;
+    const preview=document.createElement('canvas');preview.width=90;preview.height=74;
+    drawTool(preview.getContext('2d'),skin.toolId,3,45,38,.85,0,false,skin.id);
+    const name=document.createElement('strong');name.textContent=skin.name;
+    const rarity=document.createElement('small');rarity.textContent=skin.rarityLabel;
+    card.append(preview);card.append(name);card.append(rarity);results.append(card);
+  }
+  playSound(880,.26,'triangle',.05);renderSkinCollection();updateHud();
+  if(storyReducedMotion)finishTenSkinReveal(skins);
+  else skinAnimationTimer=setTimeout(()=>finishTenSkinReveal(skins),1700);
+}
+function renderShop() {
+  $('shop-balance').textContent=`🎟️ 皮膚券 ${skinTickets} 張 · 已收藏 ${ownedSkins.size} / ${TOOL_SKINS.length} 款皮膚`;
+  const clerk=$('shop-clerk').getContext('2d');clerk.clearRect(0,0,150,130);
+  clerk.save();clerk.translate(75,85);clerk.scale(1.45,1.45);storyStudent(clerk,0,0,0,false,true,'happy');clerk.restore();
+  const supplies=$('shop-supplies');supplies.replaceChildren();
+  for(const item of SHOP_SUPPLIES) {
+    const card=document.createElement('article');card.className='shop-card';
+    const heading=document.createElement('strong');heading.textContent=`${item.icon} ${item.name}`;
+    const description=document.createElement('small');description.textContent=item.description;
+    const button=document.createElement('button');button.type='button';button.textContent=`${item.price} 張皮膚券 · 購買`;
+    button.disabled=shopReturnMode!=='paused'||skinTickets<item.price||(item.id==='bread'&&player.hp>=player.maxHp)||(item.id==='riceball'&&shopPurchases.riceball>=3);
+    bindButtonAction(button,()=>buyShopSupply(item.id));
+    card.append(heading);card.append(description);card.append(button);supplies.append(card);
+  }
+  const tabs=$('shop-tool-tabs');tabs.replaceChildren();
+  for(const tool of CONTENT.weapons) {
+    const button=document.createElement('button');button.type='button';button.className=`skin-tool-tab${selectedSkinTool===tool.id?' selected':''}`;
+    button.textContent=`${tool.icon} ${tool.name}`;
+    button.setAttribute('role','tab');button.setAttribute('aria-selected',String(selectedSkinTool===tool.id));
+    bindButtonAction(button,()=>{selectedSkinTool=tool.id;renderShop();});tabs.append(button);
+  }
+  const list=$('shop-skins');list.replaceChildren();
+  for(const skin of TOOL_SKINS.filter(entry=>entry.toolId===selectedSkinTool)) {
+    const price=SKIN_SHOP_PRICES[skin.rarity],owned=ownedSkins.has(skin.id);
+    const card=document.createElement('article');card.className=`shop-card rarity-${skin.rarity}`;
+    const preview=document.createElement('canvas');preview.width=90;preview.height=78;
+    drawTool(preview.getContext('2d'),skin.toolId,3,45,40,.85,0,false,skin.id);
+    const heading=document.createElement('strong');heading.textContent=skin.name;
+    const description=document.createElement('small');description.textContent=`${skin.rarityLabel} · 攻擊附帶專屬顏色與光效`;
+    const button=document.createElement('button');button.type='button';button.textContent=owned?'已收藏':`${price} 張皮膚券 · 直接買`;
+    button.disabled=owned||skinTickets<price;
+    bindButtonAction(button,()=>buyShopSkin(skin.id));
+    card.append(preview);card.append(heading);card.append(description);card.append(button);list.append(card);
+  }
+}
+function openShop() {
+  if(mode==='shop'||!['menu','paused','reward','ended'].includes(mode))return;
+  shopReturnMode=mode;mode='shop';
+  $('shop-message').textContent=shopReturnMode==='paused'?'班長：這裡可以補給，也可以挑皮膚！':'班長：先選好皮膚；補給品可在遊戲暫停時購買。';
+  renderShop();showScreen('shop-screen');
+}
+function closeShop() {
+  if(mode!=='shop')return;
+  mode=shopReturnMode;
+  showScreen({menu:'start-screen',paused:'pause-screen',reward:'reward-screen',ended:'end-screen'}[mode]);
+}
+function buyShopSupply(id) {
+  const item=SHOP_SUPPLIES.find(entry=>entry.id===id);
+  if(mode!=='shop'||shopReturnMode!=='paused'||!item||skinTickets<item.price||id==='bread'&&player.hp>=player.maxHp||id==='riceball'&&shopPurchases.riceball>=3)return;
+  skinTickets-=item.price;
+  if(id==='bread')player.hp=Math.min(player.maxHp,player.hp+35);
+  else if(id==='riceball'){shopPurchases.riceball++;player.maxHp+=8;player.hp=Math.min(player.maxHp,player.hp+8);}
+  else player.xp+=20;
+  saveSkinTickets();updateHud();renderShop();
+  $('shop-message').textContent=`購買「${item.name}」成功！${id==='notes'?'繼續遊戲後會結算經驗。':'補給已生效。'}`;
+}
+function buyShopSkin(id) {
+  const skin=TOOL_SKIN_BY_ID[id];
+  if(mode!=='shop'||!skin||ownedSkins.has(id)||skinTickets<SKIN_SHOP_PRICES[skin.rarity])return;
+  skinTickets-=SKIN_SHOP_PRICES[skin.rarity];ownedSkins.add(id);equippedSkins[skin.toolId]=id;
+  saveSkinTickets();updateHud();renderShop();
+  $('shop-message').textContent=`班長把「${skin.name}」交給你！已收藏並套用。`;
 }
 function bindButtonAction(button, action) {
   let touch=null,suppressClickUntil=0;
@@ -1325,13 +1523,16 @@ function resetWorld() {
   enemyProjectiles = [];
   pickups = [];
   navigationFields.clear();
+  navigationTick=0;
   effects = [];
   upgradeChoices = [];
   upgradeRerolls = 0;
   spawnedBosses = new Set();
   defeatedBosses = new Set();
   gameTime = 0;
+  introducedLessonEnemies=new Set();
   runSkinTickets=0;
+  shopPurchases={riceball:0};
   rewardedLessons=new Set();
   bonusAccepted = false;
   $('game-shell').classList.remove('playground-stage');
@@ -1403,7 +1604,16 @@ function storyStudent(c,x,y,time,walking,leader=false,emotion='calm',gender=null
   drawStoryFace(c,emotion,time);
   c.fillStyle=girl?"#fff1cf":"#f0cf78";c.fillRect(-17,0,34,4);
   if(girl)drawStudentSkirt(c,18,31);
-  if(leader){c.strokeStyle="#334e54";c.lineWidth=2;c.strokeRect(-11,-28,10,9);c.strokeRect(2,-28,10,9);c.beginPath();c.moveTo(-1,-24);c.lineTo(2,-24);c.stroke();}
+  if(leader){
+    // The class president has a distinct ribbon, blazer, badge and open class notebook.
+    c.fillStyle='#e4b66e';c.beginPath();c.moveTo(-18,-42);c.lineTo(-10,-37);c.lineTo(-15,-31);c.lineTo(-24,-36);c.closePath();c.fill();
+    c.beginPath();c.moveTo(-12,-38);c.lineTo(-5,-45);c.lineTo(-3,-33);c.lineTo(-11,-32);c.closePath();c.fill();
+    c.fillStyle='#f5ead1';c.beginPath();c.moveTo(-10,-5);c.lineTo(0,8);c.lineTo(10,-5);c.closePath();c.fill();
+    c.fillStyle='#d2b46d';c.beginPath();c.moveTo(-6,-5);c.lineTo(0,3);c.lineTo(6,-5);c.closePath();c.fill();
+    storyBox(c,-15,9,10,10,'#e8ca76','#8b6d54',2);c.fillStyle='#4e675c';c.font='900 7px sans-serif';c.fillText('長',-13,17);
+    c.save();c.translate(24,10);c.rotate(-.14);storyBox(c,-4,-10,25,22,'#f9f3dc','#7c6656',2);
+    c.strokeStyle='#9bbaaa';c.lineWidth=1;for(let line=-5;line<10;line+=4){c.beginPath();c.moveTo(0,line);c.lineTo(16,line);c.stroke();}c.restore();
+  }
   c.restore();
 }
 function storyTeacher(c,x,y,time,emotion='happy') {
@@ -1443,10 +1653,13 @@ function drawStoryFace(c,emotion,time) {
   if(emotion==='happy') {c.fillStyle='#de9b8899';c.fillRect(-13,-16,5,3);c.fillRect(8,-16,5,3);}
 }
 function classmateGender(speaker) {
-  if(speaker==='嘉豪')return 'boy';
-  const number=Number(/^([0-9]+) 號同學$/.exec(speaker)?.[1]);
+  if(speaker==='嘉豪'||speaker==='瓶蓋收藏家')return 'boy';
+  const lateClassmates=LATE_CLASSMATE_NUMBERS[speaker];
+  if(lateClassmates)return lateClassmates[0]>=21?'girl':lateClassmates[0]<=16?'boy':'neutral';
+  const kind=Object.keys(ENEMY_LABELS).find(key=>ENEMY_LABELS[key]===speaker);
+  const number=ENEMY_CLASSMATES[kind];
   if(number>=1&&number<=16)return 'boy';
-  if(number>=21&&number<=33)return 'girl';
+  if(number>=21&&number<=34)return 'girl';
   return null;
 }
 function drawDialoguePortrait() {
@@ -1509,7 +1722,7 @@ function drawDialogueStoryFrame(c,dialogue,time,reduced=false) {
     c.strokeStyle='#f8e5c4';c.lineWidth=2;c.beginPath();c.moveTo(0,102);c.lineTo(440,102);c.stroke();
     storyBox(c,13,9,414,28,'#315f5c','#d9edcf',7);
     c.fillStyle='#f7ffe7';c.textAlign='center';c.font="900 15px 'Noto Sans TC',sans-serif";
-    c.fillText('7 號同學正在對螢幕前的你說話',220,29);
+    c.fillText('瓶蓋收藏家正在對螢幕前的你說話',220,29);
     storyStudent(c,220,86+sway,time,false,false,dialogue.emotion||'happy','boy');
     c.strokeStyle='#fff4c8';c.lineWidth=3;
     for(const side of [-1,1]){c.beginPath();c.moveTo(220+side*36,56);c.lineTo(220+side*51,47);c.stroke();}
@@ -1677,7 +1890,7 @@ function queueNarrative(id,entry) {
 }
 function updateNarrative(dt) {
   if(activeDialogue){dialogueTime-=dt/gameSpeed;if(dialogueTime<=0)nextDialogue();}
-  for(const beat of STORY_BEATS) if(currentLesson()>=beat.lesson) queueNarrative(beat.id,beat);
+  for(const beat of STORY_BEATS)if(currentLesson()>=beat.lesson&&(beat.lesson>=21||introducedLessonEnemies.has(beat.lesson)))queueNarrative(beat.id,beat);
 }
 
 function startTutorial() {
@@ -1818,6 +2031,7 @@ function startGame() {
   $("pause-btn").classList.remove('tutorial-focus');$("speed-btn").classList.remove('tutorial-focus');
   showScreen(null);
   showToast("撐過 30 節領飲料，還可加碼 10 節！");
+  ensureLessonSpeakerEnemy();
   updateNarrative(0);
 }
 
@@ -1827,10 +2041,10 @@ function makeEnemy(x, y, kind = "basic") {
   const baseHealth = 37 + (currentLesson() - 1) * 5;
   const health = boss ? boss.hp : practice ? 20 : kind === "deepblue" ? Math.round(baseHealth * 1.8) : kind === "spider" || kind === "dog" ? Math.round(baseHealth * .45) : ["weilong","bit","handler","shepherd","boxer","striker","medic","commander","beam","heavykick","stepboxer","flyfighter"].includes(kind) ? Math.round(baseHealth * 1.6) : kind === "water" ? Math.round(baseHealth * 1.25) : baseHealth;
   const scaledHealth=practice?health:Math.max(1,Math.round(health*(MELEE_ENEMY_KINDS.has(kind)?2:1)*difficultySettings().enemyHealth));
-  return freePosition({ x, y, kind, boss, hp: scaledHealth, maxHp: scaledHealth, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "yellowdog" ? 185 : kind === "jiahao" ? 135 : kind === "deepblue" ? 65 : kind === "mini2" ? 110 : boss ? 77 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), attackMove:kind==='yellowdog'?'bark':'shot', healClock:2.4, windup: 0, codeCooldown:kind==='final'?2.5:0, codeWindup:0, codeAngle:0, codeBurstRemaining:0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) });
+  return freePosition({ x, y, kind, boss, hp: scaledHealth, maxHp: scaledHealth, r: boss ? boss.r : kind === "spider" || kind === "dog" ? 13 : 21, speed: practice ? 0 : kind === "spider" ? 245 : kind === "dog" ? 260 : kind === "yellowdog" ? 200 : kind === "jiahao" ? 150 : kind === "deepblue" ? 65 : kind === "mini2" ? 125 : boss ? 85 : 79 + Math.min(40, (currentLesson() - 1) * 1.4), damage: boss ? boss.damage : kind === "water" ? 14 : 11, hitFlash: 0, slowTime:0, stunTime:0, rulerHitCooldown: 0, wobble: random(0, 6.28), attackClock: random(.8, 2), attackMove:kind==='yellowdog'?'bark':'shot', healClock:2.4, windup: 0, codeCooldown:kind==='final'?1.8:0, codeWindup:0, codeAngle:0, codeBurstRemaining:0, waterAttack: "throw", waterSwingTime: 0, lungeTime: 0, lungeVX: 0, lungeVY: 0, hitPlayer: false, life:kind === "spider" ? 8 : kind === "dog" ? 12 : Infinity, shieldAngle:Math.atan2(player.y-y,player.x-x) });
 }
-function spawnEnemy(kind) {
-  if((kind==='medic'||kind==='commander')&&enemies.filter(enemy=>enemy.kind===kind&&enemy.hp>0).length>=3)kind='basic';
+function spawnEnemy(kind,guaranteed=false) {
+  if(!guaranteed&&(kind==='medic'||kind==='commander')&&enemies.filter(enemy=>enemy.kind===kind&&enemy.hp>0).length>=3)kind='basic';
   const viewW = cw / scale;
   const viewH = ch / scale;
   const angle = random(0, Math.PI * 2);
@@ -1845,6 +2059,12 @@ function spawnEnemy(kind) {
   enemies.push(enemy);
   return enemy;
 }
+function ensureLessonSpeakerEnemy() {
+  const lesson=currentLesson(),kind=LESSON_ENEMY_KINDS[lesson];
+  if(mode!=='playing'||!kind||hasActiveBoss()||introducedLessonEnemies.has(lesson))return;
+  spawnEnemy(kind,true);
+  introducedLessonEnemies.add(lesson);
+}
 function spawnScheduledBosses() {
   for (const boss of BOSS_SCHEDULE) {
     if(boss.lesson>CORE_LESSONS&&!bonusAccepted)continue;
@@ -1854,7 +2074,11 @@ function spawnScheduledBosses() {
       enemyProjectiles=[];
       effects=effects.filter(effect=>!["enemy-trap","wet-tissue","water-swing","enemy-explosion","eye-poke","shield-swing","shield-block","martial-teleport","martial-uppercut","sidestep","heavy-strike"].includes(effect.type));
       spawnedBosses.add(boss.id);
-      for (let i = 0; i < (boss.members || 1); i++) spawnEnemy(boss.id).memberIndex = i;
+      for (let i = 0; i < (boss.members || 1); i++) {
+        const member=spawnEnemy(boss.id);
+        member.memberIndex=i;
+        member.classmateNumber=Array.isArray(BOSS_CLASSMATES[boss.id])?BOSS_CLASSMATES[boss.id][i]:BOSS_CLASSMATES[boss.id]||null;
+      }
       showToast(`第 ${boss.lesson} 節：${boss.name} 登場！`);
       queueNarrative(`boss-arrival-${boss.id}`,BOSS_DIALOGUE[boss.id].arrival);
     }
@@ -1883,11 +2107,11 @@ function nearestEnemy(range) {
   }
   return nearest;
 }
-function nearestFrom(origin, range, excluded = new Set()) {
-  let nearest = null, best = range;
+function nearestFrom(origin, range, excluded = null) {
+  let nearest = null, best = range*range;
   for (const enemy of enemies) {
-    const d = distance(origin, enemy);
-    if (enemy.hp > 0 && !excluded.has(enemy) && d < best) { nearest = enemy; best = d; }
+    const dx=origin.x-enemy.x,dy=origin.y-enemy.y,d2=dx*dx+dy*dy;
+    if (enemy.hp > 0 && (!excluded||!excluded.has(enemy)) && d2 < best) { nearest = enemy; best = d2; }
   }
   return nearest;
 }
@@ -1940,7 +2164,9 @@ function damageEnemy(enemy, amount, source, origin = player) {
   }
   enemy.hp -= amount;
   enemy.hitFlash = .12;
-  addEffect(enemy.x, enemy.y - enemy.r, "number", { text: String(Math.round(amount)), color: source === "pencil" ? "#fff4c3" : "#c5ecfa" });
+  const skin=TOOL_SKIN_BY_ID[equippedSkins[source]];
+  addEffect(enemy.x, enemy.y - enemy.r, "number", { text: String(Math.round(amount)), color: skin?.color|| (source === "pencil" ? "#fff4c3" : "#c5ecfa") });
+  if(skin&&effects.length<250)addEffect(enemy.x,enemy.y,'skin-strike',{color:skin.color,rarityIndex:skin.rarityIndex,toolId:source,duration:.32});
   if (enemy.hp <= 0) {
     playSound(enemy.boss ? 170 : 220, .11, "triangle", .045);
     if (enemy.kind === "practice") {
@@ -1976,12 +2202,13 @@ function updateUnityTool(dt) {
 }
 function applyCheat(rawCode) {
   if(mode!=='paused'||pauseReturnMode!=='playing')return false;
-  const code=String(rawCode||'').trim().replace(/\s+/g,'');
+  const enteredCode=String(rawCode||'').trim().replace(/\s+/g,'');
+  const code=['two突飛猛竟','two突飛猛進'].includes(enteredCode)?'two飛猛進':enteredCode;
   const status=$('cheat-status');
-  if(!['two突飛猛竟','我是外掛'].includes(code)){status.textContent='沒有找到這組密技，再檢查一下字。';return false;}
+  if(!['two飛猛進','我是外掛'].includes(code)){status.textContent='沒有找到這組密技，再檢查一下字。';return false;}
   if(usedCheats.has(code)){status.textContent='這組密技本局已經用過了。';return false;}
   usedCheats.add(code);
-  if(code==='two突飛猛竟') {
+  if(code==='two飛猛進') {
     unityTool=true;unityCooldown=0;
     status.textContent='獲得隱藏道具「大家的團結」！每 2.5 秒攻擊全圖敵人，造成 999999 傷害。';
   } else {
@@ -2022,17 +2249,18 @@ function pencilAttack() {
   player.swingTime = .22;
   player.pencilCooldown = .48*(player.talents.rhythm?.9:1);
   playSound(510, .055, "triangle", .025);
-  for (const enemy of [...enemies]) {
-    const d = distance(player, enemy);
-    const delta = Math.atan2(Math.sin(Math.atan2(enemy.y - player.y, enemy.x - player.x) - angle), Math.cos(Math.atan2(enemy.y - player.y, enemy.x - player.x) - angle));
-    if (d < reach + enemy.r * .5 && Math.abs(delta) < 1.05) damageEnemy(enemy, 28+(player.talents.blast?3:0), "pencil");
+  for (const enemy of mode==='tutorial'?[...enemies]:enemies) {
+    if(enemy.hp<=0||!withinReach(player,enemy,reach+enemy.r*.5))continue;
+    const heading=Math.atan2(enemy.y-player.y,enemy.x-player.x);
+    const delta=Math.atan2(Math.sin(heading-angle),Math.cos(heading-angle));
+    if (Math.abs(delta) < 1.05) damageEnemy(enemy, 28+(player.talents.blast?3:0), "pencil");
   }
 }
 function shootAt(target, type, speed, damage, offset = 0) {
   const angle = Math.atan2(target.y - player.y, target.x - player.x) + offset;
   const level = player.weapons[type] || 1;
   const stats = toolStats(type, level);
-  projectiles.push({ ...stats, evolved: isEvolved(type), x: player.x + Math.cos(angle) * 25, y: player.y + Math.sin(angle) * 25, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, speed, type, level, damage, r: type === "pistol" || type === "bow" ? 5 : 10 + level, life: type === "eraser" ? 3 : 2, age: 0, returning: false, hitEnemies: new Set(), target });
+  projectiles.push({ ...stats, evolved: isEvolved(type), skinId:equippedSkins[type]||null, x: player.x + Math.cos(angle) * 25, y: player.y + Math.sin(angle) * 25, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, speed, type, level, damage, r: type === "pistol" || type === "bow" ? 5 : 10 + level, life: type === "eraser" ? 3 : 2, age: 0, returning: false, hitEnemies: new Set(), target });
   playSound(type === "pistol" ? 710 : 340, type === "pistol" ? .045 : .09, type === "pistol" ? "square" : "sine", .025);
 }
 function weaponAttacks(dt) {
@@ -2040,7 +2268,9 @@ function weaponAttacks(dt) {
   const stunned=player.stunTime>0;
   if(!stunned) pencilAttack();
   const levels = player.weapons;
-  for (const id of CONTENT.weapons.map(w => w.id).filter(id => id !== "ruler")) {
+  for (const weapon of CONTENT.weapons) {
+    const id=weapon.id;
+    if(id==='ruler')continue;
     const cooldown = `${id}Cooldown`;
     player[cooldown] -= dt;
     if (stunned || !levels[id] || player[cooldown] > 0) continue;
@@ -2055,18 +2285,17 @@ function weaponAttacks(dt) {
     const stats = toolStats("ruler", levels.ruler);
     player.rulerAngle += dt * stats.rotation;
     const positions = rulerPositions();
-    for (const enemy of [...enemies]) {
-      if (enemy.hp > 0 && enemy.rulerHitCooldown <= 0 && positions.some(position => distance(position, enemy) < enemy.r + 18)) {
-        enemy.rulerHitCooldown = stats.hitCooldown;
-        damageEnemy(enemy, stats.damage, "ruler", positions.find(position=>distance(position,enemy)<enemy.r+18));
-      }
+    for (const enemy of mode==='tutorial'?[...enemies]:enemies) {
+      if(enemy.hp<=0||enemy.rulerHitCooldown>0)continue;
+      const position=positions.find(position=>withinReach(position,enemy,enemy.r+18));
+      if(position){enemy.rulerHitCooldown=stats.hitCooldown;damageEnemy(enemy,stats.damage,'ruler',position);}
     }
   }
 }
 function areaToolAttack(id, target, stats) {
   const angle = Math.atan2(target.y - player.y, target.x - player.x);
   const radius = id === "book" ? stats.attackRadius : stats.pulseRadius;
-  addEffect(player.x, player.y, id === "book" ? "book-slam" : "bell-wave", {angle, radius, level:player.weapons[id], evolved:isEvolved(id), duration:.45});
+  addEffect(player.x, player.y, id === "book" ? "book-slam" : "bell-wave", {angle, radius, level:player.weapons[id], evolved:isEvolved(id), skinColor:TOOL_SKIN_BY_ID[equippedSkins[id]]?.color, duration:.45});
   for (const enemy of [...enemies]) {
     const enemyAngle = Math.atan2(enemy.y - player.y, enemy.x - player.x);
     const difference = Math.atan2(Math.sin(enemyAngle - angle), Math.cos(enemyAngle - angle));
@@ -2093,7 +2322,7 @@ function explode(projectile) {
   const radius = projectile.blastRadius;
   addEffect(projectile.x, projectile.y, "explosion", { radius, level: projectile.level });
   playSound(130, .25, "sawtooth", .04);
-  for (const enemy of [...enemies]) if (distance(projectile, enemy) < radius + enemy.r) damageEnemy(enemy, projectile.damage, "firecracker", projectile);
+  for (const enemy of mode==='tutorial'?[...enemies]:enemies) if (withinReach(projectile, enemy, radius + enemy.r)) damageEnemy(enemy, projectile.damage, "firecracker", projectile);
   if (projectile.aftershock) effects.push({x: projectile.x, y: projectile.y, radius, damage: projectile.aftershock, type: "aftershock", age: 0, duration: .45, level: 5});
 }
 function fruitImpact(projectile, target) {
@@ -2105,8 +2334,8 @@ function fruitImpact(projectile, target) {
   push(target, projectile.knockback, true);
   if (projectile.splashRadius) {
     addEffect(projectile.x, projectile.y, "fruit-impact", {radius: projectile.splashRadius});
-    for (const enemy of [...enemies]) {
-      if (enemy !== target && enemy.hp > 0 && distance(projectile, enemy) < projectile.splashRadius + enemy.r) {
+    for (const enemy of mode==='tutorial'?[...enemies]:enemies) {
+      if (enemy !== target && enemy.hp > 0 && withinReach(projectile, enemy, projectile.splashRadius + enemy.r)) {
         if(damageEnemy(enemy, projectile.damage * .6, "blueberry", projectile)) push(enemy, projectile.knockback * .5);
       }
     }
@@ -2129,20 +2358,21 @@ function updateEffects(dt) {
       const activeDt = Math.min(dt, Math.max(0, effect.duration - (effect.age - dt)));
       effect.pulseClock -= activeDt;
       while (effect.pulseClock <= 0) {
-        for (const enemy of [...enemies]) if (enemy.hp > 0 && distance(effect, enemy) < effect.radius + enemy.r) {
+        for (const enemy of mode==='tutorial'?[...enemies]:enemies) if (enemy.hp > 0 && withinReach(effect, enemy, effect.radius + enemy.r)) {
           if(damageEnemy(enemy, effect.damage, "chalk", effect)) enemy.slowTime = Math.max(enemy.slowTime || 0, .5);
         }
         effect.pulseClock += .4;
       }
     }
     if (effect.type === "aftershock" && effect.age >= effect.duration) {
-      for (const enemy of [...enemies]) if (enemy.hp > 0 && distance(effect, enemy) < effect.radius + enemy.r) damageEnemy(enemy, effect.damage, "firecracker", effect);
+      for (const enemy of mode==='tutorial'?[...enemies]:enemies) if (enemy.hp > 0 && withinReach(effect, enemy, effect.radius + enemy.r)) damageEnemy(enemy, effect.damage, "firecracker", effect);
       addEffect(effect.x, effect.y, "explosion", {radius: effect.radius, level: effect.level});
     }
   }
   effects = effects.filter(e => e.age < e.duration);
 }
 function updateProjectiles(dt) {
+  const collisionTargets=mode==='tutorial'?[...enemies]:enemies;
   for (const projectile of projectiles) {
     projectile.age += dt;
     if (projectile.type === "plane") {
@@ -2173,15 +2403,15 @@ function updateProjectiles(dt) {
     projectile.life -= dt;
     if (projectile.type === "firecracker") {
       for (const enemy of enemies) {
-        if (enemy.hp > 0 && distance(projectile, enemy) < projectile.r + enemy.r) {
+        if (enemy.hp > 0 && withinReach(projectile, enemy, projectile.r + enemy.r)) {
           explode(projectile);
           projectile.life = -1;
           break;
         }
       }
     } else {
-      for (const enemy of [...enemies]) {
-        if (enemy.hp > 0 && !projectile.hitEnemies.has(enemy) && distance(projectile, enemy) < projectile.r + enemy.r) {
+      for (const enemy of collisionTargets) {
+        if (enemy.hp > 0 && !projectile.hitEnemies.has(enemy) && withinReach(projectile, enemy, projectile.r + enemy.r)) {
           projectile.hitEnemies.add(enemy);
           const multiplier = projectile.type === "bow" && projectile.hitEnemies.size === 2 ? projectile.pierceMultiplier : projectile.type === "eraser" && projectile.returning ? projectile.returnMultiplier : 1;
           const dealtDamage=damageEnemy(enemy, projectile.damage * multiplier, projectile.type,{x:projectile.x-projectile.vx*.1,y:projectile.y-projectile.vy*.1});
@@ -2531,7 +2761,7 @@ function throwEnemyGrenade(enemy) {
     life:1.35,r:10,damage:18,blastRadius:85,angle:0});
 }
 function throwBottleCaps(enemy) {
-  const rage=enemy.hp<=enemy.maxHp/2,count=rage?9:6,speed=rage?360:300;
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?9:6,speed=rage?420:340;
   for (let i = 0; i < count; i++) {
     const angle = enemy.throwAngle + (i - (count - 1) / 2) * .18;
     enemyShot(enemy,{ type: "cap", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 10, damage: enemy.damage, life: 5, angle });
@@ -2539,7 +2769,7 @@ function throwBottleCaps(enemy) {
   playSound(310, .08, "triangle", .04);
 }
 function throwTire(enemy) {
-  const rage=enemy.hp<=enemy.maxHp/2,count=rage?4:2,speed=rage?400:340;
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?4:2,speed=rage?470:400;
   for(let i=0;i<count;i++) {
     const angle = enemy.throwAngle+(i-(count-1)/2)*.22;
     enemyShot(enemy,{ type: "tire", x: enemy.x, y: enemy.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 17, damage: rage?32:28, life: 4.5, angle });
@@ -2550,7 +2780,7 @@ function bossShockwave(enemy) {
   const rage=enemy.hp<=enemy.maxHp/2,count=rage?16:9;
   const direction=Math.atan2(enemy.lungeVY,enemy.lungeVX);
   for(let i=0;i<count;i++) {
-    const angle=rage?i*Math.PI*2/count:direction+(i-(count-1)/2)*.25,speed=rage?315:265;
+    const angle=rage?i*Math.PI*2/count:direction+(i-(count-1)/2)*.25,speed=rage?360:310;
     enemyShot(enemy,{type:"boss-wave",x:enemy.x,y:enemy.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
       r:12,damage:28,life:2.6,angle});
   }
@@ -2562,7 +2792,7 @@ function castTeacherCode(enemy) {
   for(let i=0;i<count;i++) {
     const angle=enemy.codeAngle+(i-(count-1)/2)*.19;
     enemyShot(enemy,{type:'code-glyph',x:enemy.x+Math.cos(angle)*enemy.r*.65,y:enemy.y+Math.sin(angle)*enemy.r*.65,
-      vx:Math.cos(angle)*(rage?430:370),vy:Math.sin(angle)*(rage?430:370),r:12,damage:22,life:3.2,angle});
+      vx:Math.cos(angle)*(rage?480:430),vy:Math.sin(angle)*(rage?480:430),r:12,damage:22,life:3.2,angle});
   }
   addEffect(enemy.x,enemy.y,'burst',{color:'#83f0e8',duration:.4});
   playSound(640,.18,'square',.035);
@@ -2573,7 +2803,7 @@ function castTeacherCode(enemy) {
   }
 }
 function fireJiahaoSoccerBalls(enemy) {
-  const rage=enemy.hp<=enemy.maxHp/2,count=rage?5:3,speed=rage?430:365;
+  const rage=enemy.hp<=enemy.maxHp/2,count=rage?5:3,speed=rage?490:420;
   for(let i=0;i<count;i++) {
     const angle=enemy.throwAngle+(i-(count-1)/2)*.18;
     enemyShot(enemy,{type:'soccer-ball',x:enemy.x+Math.cos(angle)*enemy.r,y:enemy.y+Math.sin(angle)*enemy.r,
@@ -2586,7 +2816,7 @@ function barkYellowDog(enemy) {
   for(let i=0;i<count;i++) {
     const angle=i*Math.PI*2/count+(rage?0:Math.PI/count);
     enemyShot(enemy,{type:'bark-wave',x:enemy.x+Math.cos(angle)*enemy.r,y:enemy.y+Math.sin(angle)*enemy.r,
-      vx:Math.cos(angle)*310,vy:Math.sin(angle)*310,r:13,damage:rage?18:15,life:2.2,angle});
+      vx:Math.cos(angle)*360,vy:Math.sin(angle)*360,r:13,damage:rage?18:15,life:2.2,angle});
   }
   playSound(210,.2,'triangle',.045);
 }
@@ -2595,16 +2825,16 @@ function updatePlaygroundBoss(enemy,dt,movementSpeed,d,dx,dy,rage) {
     enemy.windup=Math.max(0,enemy.windup-dt);
     if(enemy.windup>0)return;
     if(enemy.attackMove==='shot') {
-      fireJiahaoSoccerBalls(enemy);enemy.attackMove='dash';enemy.attackClock=rage?1.15:1.55;
+      fireJiahaoSoccerBalls(enemy);enemy.attackMove='dash';enemy.attackClock=rage?1:1.3;
     } else if(enemy.attackMove==='bark') {
-      barkYellowDog(enemy);enemy.attackMove='pounce';enemy.attackClock=rage?1.15:1.5;
+      barkYellowDog(enemy);enemy.attackMove='pounce';enemy.attackClock=rage?.95:1.25;
     } else {
-      const speed=enemy.kind==='jiahao'?(rage?880:720):(rage?930:780);
+      const speed=enemy.kind==='jiahao'?(rage?960:820):(rage?1020:880);
       enemy.lungeVX=Math.cos(enemy.throwAngle)*speed;enemy.lungeVY=Math.sin(enemy.throwAngle)*speed;
       enemy.lungeTime=enemy.kind==='jiahao'?.52:.43;
       enemy.hitPlayer=false;
       enemy.attackMove=enemy.kind==='jiahao'?'shot':'bark';
-      enemy.attackClock=rage?1.45:1.85;
+      enemy.attackClock=rage?1.2:1.5;
     }
     return;
   }
@@ -2871,6 +3101,7 @@ function updateLateMartialEnemy(enemy,dt,movementSpeed) {
     moveActor(enemy,enemy.x+dx/d*movementSpeed*dt,enemy.y+dy/d*movementSpeed*dt,true);
 }
 function updateEnemies(dt) {
+  navigationTick++;
   let summons = 0;
   const spidersToSpawn = [];
   const dogsToSpawn = [];
@@ -2915,7 +3146,7 @@ function updateEnemies(dt) {
         enemy.codeAngle=Math.atan2(dy,dx);
         enemy.codeWindup=rage?.55:.75;
         enemy.codeBurstRemaining=rage?1:0;
-        enemy.codeCooldown=rage?2.8:3.3;
+        enemy.codeCooldown=rage?2.2:2.6;
         continue;
       }
     }
@@ -3147,8 +3378,8 @@ function updateEnemies(dt) {
       if (enemy.windup > 0) {
         enemy.windup -= dt;
         if (enemy.windup <= 0) {
-          if (enemy.kind === "mini1") { throwBottleCaps(enemy); enemy.attackClock = rage ? .85 : 1.35; }
-          else { throwTire(enemy); enemy.attackClock = rage ? 1 : 1.4; }
+          if (enemy.kind === "mini1") { throwBottleCaps(enemy); enemy.attackClock = rage ? .72 : 1.1; }
+          else { throwTire(enemy); enemy.attackClock = rage ? .8 : 1.15; }
         }
       } else {
         const direction = d > 320 ? 1 : d < 200 ? -1 : 0;
@@ -3172,8 +3403,8 @@ function updateEnemies(dt) {
       }
       if (d < (enemy.kind === "mini2" ? 450 : enemy.kind==="final"?460:235) && enemy.attackClock <= 0) {
         enemy.windup = enemy.trainingThreat ? .9 : enemy.kind === "mini2" ? (rage?.55:.65) : enemy.kind==="final"?(rage?.58:.72):.45;
-        enemy.attackClock = enemy.kind==='mini2'?(rage?1.1:1.5):enemy.kind==='final'?(rage?1.2:1.65):enemy.boss?(rage?1.4:1.9):random(2.2, 2.8);
-        const lungeSpeed = enemy.trainingThreat ? 260 : enemy.kind === "mini2" ? (rage?980:820) : enemy.kind==="final"?(rage?850:700):520;
+        enemy.attackClock = enemy.kind==='mini2'?(rage?.9:1.25):enemy.kind==='final'?(rage?1:1.4):enemy.boss?(rage?1.4:1.9):random(2.2, 2.8);
+        const lungeSpeed = enemy.trainingThreat ? 260 : enemy.kind === "mini2" ? (rage?1050:920) : enemy.kind==="final"?(rage?930:800):520;
         enemy.lungeVX = dx / d * lungeSpeed;
         enemy.lungeVY = dy / d * lungeSpeed;
       }
@@ -3239,11 +3470,14 @@ function update(dt) {
     const earnedTickets=awardCompletedLessons(previousTime,gameTime);
     if (currentLesson() !== previousLesson) {
       const firstAppearances={2:"水壺方塊人登場！",3:"橡皮筋方塊人登場！",4:"溼衛生紙方塊人登場！",5:"威龍登場！小心噴射衝刺與爆炸物！",6:"比特登場！小心機械蜘蛛！",7:"深藍登場！繞到盾牌側面或背後！",8:"訓犬員登場！小心追咬的狗！",9:"戳眼方塊人登場！別讓他靠近眼睛！",10:"牧羊人登場！避開陷阱與手雷！",11:"大聲公方塊人登場！音波命中會眩暈！",12:"飛踢方塊人登場！小心被踢飛的倒楣蛋！",13:"瞬移拳手登場！小心旁邊的瞬移落點！",14:"三球召喚者登場！側移閃避三顆球！",15:"保健股長登場！會幫周圍敵人回血！",16:"助威方塊人登場！會強化周圍敵人！",17:"氣功方塊人登場！蓄力光束會穿透課桌！",18:"重踢方塊人登場！蓄力後會把你踢到牆邊！",19:"閃身拳手登場！小心側移後的昇龍拳！",20:"飛踢重擊手登場！避開飛踢和蓄力重擊！"};
-      const announcement = hasActiveBoss() ? "Boss 戰持續中！" : firstAppearances[currentLesson()] || "更多方塊人來了！";
+      const returningKind=LESSON_ENEMY_KINDS[currentLesson()];
+      const returningName=ENEMY_LABELS[returningKind];
+      const announcement = hasActiveBoss() ? "Boss 戰持續中！" : firstAppearances[currentLesson()] ? firstAppearances[currentLesson()] : returningName?`${returningName} 再次加入迎新戰！`:"更多方塊人來了！";
       showToast(`第 ${currentLesson()} / ${activeLessons()} 節課！${announcement}${earnedTickets?` 🎟️ 皮膚券 +${earnedTickets}`:''}`);
       if (!hasActiveBoss()) spawnClock = 0;
     } else if(earnedTickets)showToast(`第 ${activeLessons()} 節課完成！🎟️ 皮膚券 +${earnedTickets}`);
     spawnScheduledBosses();
+    ensureLessonSpeakerEnemy();
     if (previousTime < CORE_GAME_LENGTH && gameTime >= CORE_GAME_LENGTH && !coreBossesDefeated()) showToast("第三十節鐘響了！擊敗剩下的 Boss 才能領飲料！");
     if (bonusAccepted && previousTime < GAME_LENGTH && gameTime >= GAME_LENGTH && !bonusBossesDefeated()) showToast("第四十節鐘響了！擊敗操場 Boss 才能領茶葉蛋券！");
     if (!hasActiveBoss()) {
@@ -3333,6 +3567,7 @@ function finishGame(won) {
   $("end-kicker").textContent = won ? "CLASS DISMISSED!" : "GAME OVER";
   $("end-title").textContent = won ? bonusAccepted ? '加碼成功！' : "放學了！" : "再試一次！";
   $("end-description").textContent = won ? bonusAccepted ? '轉學生撐過 40 節課，拿到飲料與茶葉蛋兌換券！' : '轉學生撐過 30 節課並擊敗三組 Boss，領到一杯飲料！' : drinkEarned ? `第 ${currentLesson()} 節的加碼挑戰結束了。飲料已經拿到，茶葉蛋兌換券這次還沒取得。` : `轉學生在第 ${currentLesson()} 節課倒下了。調整走位和升級選擇，再挑戰一次！`;
+  $('victory-message').hidden=!won;
   $("result-time").textContent = formatTime(Math.floor(gameTime));
   $("result-kills").textContent = kills;
   $("result-level").textContent = player.level;
@@ -3346,54 +3581,54 @@ function finishGame(won) {
   playSound(won ? 880 : 190, .5, "triangle", .06);
 }
 function formatTime(seconds) { return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`; }
+function setHudText(id,value) {const element=$(id);if(element.textContent!==value)element.textContent=value;}
+function setHudWidth(id,value) {const element=$(id);if(element.style.width!==value)element.style.width=value;}
 function updateHud() {
   if(batchingHud)return;
-  $('difficulty-indicator').textContent=isTutorialSession()?'教學練習':`難度：${DIFFICULTIES[runDifficulty].name}`;
+  setHudText('difficulty-indicator',isTutorialSession()?'教學練習':`難度：${DIFFICULTIES[runDifficulty].name}`);
   $("chapter-dialogue").classList.toggle("boss-dialogue",hasActiveBoss());
-  $("hp-text").textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
-  $("hp-fill").style.width = `${player.hp / player.maxHp * 100}%`;
-  $("level-text").textContent = `Lv. ${player.level}`;
-  $('skin-ticket-count').textContent=`${skinTickets}（本局 +${runSkinTickets}）`;
-  $("xp-text").textContent = `${Number(player.xp.toFixed(1))} / ${player.xpNeed}`;
-  $("xp-fill").style.width = `${clamp(player.xp/player.xpNeed*100,0,100)}%`;
-  $("lesson-fill").style.width = `${gameTime>=activeGameLength()?100:(gameTime%LESSON_LENGTH)/LESSON_LENGTH*100}%`;
+  setHudText('hp-text',`${Math.ceil(player.hp)} / ${player.maxHp}`);
+  setHudWidth('hp-fill',`${player.hp / player.maxHp * 100}%`);
+  setHudText('level-text',`Lv. ${player.level}`);
+  setHudText('skin-ticket-count',`${skinTickets}（本局 +${runSkinTickets}）`);
+  setHudText('xp-text',`${Number(player.xp.toFixed(1))} / ${player.xpNeed}`);
+  setHudWidth('xp-fill',`${clamp(player.xp/player.xpNeed*100,0,100)}%`);
+  setHudWidth('lesson-fill',`${gameTime>=activeGameLength()?100:(gameTime%LESSON_LENGTH)/LESSON_LENGTH*100}%`);
   $("hp-warning").hidden=player.hp<=0||player.hp>player.maxHp*.25;
-  $("lesson-label").textContent = `第 ${currentLesson()} / ${activeLessons()} 節`;
-  if(bonusAccepted)$("lesson-label").textContent+=' · 操場';
-  if(hasActiveBoss()) $("lesson-label").textContent += " · Boss 戰，計時暫停";
-  $("timer").textContent = formatTime(gameTime >= activeGameLength() ? 0 : Math.ceil(LESSON_LENGTH - gameTime % LESSON_LENGTH));
-  $("wave").textContent = formatTime(Math.max(0, Math.ceil(activeGameLength() - gameTime)));
-  $('wave-label').textContent=bonusAccepted?'距離茶葉蛋券':'距離領飲料';
-  if(isTutorialSession()) {$("lesson-label").textContent="教學練習";$("timer").textContent="--:--";$("wave").textContent="30 節課";}
-  $("loadout-label").textContent = `✎ 鉛筆揮砍 · 道具 ${Object.values(player.weapons).filter(level => level > 0).length} / 6`;
+  const lessonText=isTutorialSession()?'教學練習':`第 ${currentLesson()} / ${activeLessons()} 節${bonusAccepted?' · 操場':''}${hasActiveBoss()?' · Boss 戰，計時暫停':''}`;
+  setHudText('lesson-label',lessonText);
+  setHudText('timer',isTutorialSession()?'--:--':formatTime(gameTime >= activeGameLength() ? 0 : Math.ceil(LESSON_LENGTH - gameTime % LESSON_LENGTH)));
+  setHudText('wave',isTutorialSession()?'30 節課':formatTime(Math.max(0, Math.ceil(activeGameLength() - gameTime))));
+  setHudText('wave-label',bonusAccepted?'距離茶葉蛋券':'距離領飲料');
+  setHudText('loadout-label',`✎ 鉛筆揮砍 · 道具 ${Object.values(player.weapons).filter(level => level > 0).length} / 6`);
   $("hp-text").setAttribute("title",`每秒自動回復 ${player.healthRegen+(player.talents.blackboard?.25:0)} 點體力`);
   $('secret-tool').hidden=!unityTool;
-  $("kill-count").textContent = `擊退 ${kills}`;
+  setHudText('kill-count',`擊退 ${kills}`);
   $("slow-label").hidden = player.slowTime <= 0;
-  $("slow-label").textContent = `減速 ${player.slowTime.toFixed(1)} 秒`;
+  setHudText('slow-label',`減速 ${player.slowTime.toFixed(1)} 秒`);
   $("stun-label").hidden = player.stunTime<=0;
-  $("stun-label").textContent = `眩暈 ${player.stunTime.toFixed(1)} 秒`;
+  setHudText('stun-label',`眩暈 ${player.stunTime.toFixed(1)} 秒`);
     const equippedTools = CONTENT.weapons.filter(w => player.weapons[w.id] > 0);
-    $("weapon-levels").textContent = (equippedTools.length ? equippedTools : CONTENT.weapons.slice(0,6)).map(w => `${w.icon} ${isEvolved(w.id) ? "超" : `${player.weapons[w.id]}/5`}`).reduce((rows, item, i) => rows + (i ? (i % 3 === 0 ? "\n" : "　") : "") + item, "");
+    setHudText('weapon-levels',(equippedTools.length ? equippedTools : CONTENT.weapons.slice(0,6)).map(w => `${w.icon} ${isEvolved(w.id) ? "超" : `${player.weapons[w.id]}/5`}`).reduce((rows, item, i) => rows + (i ? (i % 3 === 0 ? "\n" : "　") : "") + item, ""));
   renderTalentHud();
   const activeBoss = [...enemies].reverse().find(e => e.boss && e.hp > 0);
   $("boss-health").hidden = !activeBoss;
   if (activeBoss) {
     const groupRage=enemies.some(e=>e.kind===activeBoss.kind&&e.hp>0&&e.hp<=e.maxHp/2);
-    $("boss-name").textContent = activeBoss.boss.name+(groupRage?" · 暴走":"");
+    setHudText('boss-name',activeBoss.boss.name+(groupRage?" · 暴走":""));
     const team=activeBoss.kind==='mini2';
     $("boss-single-bar").hidden=team;$("boss-team-health").hidden=!team;
     if(team) {
       for(let i=0;i<2;i++) {
         const rider=enemies.find(e=>e.kind==='mini2'&&e.memberIndex===i&&e.hp>0);
         const hp=Math.max(0,Math.ceil(rider?.hp||0));
-        $(`boss-rider-${i}-hp`).textContent=`${hp} / ${activeBoss.maxHp}`;
-        $(`boss-rider-${i}-fill`).style.width=`${hp/activeBoss.maxHp*100}%`;
+        setHudText(`boss-rider-${i}-hp`,`${hp} / ${activeBoss.maxHp}`);
+        setHudWidth(`boss-rider-${i}-fill`,`${hp/activeBoss.maxHp*100}%`);
       }
-      $("boss-hp").textContent=`${enemies.filter(e=>e.kind==='mini2'&&e.hp>0).length} / 2 人`;
+      setHudText('boss-hp',`${enemies.filter(e=>e.kind==='mini2'&&e.hp>0).length} / 2 人`);
     } else {
-      $("boss-hp").textContent = `${Math.ceil(activeBoss.hp)} / ${activeBoss.maxHp}`;
-      $("boss-fill").style.width = `${Math.max(0,activeBoss.hp/activeBoss.maxHp)*100}%`;
+      setHudText('boss-hp',`${Math.ceil(activeBoss.hp)} / ${activeBoss.maxHp}`);
+      setHudWidth('boss-fill',`${Math.max(0,activeBoss.hp/activeBoss.maxHp)*100}%`);
     }
   }
 }
@@ -3419,7 +3654,7 @@ function renderLoadoutGuide() {
 function renderTalentHud() {
   const equipped = CONTENT.talents.filter(t => player.talents[t.id]);
   const unlocked=equippedToolCount()===MAX_EQUIPPED_TOOLS;
-  $("talent-label").textContent = unlocked?`天賦 ${equipped.length} / ${MAX_EQUIPPED_TALENTS}`:`天賦未解鎖 · 道具 ${equippedToolCount()} / ${MAX_EQUIPPED_TOOLS}`;
+  setHudText('talent-label',unlocked?`天賦 ${equipped.length} / ${MAX_EQUIPPED_TALENTS}`:`天賦未解鎖 · 道具 ${equippedToolCount()} / ${MAX_EQUIPPED_TOOLS}`);
   const signature = `${unlocked}:`+CONTENT.talents.map(t => `${Number(!!player.talents[t.id])}:${Number(isEvolved(t.toolId))}`).join(",");
   if (signature === talentHudSignature) return;
   talentHudSignature = signature;
@@ -3779,6 +4014,22 @@ function drawClassroom() {
   ctx.fillStyle = "#ebd59d"; ctx.beginPath(); ctx.arc(MAP.w - 59, 501, 5, 0, 7); ctx.fill();
   ctx.textAlign = "left";
 }
+let sceneCanvas=null,sceneKind=null;
+function drawSceneBackdrop(kind) {
+  if(sceneKind!==kind||!sceneCanvas) {
+    const scene=document.createElement('canvas');
+    scene.width=MAP.w;scene.height=MAP.h;
+    const sceneContext=scene.getContext('2d');
+    if(!sceneContext){kind==='playground'?drawPlayground():drawClassroom();return;}
+    const mainContext=ctx;
+    try {
+      ctx=sceneContext;
+      if(kind==='playground')drawPlayground();else drawClassroom();
+    } finally {ctx=mainContext;}
+    sceneCanvas=scene;sceneKind=kind;
+  }
+  ctx.drawImage(sceneCanvas,0,0);
+}
 function drawWaterBottle(c, x, y, size = 1, angle = 0) {
   c.save(); c.translate(x, y); c.rotate(angle); c.scale(size, size);
   c.beginPath(); c.roundRect(-9, -14, 18, 31, 5); c.fillStyle = "#8bd9ea"; c.fill();
@@ -3864,20 +4115,17 @@ function drawEnemy(enemy, time) {
   } else if(enemy.kind==='stepboxer') {
     roundedRect(-20,-31,40,9,3,'#9de1cf','#39756e',2);
     roundedRect(-12,5,24,18,3,'#2f6d6e','#284e57',2);
-    ctx.fillStyle='#d8fff0';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('19',0,18);
     roundedRect(-26,enemy.martialPhase==='uppercut-windup'?-18:3,12,15,3,'#74d8cb','#2d6167',2);
     roundedRect(15,enemy.martialPhase==='uppercut-windup'?-24:3,12,15,3,'#74d8cb','#2d6167',2);
   } else if(enemy.kind==='flyfighter') {
     roundedRect(-20,-31,40,9,3,'#e8b680','#86564d',2);
     roundedRect(-12,5,24,18,3,'#8d4f4b','#663d42',2);
-    ctx.fillStyle='#ffe2bd';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('20',0,18);
     ctx.save();ctx.rotate(enemy.throwAngle||0);
     roundedRect(15,enemy.martialPhase==='kick-flight'?7:19,enemy.martialPhase==='kick-flight'?36:25,11,3,'#e5b18a','#6e4c48',2);
     ctx.restore();
   } else if(enemy.kind==='heavykick') {
     roundedRect(-20,-31,40,9,3,'#e6b394','#7b554e',2);
     roundedRect(-12,5,24,17,3,'#6e4a4c','#503d46',2);
-    ctx.fillStyle='#ffe2be';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('18',0,18);
     ctx.save();ctx.rotate(enemy.throwAngle||0);
     roundedRect(enemy.windup>0?8:11,18,30,12,3,'#3f454f','#e6b394',2);
     ctx.restore();
@@ -3889,20 +4137,19 @@ function drawEnemy(enemy, time) {
   } else if(enemy.kind==='commander') {
     roundedRect(-20,-31,40,9,3,'#ffe0a0','#8b6646',2);
     roundedRect(-13,5,26,18,3,'#f3d29b','#8b6646',2);
-    ctx.fillStyle='#825b46';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('16',0,18);
+    ctx.fillStyle='#e3b462';ctx.beginPath();ctx.moveTo(-21,-34);ctx.lineTo(-10,-29);ctx.lineTo(-15,-24);ctx.lineTo(-26,-30);ctx.closePath();ctx.fill();
+    roundedRect(-24,4,9,11,2,'#f6e5b9','#8b6646',1);ctx.fillStyle='#3f6860';ctx.font='900 8px sans-serif';ctx.fillText('長',-20,12);
     roundedRect(18,-23,43,21,4,'#fff0be','#8b6646',2);
     ctx.fillStyle='#a06b42';ctx.font='900 10px sans-serif';ctx.fillText('衝啊！',39,-8);
   } else if(enemy.kind==='beam') {
     roundedRect(-20,-31,40,8,3,'#a7e9f3','#356480',2);
     roundedRect(-12,5,24,18,3,'#345e8d','#273f63',2);
-    ctx.fillStyle='#cffcff';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText('17',0,18);
     ctx.fillStyle='#8ef7ff';ctx.beginPath();ctx.arc(24,8,enemy.windup>0?9:5,0,Math.PI*2);ctx.fill();
   } else if(enemy.kind==="boxer"||enemy.kind==="striker") {
     const boxer=enemy.kind==="boxer",trim=boxer?"#64d9d0":"#ca8cdb";
     roundedRect(-19,-29,38,7,2,trim,"#465568",2);
     ctx.fillStyle=trim;ctx.beginPath();ctx.moveTo(17,-26);ctx.lineTo(35,-20);ctx.lineTo(24,-15);ctx.closePath();ctx.fill();
     roundedRect(-13,3,26,21,2,boxer?"#e6f5ed":"#725487","#465568",2);
-    ctx.fillStyle=boxer?"#397d83":"#fff0d9";ctx.font="900 12px sans-serif";ctx.textAlign="center";ctx.fillText(boxer?"13":"14",0,18);
     roundedRect(-26,boxer&&enemy.martialMove==="uppercut"?-12:4,12,13,3,trim,"#465568",2);
     roundedRect(15,boxer&&enemy.martialMove==="uppercut"?-23:4,12,13,3,trim,"#465568",2);
     if(!boxer) {
@@ -3912,7 +4159,6 @@ function drawEnemy(enemy, time) {
   } else if(enemy.kind==="kicker") {
     roundedRect(-20,-31,40,8,2,"#f2c885","#94623f",2);
     roundedRect(-11,4,22,16,3,"#edd4ac","#94623f",2);
-    ctx.fillStyle="#885741";ctx.font="900 11px sans-serif";ctx.textAlign="center";ctx.fillText("12",0,16);
     ctx.save();ctx.rotate(enemy.throwAngle||0);
     roundedRect(enemy.windup>0?4:12,20,22,10,3,"#51424b","#edc488",2);
     ctx.restore();
@@ -4060,7 +4306,7 @@ function drawEnemy(enemy, time) {
   }
   if(enemy.stunTime>0){ctx.strokeStyle="#c6b7ff";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-enemy.r-12,16,5,time*3,0,Math.PI*2);ctx.stroke();}
   if(enemy.boss&&enemy.hp<=enemy.maxHp/2){ctx.strokeStyle="#ff9f6b99";ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y+15,enemy.r+8,enemy.r*.42,0,0,Math.PI*2);ctx.stroke();}
-  const name={weilong:"威龍",bit:"比特",deepblue:"深藍",handler:"訓犬員",eye:"戳眼方塊人",shepherd:"牧羊人",megaphone:"大聲公方塊人",kicker:"飛踢方塊人",boxer:"瞬移拳手",striker:"三球召喚者",medic:"保健股長",commander:"助威方塊人",beam:"氣功方塊人",heavykick:"重踢方塊人",stepboxer:"閃身拳手",flyfighter:"飛踢重擊手"}[enemy.kind];
+  const name=ENEMY_LABELS[enemy.kind]||null;
   if(name){const width=name.length*11+12;roundedRect(x-width/2,y-56,width,17,4,"#29464bde");ctx.fillStyle="#d9f5ec";ctx.font="900 11px 'Noto Sans TC',sans-serif";ctx.textAlign="center";ctx.fillText(name,x,y-43);}
   if (enemy.windup > 0) {
     ctx.strokeStyle = `rgba(221,99,78,${.4 + Math.sin(time * 35) * .25})`;
@@ -4191,14 +4437,18 @@ function drawPickup(pickup, time) {
   ctx.restore();
 }
 function drawProjectile(p) {
+  const skin=TOOL_SKIN_BY_ID[p.skinId];
   if (p.type === "blueberry") {
-    drawTool(ctx, p.type, p.level, p.x, p.y, .55, Math.atan2(p.vy, p.vx), p.evolved);
+    drawTool(ctx, p.type, p.level, p.x, p.y, .55, Math.atan2(p.vy, p.vx), p.evolved,p.skinId);
   } else if (p.type === "pistol") {
-    ctx.strokeStyle = p.evolved ? "#e2bdff" : ["#fff0ab", "#d9f4fa", "#a2ebdb", "#94d6fc", "#ffd66c"][p.level - 1];
+    ctx.save();ctx.shadowColor=skin?.color||'transparent';ctx.shadowBlur=skin?.glow||0;
+    ctx.strokeStyle = skin?.color||(p.evolved ? "#e2bdff" : ["#fff0ab", "#d9f4fa", "#a2ebdb", "#94d6fc", "#ffd66c"][p.level - 1]);
     ctx.lineWidth = 2 + p.level * .7; ctx.beginPath(); ctx.moveTo(p.x - p.vx * (.012 + p.level * .004), p.y - p.vy * (.012 + p.level * .004)); ctx.lineTo(p.x, p.y); ctx.stroke();
+    ctx.restore();
   } else if (p.type === "bow") {
     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.atan2(p.vy, p.vx));
-    ctx.strokeStyle = p.evolved ? "#e2bdff" : p.level === 5 ? "#ffe09b" : "#fff4d7"; ctx.lineWidth = 2 + p.level * .4;
+    ctx.shadowColor=skin?.color||'transparent';ctx.shadowBlur=skin?.glow||0;
+    ctx.strokeStyle = skin?.color||(p.evolved ? "#e2bdff" : p.level === 5 ? "#ffe09b" : "#fff4d7"); ctx.lineWidth = 2 + p.level * .4;
     ctx.beginPath(); ctx.moveTo(-21 - p.level * 2, 0); ctx.lineTo(9, 0); ctx.stroke();
     ctx.fillStyle = p.level === 5 ? "#e8be5a" : "#557c93";
     ctx.beginPath(); ctx.moveTo(17, 0); ctx.lineTo(5, -5 - p.level); ctx.lineTo(5, 5 + p.level); ctx.closePath(); ctx.fill();
@@ -4206,10 +4456,10 @@ function drawProjectile(p) {
     for (let i = 0; i < p.level; i++) ctx.fillRect(-24 + i * 4, -7, 3, 14);
     ctx.restore();
   } else if(p.type === "stapler") {
-    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.atan2(p.vy,p.vx));ctx.strokeStyle=p.evolved?"#dec1ff":p.level===5?"#f2d77f":"#e2eff6";ctx.lineWidth=2+p.level*.3;
+    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.atan2(p.vy,p.vx));ctx.shadowColor=skin?.color||'transparent';ctx.shadowBlur=skin?.glow||0;ctx.strokeStyle=skin?.color||(p.evolved?"#dec1ff":p.level===5?"#f2d77f":"#e2eff6");ctx.lineWidth=2+p.level*.3;
     ctx.beginPath();ctx.moveTo(-5,-8);ctx.lineTo(5,-8);ctx.lineTo(5,8);ctx.lineTo(-5,8);ctx.stroke();ctx.restore();
   } else {
-    drawTool(ctx, p.type, p.level, p.x, p.y, .6, p.type === "eraser" || p.type === "football" ? p.age * 12 : Math.atan2(p.vy, p.vx), p.evolved);
+    drawTool(ctx, p.type, p.level, p.x, p.y, .6, p.type === "eraser" || p.type === "football" ? p.age * 12 : Math.atan2(p.vy, p.vx), p.evolved,p.skinId);
   }
 }
 function drawTissueBall(c,x,y,radius=12) {
@@ -4320,7 +4570,22 @@ function drawUnlucky(c,x,y,angle,size=1) {
 }
 function drawEffect(effect) {
   const t = effect.age / effect.duration;
-  if(effect.type==='sidestep') {
+  if(effect.type==='skin-strike') {
+    ctx.save();ctx.translate(effect.x,effect.y);ctx.globalAlpha=(1-t)*.9;
+    ctx.strokeStyle=effect.color;ctx.fillStyle=effect.color;ctx.shadowColor=effect.color;ctx.shadowBlur=6+effect.rarityIndex*5;
+    ctx.lineWidth=2+effect.rarityIndex*.6;
+    const radius=10+t*(15+effect.rarityIndex*5);
+    if(['blueberry','football','bell','eraser'].includes(effect.toolId)){
+      ctx.beginPath();ctx.arc(0,0,radius,0,Math.PI*2);ctx.stroke();
+      if(effect.rarityIndex>=2){ctx.beginPath();ctx.arc(0,0,radius*.55,0,Math.PI*2);ctx.stroke();}
+    } else if(['pistol','bow','plane','stapler'].includes(effect.toolId)){
+      for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(-radius,i*6-radius*.2);ctx.lineTo(radius,i*7+radius*.2);ctx.stroke();}
+    } else {
+      const rays=5+effect.rarityIndex*2;
+      for(let i=0;i<rays;i++){const a=i*Math.PI*2/rays;ctx.beginPath();ctx.moveTo(Math.cos(a)*radius*.35,Math.sin(a)*radius*.35);ctx.lineTo(Math.cos(a)*radius,Math.sin(a)*radius);ctx.stroke();}
+    }
+    ctx.restore();
+  } else if(effect.type==='sidestep') {
     ctx.save();ctx.translate(effect.x,effect.y);ctx.rotate(effect.angle);ctx.globalAlpha=1-t;
     ctx.strokeStyle='#a2f2d8';ctx.lineWidth=5*(1-t)+1;
     for(const offset of [-12,0,12]){ctx.beginPath();ctx.moveTo(-effect.radius+offset,-14);ctx.lineTo(effect.radius*.4+offset,-14);ctx.stroke();}
@@ -4383,11 +4648,11 @@ function drawEffect(effect) {
     ctx.strokeStyle=effect.evolved?"#d2b6ef99":"#f8efdf99";ctx.lineWidth=2;ctx.beginPath();ctx.arc(effect.x,effect.y,effect.radius,0,Math.PI*2);ctx.stroke();
     for(let i=0;i<6;i++){const a=i*Math.PI/3+effect.age;ctx.fillStyle="#f5e9ef";ctx.fillRect(effect.x+Math.cos(a)*effect.radius*.7,effect.y+Math.sin(a)*effect.radius*.7,3,3);}
   } else if(effect.type === "book-slam") {
-    ctx.globalAlpha=1-t;ctx.fillStyle=effect.evolved?"#c8a0ef55":"#c2dca455";ctx.strokeStyle=effect.evolved?"#dfc2ff":"#dbefb8";ctx.lineWidth=5*(1-t)+1;
+    ctx.globalAlpha=1-t;ctx.fillStyle=effect.evolved?"#c8a0ef55":"#c2dca455";ctx.strokeStyle=effect.skinColor||(effect.evolved?"#dfc2ff":"#dbefb8");ctx.lineWidth=5*(1-t)+1;
     ctx.beginPath();ctx.moveTo(effect.x,effect.y);ctx.arc(effect.x,effect.y,effect.radius,effect.angle-1.05,effect.angle+1.05);ctx.closePath();ctx.fill();ctx.stroke();
     drawTool(ctx,"book",effect.level,effect.x+Math.cos(effect.angle)*65,effect.y+Math.sin(effect.angle)*65,1,effect.angle,effect.evolved);ctx.globalAlpha=1;
   } else if(effect.type === "bell-wave") {
-    ctx.globalAlpha=1-t;ctx.strokeStyle=effect.evolved?"#dfc2ff":"#f7da85";ctx.lineWidth=6*(1-t)+1;
+    ctx.globalAlpha=1-t;ctx.strokeStyle=effect.skinColor||(effect.evolved?"#dfc2ff":"#f7da85");ctx.lineWidth=6*(1-t)+1;
     ctx.beginPath();ctx.arc(effect.x,effect.y,effect.radius*(.3+t*.7),0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;
   } else if (effect.type === "evolution") {
     ctx.strokeStyle = "#dec1ff"; ctx.globalAlpha = 1 - t; ctx.lineWidth = 8 * (1 - t);
@@ -4412,7 +4677,7 @@ function render(timestamp) {
   camera.x = clamp(player.x - viewW / 2, 0, Math.max(0, MAP.w - viewW));
   camera.y = clamp(player.y - viewH * (isTutorialSession()&&ch<550?.68:.5), 0, Math.max(0, MAP.h - viewH));
   ctx.save(); ctx.scale(scale, scale); ctx.translate(-camera.x, -camera.y);
-  if(bonusAccepted)drawPlayground();else drawClassroom();
+  drawSceneBackdrop(bonusAccepted?'playground':'classroom');
   const visible=(entity,margin=100)=>entity.x>=camera.x-margin&&entity.x<=camera.x+viewW+margin&&entity.y>=camera.y-margin&&entity.y<=camera.y+viewH+margin;
   for (const pickup of pickups) if(visible(pickup))drawPickup(pickup, timestamp);
   for (const enemy of enemies) if(enemy.windup>0||visible(enemy))drawEnemy(enemy, timestamp);
@@ -4542,8 +4807,11 @@ bindButtonAction($('bestiary-btn'),openBestiary);
 bindButtonAction($('start-bestiary-btn'),openBestiary);
 bindButtonAction($('pause-bestiary-btn'),openBestiary);
 for(const id of ['start-skins-btn','pause-skins-btn','reward-skins-btn','end-skins-btn'])bindButtonAction($(id),openSkinCollection);
+for(const id of ['start-shop-btn','pause-shop-btn','reward-shop-btn','end-shop-btn'])bindButtonAction($(id),openShop);
+bindButtonAction($('shop-close-btn'),closeShop);
 bindButtonAction($('skin-close-btn'),closeSkinCollection);
 bindButtonAction($('skin-draw-btn'),drawRandomToolSkin);
+bindButtonAction($('skin-draw-ten-btn'),drawTenToolSkins);
 bindButtonAction($('cheat-submit'),()=>applyCheat($('cheat-input').value));
 $('cheat-input').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();applyCheat($('cheat-input').value);}});
 bindButtonAction($('bestiary-close-btn'),closeBestiary);
@@ -4579,6 +4847,8 @@ document.addEventListener("keydown", event => {
   if(interactive&&key!=='escape')return;
   if (!interactive&&["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) event.preventDefault?.();
   if(mode==="playing"||mode==="tutorial")keys.add(key);
+  if(key==='escape'&&!event.repeat&&mode==='shop'){closeShop();return;}
+  if(key==='escape'&&!event.repeat&&mode==='skins'){closeSkinCollection();return;}
   if ((key === "p" || key === "escape")&&!event.repeat) togglePause();
   if (key === "f" && !event.repeat) cycleGameSpeed();
   if (key === "h" && !event.repeat) toggleHud();

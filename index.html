@@ -104,6 +104,7 @@
         <button id="practice-btn" class="secondary-btn">直接練習新手教學</button>
         <button id="start-bestiary-btn" class="secondary-btn">敵人圖鑑 · 擊敗後解鎖</button>
         <button id="start-skins-btn" class="secondary-btn">皮膚收藏室 · 使用皮膚券</button>
+        <button id="start-shop-btn" class="secondary-btn">🏪 102 班福利社</button>
         <button id="quick-start-btn" class="secondary-btn">已熟悉操作，直接挑戰</button>
         <p class="microcopy">30 節領飲料 · 可加碼 10 節 · 每節 30 秒 · 支援倍速</p>
       </div>
@@ -154,6 +155,7 @@
         <div class="joystick-size-picker" role="group" aria-label="觸控搖桿大小"><span>移動搖桿</span><div><button id="pause-joystick-size-small" type="button" aria-pressed="false">小手</button><button id="pause-joystick-size-standard" type="button" class="selected" aria-pressed="true">標準</button><button id="pause-joystick-size-large" type="button" aria-pressed="false">大手</button></div></div>
         <button id="pause-bestiary-btn" class="secondary-btn">查看敵人圖鑑</button>
         <button id="pause-skins-btn" class="secondary-btn">皮膚收藏室 · 抽道具皮膚</button>
+        <button id="pause-shop-btn" class="secondary-btn">🏪 福利社 · 補給與皮膚</button>
         <button id="resume-btn" class="primary-btn">繼續遊戲 <span>→</span></button>
         <button id="pause-restart-btn" class="secondary-btn">重新開始</button>
         <button id="pause-menu-btn" class="secondary-btn">結束本局，回主選單</button>
@@ -167,6 +169,7 @@
         <p>老師把一杯飲料遞給你，同學們齊聲歡呼。你可以今天放學，或自己選擇到操場加碼 10 節；操場沒有課桌掩護，撐過第 40 節就能拿到茶葉蛋兌換券！</p>
         <div class="reward-prizes"><span>🥤 飲料：已獲得</span><span>🥚 茶葉蛋兌換券：再撐 10 節</span><span id="reward-skin-tickets">🎟️ 本局獲得 30 張皮膚券</span></div>
         <button id="reward-skins-btn" class="secondary-btn">到皮膚收藏室抽獎</button>
+        <button id="reward-shop-btn" class="secondary-btn">到福利社逛逛</button>
         <button id="claim-drink-btn" class="primary-btn">領飲料，今天放學 <span>→</span></button>
         <button id="accept-bonus-btn" class="secondary-btn">去操場加碼 10 節，挑戰茶葉蛋兌換券</button>
       </div>
@@ -188,14 +191,33 @@
         <div class="modal-kicker">CLASS 102 COLLECTION</div>
         <h2 id="skin-title">道具皮膚收藏室</h2>
         <p id="skin-balance" role="status">皮膚券 0 張 · 已收藏 0 / 60</p>
-        <p>每個道具各有 5 款皮膚。每次使用 1 張皮膚券，隨機抽到一款尚未擁有的皮膚；抽到後自動套用，也能在下方切換已收藏外觀。皮膚不影響攻擊能力。</p>
+        <p>每個道具各有 5 款皮膚。單抽花 1 張，十連抽花 10 張，且不會抽到重複皮膚；抽到後自動套用，也能切換收藏。皮膚會改變道具與攻擊特效，不影響傷害數值。皮膚收藏只在這次開啟遊戲期間有效，重新開啟會清空。</p>
         <p class="skin-odds">抽取機率：普通 55% · 稀有 28% · 史詩 12% · 傳說 4% · 神話 1%。某稀有度抽齊後，機率會在其他尚有皮膚的稀有度中重新分配。</p>
         <div id="skin-draw-stage" class="skin-draw-stage" aria-live="polite"><div class="skin-draw-orbit" aria-hidden="true">✦　✧　✦</div><canvas id="skin-reveal-canvas" width="130" height="110" aria-label="抽取結果預覽"></canvas><strong id="skin-reveal-title">等待抽取</strong><small id="skin-reveal-rarity">每張券抽一款新外觀</small></div>
-        <button id="skin-draw-btn" type="button" class="primary-btn">🎟️ 抽一款皮膚</button>
+        <div class="skin-draw-actions"><button id="skin-draw-btn" type="button" class="primary-btn">🎟️ 抽一款皮膚</button><button id="skin-draw-ten-btn" type="button" class="secondary-btn">🎟️ 10 張十連抽</button></div>
+        <div id="skin-draw-results" class="skin-draw-results" aria-live="polite"></div>
         <p id="skin-result" class="skin-result" role="status">完成課節就能獲得皮膚券。</p>
         <div id="skin-tool-tabs" class="skin-tool-tabs" role="tablist" aria-label="選擇道具查看皮膚"></div>
         <div id="skin-list" class="skin-list"></div>
         <button id="skin-close-btn" class="secondary-btn">返回遊戲</button>
+      </div>
+    </section>
+
+    <section id="shop-screen" class="overlay" aria-labelledby="shop-title">
+      <div class="modal-card shop-modal">
+        <div class="modal-kicker">102 班 · 課間福利社</div>
+        <canvas id="shop-clerk" width="150" height="130" aria-label="綁金色緞帶並拿著班級筆記的女班長"></canvas>
+        <h2 id="shop-title">班長的福利社 🏪</h2>
+        <p id="shop-balance" role="status">皮膚券 0 張</p>
+        <p>每完成一節課可拿到一張皮膚券。暫停時可買麵包、飯糰等補給，或直接選購道具皮膚。第 30 節的飲料與加碼獎勵仍要靠挑戰取得。直購皮膚重新開啟遊戲後也會清空。</p>
+        <p id="shop-message" class="skin-result" role="status">班長：歡迎光臨，慢慢挑！</p>
+        <h3>課間補給 · 僅在遊戲暫停時使用</h3>
+        <div id="shop-supplies" class="shop-grid"></div>
+        <h3>指定皮膚直購</h3>
+        <p class="skin-odds">普通 4 張 · 稀有 8 張 · 史詩 16 張 · 傳說 30 張 · 神話 55 張。購買後立即收藏並套用。</p>
+        <div id="shop-tool-tabs" class="skin-tool-tabs" role="tablist" aria-label="選擇要購買皮膚的道具"></div>
+        <div id="shop-skins" class="shop-grid"></div>
+        <button id="shop-close-btn" class="secondary-btn">返回</button>
       </div>
     </section>
 
@@ -204,6 +226,11 @@
         <div id="end-kicker" class="modal-kicker">GAME OVER</div>
         <h2 id="end-title">再試一次！</h2>
         <p id="end-description"></p>
+        <div id="victory-message" class="victory-message" role="note" hidden>
+          <strong>學號 151040 的同學</strong>
+          <p>「我們班號拿下所有比賽的冠軍，謝謝我們班的同學和老師。」</p>
+          <span>【感謝遊玩】</span>
+        </div>
         <div class="ending-art" aria-hidden="true"><canvas id="ending-canvas" width="900" height="300"></canvas></div>
         <p id="end-epilogue" class="end-epilogue"></p>
         <p id="end-skin-tickets" class="end-skin-tickets">🎟️ 本局獲得 0 張皮膚券</p>
@@ -211,6 +238,7 @@
         <div class="result-stats"><div><strong id="result-time">00:00</strong><span>課程進度</span></div><div><strong id="result-kills">0</strong><span>擊退敵人</span></div><div><strong id="result-level">1</strong><span>達到等級</span></div></div>
         <button id="restart-btn" class="primary-btn">再玩一局 <span>↻</span></button>
         <button id="end-skins-btn" class="secondary-btn">到皮膚收藏室抽獎</button>
+        <button id="end-shop-btn" class="secondary-btn">到福利社逛逛</button>
         <button id="end-menu-btn" class="secondary-btn">回主選單選擇難度</button>
       </div>
     </section>
